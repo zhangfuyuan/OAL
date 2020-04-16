@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Button, Form, InputNumber, Typography, Divider } from 'antd';
 import { validateNum } from '@/utils/utils';
 import styles from './baseView.less';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const { Title } = Typography;
 const FormItem = Form.Item;
@@ -17,7 +18,7 @@ class FaceLibrary extends Component {
 
     checkNum = (rule, value, callback) => {
         if (value !== '' && !validateNum(value)) {
-            callback('请输入正整数');
+            callback(formatMessage({ id: 'oal.settings.enterPositiveInteger' }));
         }
         callback();
     };
@@ -35,9 +36,9 @@ class FaceLibrary extends Component {
                 <div style={{ width: '100%' }}>
                     <Form layout="inline">
                         <Divider style={{ marginTop: 0 }}/>
-                        <Title level={3}>图片尺寸(KB)</Title>
+                        <Title level={3}><FormattedMessage id="oal.settings.photoSize" />(KB)</Title>
                         <Form.Item
-                            label="最小值"
+                            label={formatMessage({ id: 'oal.common.minVal' })}
                             name="minSize"
                         >
                             {getFieldDecorator('minSize', {
@@ -48,7 +49,7 @@ class FaceLibrary extends Component {
                             })(<InputNumber />)}
                         </Form.Item>
                         <Form.Item
-                            label="最大值"
+                            label={formatMessage({ id: 'oal.common.maxVal' })}
                             name="maxSize"
                         >
                             {getFieldDecorator('maxSize', {
@@ -60,9 +61,9 @@ class FaceLibrary extends Component {
                         </Form.Item>
 
                         <Divider/>
-                        <Title level={3}>底库数量</Title>
+                        <Title level={3}><FormattedMessage id="oal.settings.libraryNumber" /></Title>
                         <FormItem
-                            label="最大值"
+                            label={formatMessage({ id: 'oal.common.maxVal' })}
                         >
                             {getFieldDecorator('maxFaceCount', {
                                 rules: [{
@@ -75,7 +76,7 @@ class FaceLibrary extends Component {
                         </FormItem>
                         <Divider/>
                         <Button type="primary" onClick={this.handlerSubmit}>
-                            保存
+                            <FormattedMessage id="oal.common.save" />
                         </Button>
                     </Form>
                 </div>

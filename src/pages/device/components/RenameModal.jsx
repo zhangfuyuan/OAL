@@ -1,5 +1,6 @@
 import { Modal, Form, Input } from 'antd';
 import React from 'react';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const formItemLayout = {
   labelCol: {
@@ -15,9 +16,9 @@ const RenameModal = props => {
   const { form, bean, visible, handleSubmit, confirmLoading, handleCancel } = props;
   const { getFieldDecorator } = form;
 
-  let title = '修改设备';
+  let title = formatMessage({ id: 'oal.device.modifyDevice' });
   if (bean && bean.name) {
-    title = `修改设备(${bean.name})`;
+    title = `${formatMessage({ id: 'oal.device.modifyDevice' })}(${bean.name})`;
   }
 
   const handleOk = () => {
@@ -43,16 +44,16 @@ const RenameModal = props => {
       maskClosable={false}
     >
       <Form {...formItemLayout}>
-        <Form.Item label="设备名称">
+        <Form.Item label={formatMessage({ id: 'oal.device.deviceName' })}>
           {getFieldDecorator('name', {
             rules: [
               {
                 required: true,
-                message: '请输入设备名称',
+                message: formatMessage({ id: 'oal.device.enterDeviceName' }),
               },
             ],
             initialValue: bean.name,
-          })(<Input placeholder="设备名称" />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.device.deviceName' })} />)}
         </Form.Item>
       </Form>
     </Modal>

@@ -11,13 +11,14 @@ import {
 } from 'antd';
 import React, { Component, Fragment } from 'react';
 import moment from 'moment';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const deviceType = [
-    { value: 1, text: '门禁设备' },
+    { value: 1, text: 'oal.device.accessControlDevice' },
     { value: 2, text: 'EAIS' },
 ];
 const statusMap = ['error', 'success'];
-const status = ['离线', '在线'];
+const status = ['oal.device.offline', 'oal.device.online'];
 
 class DeviceList extends Component {
     state = {
@@ -29,37 +30,37 @@ class DeviceList extends Component {
             <Dropdown
                 overlay={
                     <Menu onClick={({ key }) => this.modifyAndDelete(key, item)}>
-                        <Menu.Item key="modify">修改</Menu.Item>
-                        <Menu.Item key="delete">删除</Menu.Item>
+                        <Menu.Item key="modify"><FormattedMessage id="oal.common.modify" /></Menu.Item>
+                        <Menu.Item key="delete"><FormattedMessage id="oal.common.delete" /></Menu.Item>
                     </Menu>
                 }
             >
                 <a>
-                    更多 <Icon type="down" />
+                    <FormattedMessage id="oal.common.more" /> <Icon type="down" />
                 </a>
             </Dropdown>
         );
         let cl = [
             {
-                title: '设备名称',
+                title: formatMessage({ id: 'oal.device.deviceName' }),
                 dataIndex: 'name',
                 render: text => text || '--',
             },
             {
-                title: 'IP地址',
+                title: formatMessage({ id: 'oal.device.ipAddress' }),
                 dataIndex: 'ip',
                 render: text => text || '--',
             },
             {
-                title: '类型',
+                title: formatMessage({ id: 'oal.common.type' }),
                 dataIndex: 'deviceType',
                 render(val) {
                     const bean = deviceType.find(item => item.value === val);
-                    return <span>{bean.text}</span>;
+                    return <span>{bean.value===2 ? bean.text : (bean.text && formatMessage({ id: bean.text }) || '--')}</span>;
                 },
             },
             {
-                title: '软件版本',
+                title: formatMessage({ id: 'oal.device.softwareRelease' }),
                 dataIndex: 'deviceVersion',
                 render: text => text || '--',
             },
@@ -67,21 +68,21 @@ class DeviceList extends Component {
         if (type === 'pass') {
             cl.push(
                 {
-                    title: '状态',
+                    title: formatMessage({ id: 'oal.common.status' }),
                     dataIndex: 'networkState',
                     render(val) {
-                        return <Badge status={statusMap[val]} text={status[val]} />;
+                        return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
                     },
                 },
                 {
-                    title: '操作',
+                    title: formatMessage({ id: 'oal.common.handle' }),
                     dataIndex: 'action',
                     render: (text, record) => (
                         <Fragment>
-                            <a href="#" onClick={() => this.modifyAndDelete('modify', record)}>修改</a>
+                            <a href="#" onClick={() => this.modifyAndDelete('modify', record)}><FormattedMessage id="oal.common.modify" /></a>
                             <Divider type="vertical" />
-                            <Popconfirm title="确定删除该设备？" okText="确定" cancelText="取消" onConfirm={() => this.modifyAndDelete('deletePass', record)}>
-                                <a href="#">删除</a>
+                            <Popconfirm title={formatMessage({ id: 'oal.device.confirmDeleteDevice' })} okText={formatMessage({ id: 'oal.common.confirm' })} cancelText={formatMessage({ id: 'oal.common.cancel' })} onConfirm={() => this.modifyAndDelete('deletePass', record)}>
+                                <a href="#"><FormattedMessage id="oal.common.delete" /></a>
                             </Popconfirm>
                         </Fragment>
                     ),
@@ -91,31 +92,31 @@ class DeviceList extends Component {
         if (type === 'wait') {
             cl.push(
                 {
-                    title: '申请时间',
+                    title: formatMessage({ id: 'oal.device.applicationTime' }),
                     dataIndex: 'createAt',
                     render: text => moment(text).format('YYYY-MM-DD HH:mm:ss') || '--',
                 },
                 {
-                    title: '审核',
+                    title: formatMessage({ id: 'oal.common.audit' }),
                     dataIndex: 'action',
                     render: (text, record) => (
                         <Fragment>
                             <Popconfirm
-                                title="确定审核不通过该设备？"
-                                okText="确定"
-                                cancelText="取消"
+                                title={formatMessage({ id: 'oal.device.confirmNotApproveDevice' })}
+                                okText={formatMessage({ id: 'oal.common.confirm' })}
+                                cancelText={formatMessage({ id: 'oal.common.cancel' })}
                                 onConfirm={() => this.handleVerity('fail', record)}
                             >
-                                <a href="#">拒绝</a>
+                                <a href="#"><FormattedMessage id="oal.common.reject" /></a>
                             </Popconfirm>
                             <Divider type="vertical" />
                             <Popconfirm
-                                title="确定审核通过该设备？"
-                                okText="确定"
-                                cancelText="取消"
+                                title={formatMessage({ id: 'oal.device.confirmApproveDevice' })}
+                                okText={formatMessage({ id: 'oal.common.confirm' })}
+                                cancelText={formatMessage({ id: 'oal.common.cancel' })}
                                 onConfirm={() => this.handleVerity('pass', record)}
                             >
-                                <Button type="primary">接受</Button>
+                                <Button type="primary"><FormattedMessage id="oal.common.accept" /></Button>
                             </Popconfirm>
                         </Fragment>
                     ),
@@ -125,26 +126,26 @@ class DeviceList extends Component {
         if (type === 'fail') {
             cl.push(
                 {
-                    title: '审核人',
+                    title: formatMessage({ id: 'oal.device.auditor' }),
                     dataIndex: 'verifyUser',
                     render: (text, record) => (
                         <span>{record.verifyInfo && record.verifyInfo.auditor && record.verifyInfo.auditor.userName ? record.verifyInfo.auditor.userName : '--'}</span>
                     ),
                 },
                 {
-                    title: '审核时间',
+                    title: formatMessage({ id: 'oal.device.auditTime' }),
                     dataIndex: 'verifyAt',
                     render: (text, record) => (
                         <span>{record.verifyInfo && record.verifyInfo.at ? moment(record.verifyInfo.at).format('YYYY-MM-DD HH:mm:ss') : '--'}</span>
                     ),
                 },
                 {
-                    title: '操作',
+                    title: formatMessage({ id: 'oal.common.handle' }),
                     dataIndex: 'action',
                     render: (text, record) => (
                         <Fragment>
-                            <Popconfirm title="确定删除该设备？" okText="确定" cancelText="取消" onConfirm={() => this.modifyAndDelete('deletePass', record)}>
-                                <a href="#">删除</a>
+                            <Popconfirm title={formatMessage({ id: 'oal.device.confirmDeleteDevice' })} okText={formatMessage({ id: 'oal.common.confirm' })} cancelText={formatMessage({ id: 'oal.common.cancel' })} onConfirm={() => this.modifyAndDelete('deletePass', record)}>
+                                <a href="#"><FormattedMessage id="oal.common.delete" /></a>
                             </Popconfirm>
                         </Fragment>
                     ),
@@ -165,10 +166,10 @@ class DeviceList extends Component {
             openRenameModal(record);
         } else if (type === 'delete') {
             Modal.confirm({
-                title: '删除设备',
-                content: '确定删除该设备吗？',
-                okText: '确认',
-                cancelText: '取消',
+                title: formatMessage({ id: 'oal.device.removeDevice' }),
+                content: formatMessage({ id: 'oal.device.confirmRemoveDevice' }),
+                okText: formatMessage({ id: 'oal.common.affirm' }),
+                cancelText: formatMessage({ id: 'oal.common.cancel' }),
                 onOk: () => submitDelete(record),
             });
         } else {

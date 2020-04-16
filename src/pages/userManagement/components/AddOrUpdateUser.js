@@ -1,6 +1,7 @@
 import { Modal, Form, Input } from 'antd';
 import React from 'react';
 import { validateMobile } from '@/utils/utils';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const formItemLayout = {
   labelCol: {
@@ -16,9 +17,9 @@ const AddOrUpdateUser = props => {
   const { form, userBean, visible, handleSubmit, confirmLoading, handleCancel } = props;
   const { getFieldDecorator } = form;
 
-  let title = '新增用户';
+  let title = formatMessage({ id: 'oal.user-manage.newUsers' });
   if (userBean && userBean.name) {
-    title = `修改用户(${userBean.name})`;
+    title = `${formatMessage({ id: 'oal.user-manage.modifyUsers' })}(${userBean.name})`;
   }
 
   const handleOk = () => {
@@ -38,7 +39,7 @@ const AddOrUpdateUser = props => {
 
   const checkMobile = (rule, value, callback) => {
     if (value && !validateMobile(value)) {
-      callback('请输入正确的手机号');
+      callback(formatMessage({ id: 'oal.common.enterPhoneNumber' }));
     }
     callback();
   };
@@ -54,31 +55,31 @@ const AddOrUpdateUser = props => {
       maskClosable={false}
     >
       <Form {...formItemLayout}>
-        <Form.Item label="用户名">
+        <Form.Item label={formatMessage({ id: 'oal.common.username' })}>
           {getFieldDecorator('userName', {
             rules: [
               {
                 required: true,
-                message: '请输入用户名',
+                message: formatMessage({ id: 'oal.user-manage.enterUsername' }),
               },
               {
                 pattern: /^[a-zA-Z]+$/,
-                message: '只能输入字母',
+                message: formatMessage({ id: 'oal.user-manage.enterUsernameError' }),
               },
               {
                 max: 50,
-                message: '最大长度为50',
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '50' }),
               },
             ],
             initialValue: userBean.name,
-          })(<Input placeholder="用户名" />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.common.username' })} />)}
         </Form.Item>
-        <Form.Item label="昵称">
+        <Form.Item label={formatMessage({ id: 'oal.common.nickname' })}>
           {getFieldDecorator('nickName', {
             initialValue: userBean.nickName,
-          })(<Input placeholder="昵称" />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.common.nickname' })} />)}
         </Form.Item>
-        <Form.Item label="手机号">
+        <Form.Item label={formatMessage({ id: 'oal.common.phoneNumber' })}>
           {getFieldDecorator('mobile', {
             rules: [
               {
@@ -86,18 +87,18 @@ const AddOrUpdateUser = props => {
               },
             ],
             initialValue: userBean.mobile,
-          })(<Input placeholder="手机号" />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.common.phoneNumber' })} />)}
         </Form.Item>
-        <Form.Item label="邮箱地址">
+        <Form.Item label={formatMessage({ id: 'oal.common.emailAddress' })}>
           {getFieldDecorator('email', {
             rules: [
               {
                 type: 'email',
-                message: '请输入正确的邮箱地址',
+                message: formatMessage({ id: 'oal.common.enterCorrectEmailAddress' }),
               },
             ],
             initialValue: userBean.email,
-          })(<Input placeholder="邮箱地址" />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.common.emailAddress' })} />)}
         </Form.Item>
       </Form>
     </Modal>

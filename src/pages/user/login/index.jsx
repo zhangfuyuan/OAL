@@ -106,11 +106,11 @@ class Login extends Component {
     return (
       <Result
         status="404"
-        title="信息未找到"
-        subTitle="很抱歉，未找到匹配的公司信息，请确认登录地址是否正确."
+        title={formatMessage({ id: 'oal.user-login.infoNotFound' })}
+        subTitle={formatMessage({ id: 'oal.user-login.infoNotFoundTips' })}
         extra={
           <Button size="large" type="primary">
-            联系我们
+            <FormattedMessage id="oal.user-login.contactUs" />
           </Button>
         }
       />
@@ -216,7 +216,7 @@ class Login extends Component {
           </Submit>
         </LoginComponents>
         {systemVersion ?
-          <div style={{ textAlign: 'center' }}>版本: {systemVersion}</div> : null
+          <div style={{ textAlign: 'center' }}><FormattedMessage id="oal.user-login.release" />: {systemVersion}</div> : null
         }
       </div>
     );

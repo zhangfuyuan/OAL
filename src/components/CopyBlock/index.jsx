@@ -57,7 +57,7 @@ export default connect(({ routing }) => ({
   const divDom = useRef(null);
   return (
     <Popover
-      title={<FormattedMessage id="app.preview.down.block" defaultMessage="下载此页面到本地项目" />}
+      title={<FormattedMessage id="app.preview.down.block" defaultMessage="Download this page to a local project" />}
       placement="topLeft"
       content={<BlockCodeView url={url} />}
       trigger="click"

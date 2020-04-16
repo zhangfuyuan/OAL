@@ -1,8 +1,9 @@
 import React from 'react';
 import { Table, Drawer, Descriptions, Divider, Avatar, Popover } from 'antd';
 import moment from 'moment';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
-const accessType = ['进入', '离开'];
+const accessType = ['oal.work.enter', 'oal.work.leave'];
 
 const DetailDrawer = props => {
     const { visible, selectedBean, data, loading, onClose, faceKeyList } = props;
@@ -10,11 +11,11 @@ const DetailDrawer = props => {
     // eslint-disable-next-line no-underscore-dangle
     const deviceDate = selectedBean && selectedBean._id && selectedBean._id.deviceDate;
     const deviceName = (selectedBean && selectedBean.deviceInfo && selectedBean.deviceInfo.name) || '';
-    const title = `${name}的考勤详情`;
+    const title = formatMessage({ id: 'oal.work.attendanceDetailsOf' }, { name });
 
     const columns = [
         {
-            title: '照片',
+            title: formatMessage({ id: 'oal.common.photo' }),
             key: 'avatar',
             width: 100,
             render: (text, record) => (
@@ -24,19 +25,19 @@ const DetailDrawer = props => {
                 ),
         },
         {
-            title: '时间',
+            title: formatMessage({ id: 'oal.common.time' }),
             key: 'time',
             render: (text, record) => <span>{moment(record.deviceTime).format('HH:mm:ss')}</span>,
         },
         {
-            title: '类型',
+            title: formatMessage({ id: 'oal.common.type' }),
             key: 'accessType',
-            render: (text, record) => <span>{accessType[record.accessType - 1]}</span>,
+            render: (text, record) => <span>{accessType[record.accessType - 1] && formatMessage({ id: accessType[record.accessType - 1] }) || '--'}</span>,
         },
         {
-            title: '温度',
+            title: formatMessage({ id: 'oal.work.temperature' }),
             key: 'temperature',
-            render: (text, record) => { console.log(record); return (<span>{record.extendInfo && record.extendInfo.temperature || '--'}</span>)},
+            render: (text, record) => <span>{record.extendInfo && record.extendInfo.temperature || '--'}</span>,
         },
     ];
 
@@ -47,8 +48,8 @@ const DetailDrawer = props => {
             onClose={onClose}
         >
             <Descriptions title={title}>
-                <Descriptions.Item label="姓名">{name}</Descriptions.Item>
-                <Descriptions.Item label="考勤设备">{deviceName}</Descriptions.Item>
+                <Descriptions.Item label={formatMessage({ id: 'oal.common.fullName' })}>{name}</Descriptions.Item>
+                <Descriptions.Item label={formatMessage({ id: 'oal.work.attendanceDevice' })}>{deviceName}</Descriptions.Item>
                 {
                     faceKeyList && faceKeyList.length > 0 && faceKeyList.map(item => {
                         if (item.reportQuery) {

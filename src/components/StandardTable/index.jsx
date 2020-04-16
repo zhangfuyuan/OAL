@@ -1,6 +1,7 @@
 import { Alert, Table } from 'antd';
 import React, { Component, Fragment } from 'react';
 import styles from './index.less';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 function initTotalList(columns) {
   if (!columns) {
@@ -73,7 +74,13 @@ class StandardTable extends Component {
     }
   };
 
-  showTotal = (total, range) => `当前${range[0]}到${range[1]}条，总共${total}条`;
+  showTotal = (total, range) => (formatMessage({
+    id: 'oal.common.currentToTotal',
+  }, {
+    range0: range[0],
+    range1: range[1],
+    total,
+  }));
 
   render() {
     const { selectedRowKeys, needTotalList } = this.state;
@@ -99,7 +106,7 @@ class StandardTable extends Component {
             <Alert
               message={
                 <Fragment>
-                  已选择{' '}
+                  <FormattedMessage id="oal.common.selected" />{' '}
                   <a
                     style={{
                       fontWeight: 600,
@@ -107,7 +114,7 @@ class StandardTable extends Component {
                   >
                     {selectedRowKeys.length}
                   </a>{' '}
-                  项&nbsp;&nbsp;
+                  <FormattedMessage id="oal.common.items" />&nbsp;&nbsp;
               {needTotalList.map((item, index) => (
                     <span
                       style={{
@@ -116,7 +123,7 @@ class StandardTable extends Component {
                       key={item.dataIndex}
                     >
                       {item.title}
-                      总计&nbsp;
+                      <FormattedMessage id="oal.common.total" />&nbsp;
                   <span
                         style={{
                           fontWeight: 600,
@@ -132,7 +139,7 @@ class StandardTable extends Component {
                       marginLeft: 24,
                     }}
                   >
-                    清空
+                    <FormattedMessage id="oal.common.empty" />
               </a>
                 </Fragment>
               }

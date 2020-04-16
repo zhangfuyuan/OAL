@@ -11,16 +11,17 @@ import ModifyModal from './components/ModifyModal';
 import UploadProgress from './components/UploadProgress';
 import UploadDetail from './components/UploadDetail';
 import StandardTable from '@/components/StandardTable'
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const { Search } = Input;
 const { confirm } = Modal;
 
 const renderStatusText = data => {
-  let statusText = <Badge status="processing" text="授权中" />
+  let statusText = <Badge status="processing" text={formatMessage({ id: 'oal.face.authorization' })} />
   if (data.featureState === 1) {
-    statusText = <Badge status="success" text="已授权" />
+    statusText = <Badge status="success" text={formatMessage({ id: 'oal.face.beAuthorized' })} />
   } else if (data.featureState === -1) {
-    statusText = <Badge status="error" text="授权失败" />
+    statusText = <Badge status="error" text={formatMessage({ id: 'oal.face.authorizationFailure' })} />
   }
   return (
     <span>{statusText}</span>
@@ -28,11 +29,11 @@ const renderStatusText = data => {
 }
 
 const listSubName = data => {
-  let subNameText = <span><Icon type="loading" style={{ marginRight: 8 }} /> 提取特征中 </span>;
+  let subNameText = <span><Icon type="loading" style={{ marginRight: 8 }} /> <FormattedMessage id="oal.face.featureExtraction" /> </span>;
   if (data.featureState === 1) {
-    subNameText = <span><Icon type="check-circle" style={{ marginRight: 8, color: '#52C418' }} />已提取特征</span>
+    subNameText = <span><Icon type="check-circle" style={{ marginRight: 8, color: '#52C418' }} /><FormattedMessage id="oal.face.extractedFeature" /></span>
   } else if (data.featureState === -1) {
-    subNameText = <span><Icon type="close-circle" style={{ marginRight: 8, color: '#f5222d' }} />特征提取失败</span>
+    subNameText = <span><Icon type="close-circle" style={{ marginRight: 8, color: '#f5222d' }} /><FormattedMessage id="oal.face.featureExtractionFailure" /></span>
     if (data.featureErrorCode && data.featureErrorCode.errorMsg) {
       subNameText += `:${data.featureErrorCode.errorMsg}`
     }
@@ -114,25 +115,25 @@ class Face extends Component {
       <Dropdown
         overlay={
           <Menu onClick={({ key }) => this.editAndDelete(key, item)}>
-            <Menu.Item key="modify">修改</Menu.Item>
-            <Menu.Item key="editPhoto">改照片</Menu.Item>
+            <Menu.Item key="modify"><FormattedMessage id="oal.common.modify" /></Menu.Item>
+            <Menu.Item key="editPhoto"><FormattedMessage id="oal.face.modifyPhoto" /></Menu.Item>
           </Menu>
         }
       >
         <a>
-          编辑 <Icon type="down" />
+          <FormattedMessage id="oal.common.edit" /> <Icon type="down" />
         </a>
       </Dropdown>
     );
     const cl = [
       {
-        title: '照片',
+        title: formatMessage({ id: 'oal.common.photo' }),
         key: 'avatar',
         width: 100,
         render: (text, record) => <Avatar src={`${record.imgPath}.jpg?height=64&width=64&mode=fit`} shape="square" size="large" onClick={() => this.openViewModal(record)} />,
       },
       {
-        title: '姓名',
+        title: formatMessage({ id: 'oal.common.fullName' }),
         key: 'name',
         dataIndex: 'name',
         ellipsis: true,
@@ -170,19 +171,19 @@ class Face extends Component {
 
     cl.push(
       {
-        title: '更新时间',
+        title: formatMessage({ id: 'oal.common.updateTime' }),
         key: 'updateAt',
         width: 150,
         render: (text, record) => <span>{record.updateAt ? moment(record.updateAt).format('YYYY-MM-DD HH:mm') : ''}</span>,
       },
       {
-        title: '操作',
+        title: formatMessage({ id: 'oal.common.handle' }),
         width: 150,
         render: (text, record) => (
           <Fragment>
-            <Popconfirm placement="topLeft" title="是否删除此人脸?" onConfirm={() => this.deleteFace(record)} okText="删除" cancelText="取消">
+            <Popconfirm placement="topLeft" title={formatMessage({ id: 'oal.face.confirmDeleteFace' })} onConfirm={() => this.deleteFace(record)} okText={formatMessage({ id: 'oal.common.delete' })} cancelText={formatMessage({ id: 'oal.common.cancel' })}>
               <a key="remove">
-                删除
+                <FormattedMessage id="oal.common.delete" />
             </a>
             </Popconfirm>
             <Divider type="vertical" />
@@ -318,7 +319,7 @@ class Face extends Component {
             })
 
             notification.error({
-              message: <div><span style={{ fontWeight: 700 }}>{uniqueIndex[p].name}</span>字段重复</div>,
+              message: <div><span style={{ fontWeight: 700 }}>{uniqueIndex[p].name}</span><FormattedMessage id="oal.face.fieldRepeat" /></div>,
               description: (<div>
                 <div style={{ marginTop: '1em' }}>{this.getErrorName(file.name, uniqueIndex[p].index + 2)}</div>
                 <div style={{ marginTop: '1em' }}>{this.getErrorName(fList[i].name, uniqueIndex[p].index + 2)}</div>
@@ -432,9 +433,9 @@ class Face extends Component {
     const isUploading = fileList.length > 0
     // eslint-disable-next-line no-underscore-dangle
     const isEdit = !!(selectedBean && selectedBean._id);
-    let title = '上传人脸照片';
+    let title = formatMessage({ id: 'oal.face.uploadFacePhoto' });
     if (isEdit) {
-      title = `修改${selectedBean.name}的人脸照片`;
+      title = formatMessage({ id: 'oal.face.uploadFacePhoto' }, { name: selectedBean.name });
     }
     const faceSizeBean = sysConfigs.find(item => item.key === 'faceSize');
     const maxFaceCountBean = sysConfigs.find(item => item.key === 'maxFaceCount');
@@ -456,51 +457,51 @@ class Face extends Component {
           message={
             <div>
               <div>
-                1、图片名称需按<span style={{ color: 'green', margin: '0 8px' }}>0_姓名_扩展属性1_扩展属性2_......</span>的格式命名；
+                <FormattedMessage id="oal.face.uploadPanelTips1-1" /><span style={{ color: 'green', margin: '0 8px' }}><FormattedMessage id="oal.face.uploadPanelTips1-2" /></span><FormattedMessage id="oal.face.uploadPanelTips1-3" />
               </div>
               <div>
-                2、什么是扩展属性？可移步
-                <span style={{ color: 'green', margin: '0 8px' }}>设置 > 人脸属性</span>进行设置；
+                <FormattedMessage id="oal.face.uploadPanelTips2-1" />
+                <span style={{ color: 'green', margin: '0 8px' }}><FormattedMessage id="oal.face.uploadPanelTips2-2" /></span><FormattedMessage id="oal.face.uploadPanelTips2-3" />
               </div>
               <div>
-                例如：<span style={{ color: 'red' }}>0_张三<span>{exampleStr}</span>.jpeg</span>
+                <FormattedMessage id="oal.face.uploadPanelTips2-4" /><span style={{ color: 'red' }}><FormattedMessage id="oal.face.uploadPanelTips2-5" /><span>{exampleStr}</span>.jpeg</span>
               </div>
               <div>
-                3、可上传图片尺寸(kb)
+                <FormattedMessage id="oal.face.uploadPanelTips3" />(kb)
                 <div style={{ marginLeft: '22px' }}>
-                  最小值：
+                  <FormattedMessage id="oal.common.minVal" />：
                   <span style={{ color: 'green' }}>
                     {faceSizeBean && faceSizeBean.value && faceSizeBean.value.min ?
                       `${faceSizeBean && faceSizeBean.value && faceSizeBean.value.min}kb`
                       :
-                      '未设置'
+                      formatMessage({ id: 'oal.common.unset' })
                     }
                   </span>
                 </div>
                 <div style={{ marginLeft: '22px' }}>
-                  最大值：
+                  <FormattedMessage id="oal.common.maxVal" />：
                   <span style={{ color: 'green' }}>
                     {faceSizeBean && faceSizeBean.value && faceSizeBean.value.max ?
                       `${faceSizeBean && faceSizeBean.value && faceSizeBean.value.max}kb`
                       :
-                      '未设置'
+                      formatMessage({ id: 'oal.common.unset' })
                     }
                   </span>
                 </div>
               </div>
               <div>
-                4、底库最大数量：
+                <FormattedMessage id="oal.face.uploadPanelTips4-1" />
                 <span style={{ color: 'green' }}>
                   {maxFaceCountBean && maxFaceCountBean.value ?
-                    `${maxFaceCountBean && maxFaceCountBean.value}张`
+                    `${maxFaceCountBean && maxFaceCountBean.value}${formatMessage({ id: 'oal.face.uploadPanelTips4-2' })}`
                     :
-                    '未设置'
+                    formatMessage({ id: 'oal.common.unset' })
                   }
                 </span>
               </div>
               <div>
-                5、人脸图片规格和底库数量设置，请移步
-                <span style={{ color: 'green', margin: '0 8px' }}>设置 > 人脸底库</span>进行设置；
+                <FormattedMessage id="oal.face.uploadPanelTips5-1" />
+                <span style={{ color: 'green', margin: '0 8px' }}><FormattedMessage id="oal.face.uploadPanelTips5-2" /></span><FormattedMessage id="oal.face.uploadPanelTips5-3" />
               </div>
             </div>
           }
@@ -511,12 +512,12 @@ class Face extends Component {
         <div style={{ display: isUploading ? 'none' : 'flex', marginTop: '16px' }}>
           {isEdit ? null : this.renderUpload(true, (
             <Button>
-              <Icon type="upload" /> 上传文件夹
+              <Icon type="upload" /> <FormattedMessage id="oal.face.uploadFolder" />
             </Button>
           ))}
           {this.renderUpload(false, (
             <Button style={{ marginLeft: 16 }}>
-              <Icon type="upload" /> 上传图片
+              <Icon type="upload" /> <FormattedMessage id="oal.face.uploadPhoto" />
             </Button>
           ), selectedBean)}
         </div>
@@ -556,7 +557,7 @@ class Face extends Component {
     }).then(res => {
       if (res.res > 0) {
         this.loadFaceList();
-        message.success('删除成功');
+        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
       }
     });
   };
@@ -582,7 +583,7 @@ class Face extends Component {
       if (res.res > 0) {
         this.closeModifyModal();
         this.loadFaceList();
-        message.success('修改成功');
+        message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
         callback();
       }
     });
@@ -616,9 +617,9 @@ class Face extends Component {
   showConfirmRemoveAll = () => {
     const self = this;
     confirm({
-      title: '是否删除所有人脸?',
+      title: formatMessage({ id: 'oal.face.confirmDeleteAllFace' }),
       icon: <ExclamationCircleOutlined />,
-      content: '点击“确定”将会清空人脸库，且会同步到相应的设备',
+      content: formatMessage({ id: 'oal.face.clearFaceLibraryTips' }),
       onOk() {
         const { dispatch } = self.props;
         return dispatch({
@@ -626,7 +627,7 @@ class Face extends Component {
         }).then(res => {
           if (res.res > 0) {
             self.loadFaceList();
-            message.success('删除成功');
+            message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
           }
         });
       },
@@ -646,7 +647,7 @@ class Face extends Component {
           <RadioButton value="0">授权中</RadioButton>
           <RadioButton value="-1">失败</RadioButton>
         </RadioGroup> */}
-        <Search className={styles.extraContentSearch} placeholder="搜索姓名" ref={ref => {
+        <Search className={styles.extraContentSearch} placeholder={formatMessage({ id: 'oal.face.searchFullName' })} ref={ref => {
           this.nameRef = ref
         }} onSearch={() => {
           this.onPageChange(1, 10)
@@ -657,13 +658,13 @@ class Face extends Component {
       <Dropdown
         overlay={
           <Menu onClick={({ key }) => this.editAndDelete(key, item)}>
-            <Menu.Item key="modify">修改</Menu.Item>
-            <Menu.Item key="editPhoto">改照片</Menu.Item>
+            <Menu.Item key="modify"><FormattedMessage id="oal.common.modify" /></Menu.Item>
+            <Menu.Item key="editPhoto"><FormattedMessage id="oal.face.modifyPhoto" /></Menu.Item>
           </Menu>
         }
       >
         <a>
-          编辑 <Icon type="down" />
+          <FormattedMessage id="oal.common.edit" /> <Icon type="down" />
         </a>
       </Dropdown>
     );
@@ -674,7 +675,7 @@ class Face extends Component {
         <Card
           className={styles.listCard}
           bordered={false}
-          title="人脸列表"
+          title={formatMessage({ id: 'oal.face.faceList' })}
           bodyStyle={{
             padding: '0 32px 40px 32px',
           }}
@@ -691,7 +692,7 @@ class Face extends Component {
                 this.addBtn = findDOMNode(component);
               }}
             >
-              新增
+              <FormattedMessage id="oal.common.new" />
             </Button>
             <Button
               style={{ marginRight: 8 }}
@@ -701,12 +702,12 @@ class Face extends Component {
                 this.addBtn = findDOMNode(component);
               }}
             >
-              全部删除
+              <FormattedMessage id="oal.common.deleteAll" />
             </Button>
           </div>
 
           {infoVisible ? (
-              <Alert showIcon message={ <div>更多属性配置，请移步: <span style={{ color: 'red', marginLeft: 8 }}> 设置 > 人脸属性</span></div>} type="info" closable afterClose={this.handleInfoClose} style={{ marginBottom: 8 }}/>
+              <Alert showIcon message={ <div><FormattedMessage id="oal.face.moreConfigTips-1" /> <span style={{ color: 'red', marginLeft: 8 }}> <FormattedMessage id="oal.face.moreConfigTips-2" /></span></div>} type="info" closable afterClose={this.handleInfoClose} style={{ marginBottom: 8 }}/>
             ) : null}
           <StandardTable
             rowKey={record => record._id}

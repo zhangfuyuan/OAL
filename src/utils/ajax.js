@@ -6,36 +6,37 @@ import router from 'umi/router';
 import { notification } from 'antd';
 import { stringify } from 'qs';
 import { SYSTEM_PATH } from '@/utils/constants';
+import { formatMessage } from 'umi-plugin-react/locale';
 
 const errorCode = {
-  1000: '系统错误或未知错误',
-  3001: '用户未找到',
-  3002: '密码错误',
-  3003: '密码错误次数过多',
-  3004: '用户被冻结或者状态无效',
-  3005: '无效的认证凭证',
-  3006: '认证过期',
-  3007: '所属组织已经失效',
-  3008: '所属组织未找到',
-  3009: '没有此权限',
-  3010: '用户名已经存在',
-  3011: '新密码和旧密码一致，请重新设置',
-  4001: '查询条件为空',
-  4002: '缺少查询条件',
-  4003: '数据未找到',
-  5001: '保存数据错误',
-  5002: '数据更新失败，已经不是最新版本',
-  5003: '数据更新失败，数据已经不存在',
-  5004: '删除失败',
-  5005: '缺少必要参数',
-  5006: '未知操作',
-  5007: '数据已经存在',
-  6001: '邮箱已经存在',
-  6002: '组织路径已经存在',
-  6003: '设备已经存在于该组织下',
-  6004: '设备还未通过审核',
-  6005: '开发者信息已经存在',
-  6006: '属性已经存在',
+  1000: 'oal.ajax.1000',
+  3001: 'oal.ajax.3001',
+  3002: 'oal.ajax.3002',
+  3003: 'oal.ajax.3003',
+  3004: 'oal.ajax.3004',
+  3005: 'oal.ajax.3005',
+  3006: 'oal.ajax.3006',
+  3007: 'oal.ajax.3007',
+  3008: 'oal.ajax.3008',
+  3009: 'oal.ajax.3009',
+  3010: 'oal.ajax.3010',
+  3011: 'oal.ajax.3011',
+  4001: 'oal.ajax.4001',
+  4002: 'oal.ajax.4002',
+  4003: 'oal.ajax.4003',
+  5001: 'oal.ajax.5001',
+  5002: 'oal.ajax.5002',
+  5003: 'oal.ajax.5003',
+  5004: 'oal.ajax.5004',
+  5005: 'oal.ajax.5005',
+  5006: 'oal.ajax.5006',
+  5007: 'oal.ajax.5007',
+  6001: 'oal.ajax.6001',
+  6002: 'oal.ajax.6002',
+  6003: 'oal.ajax.6003',
+  6004: 'oal.ajax.6004',
+  6005: 'oal.ajax.6005',
+  6006: 'oal.ajax.6006',
 };
 /**
  * 全局的处理
@@ -46,8 +47,8 @@ request.interceptors.response.use(async (response, options) => {
     if (response.status === 401) {
       // 鉴权失败，跳转到登录
       notification.error({
-        message: '请重新登录',
-        description: '授权失败或者已过期',
+        message: formatMessage({ id: 'oal.ajax.401-message' }),
+        description: formatMessage({ id: 'oal.ajax.401-description' }),
       });
       router.replace({
         pathname: `/user/${localStorage.getItem(SYSTEM_PATH)}/login`,
@@ -59,8 +60,8 @@ request.interceptors.response.use(async (response, options) => {
   console.info('http response:', data);
   if (data.res < 0) {
     notification.error({
-      message: '请求失败',
-      description: data.errorCode ? (errorCode[data.errorCode] || '') : '',
+      message: formatMessage({ id: 'oal.ajax.requestFailed' }),
+      description: data.errorCode ? (errorCode[data.errorCode] && formatMessage({ id: errorCode[data.errorCode] }) || '') : '',
     });
   }
   return response;

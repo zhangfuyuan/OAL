@@ -21,12 +21,13 @@ import AddOrUpdateOrg from './components/AddOrUpdateOrg';
 import OrgDetailModal from './components/OrgDetailModal';
 import styles from './style.less';
 import defaultSettings from '../../../config/defaultSettings';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
 const statusMap = ['error', 'success'];
-const status = ['禁用', '启用'];
+const status = ['oal.common.disable', 'oal.common.enable'];
 const { publicPath } = defaultSettings;
 
 @connect(({ org, loading }) => ({
@@ -101,31 +102,31 @@ class OrgList extends Component {
       <Dropdown
         overlay={
           <Menu onClick={({ key }) => this.moreAction(key, item)}>
-            <Menu.Item key="modify" disabled={item.state === 0}>修改</Menu.Item>
-            <Menu.Item key="open" disabled={item.state === 1}>启用</Menu.Item>
-            <Menu.Item key="close" disabled={item.state === 0}>禁用</Menu.Item>
+            <Menu.Item key="modify" disabled={item.state === 0}><FormattedMessage id="oal.common.modify" /></Menu.Item>
+            <Menu.Item key="open" disabled={item.state === 1}><FormattedMessage id="oal.common.enable" /></Menu.Item>
+            <Menu.Item key="close" disabled={item.state === 0}><FormattedMessage id="oal.common.disable" /></Menu.Item>
           </Menu>
         }
       >
         <a>
-          更多<Icon type="down" />
+          <FormattedMessage id="oal.common.more" /><Icon type="down" />
         </a>
       </Dropdown>
     );
     const cl = [
       {
-        title: '组织名称',
+        title: formatMessage({ id: 'oal.org.orgName' }),
         dataIndex: 'name',
       },
       {
-        title: '状态',
+        title: formatMessage({ id: 'oal.common.status' }),
         dataIndex: 'state',
         render(val) {
-          return <Badge status={statusMap[val]} text={status[val]} />;
+          return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
         },
       },
       {
-        title: '路径',
+        title: formatMessage({ id: 'oal.org.path' }),
         dataIndex: 'path',
         render: (_text, record) => (
           <Fragment>
@@ -134,16 +135,16 @@ class OrgList extends Component {
         ),
       },
       {
-        title: '联系人',
+        title: formatMessage({ id: 'oal.org.contacts' }),
         dataIndex: 'contactName',
-        render: (text, record) => <span>{(record && record.contact && record.contact.nickName) || '未填写'}</span>,
+        render: (text, record) => <span>{(record && record.contact && record.contact.nickName) || formatMessage({ id: 'oal.org.notFill' })}</span>,
       },
       {
-        title: '操作',
+        title: formatMessage({ id: 'oal.common.handle' }),
         width: 150,
         render: (text, record) => (
           <Fragment>
-            <a onClick={() => this.openDetailModal(record)}>查看</a>
+            <a onClick={() => this.openDetailModal(record)}><FormattedMessage id="oal.common.view" /></a>
             <Divider type="vertical" />
             <MoreBtn item={record} />
           </Fragment>
@@ -175,7 +176,7 @@ class OrgList extends Component {
       },
     }).then(res => {
       if (res.res > 0) {
-        message.success('设置成功');
+        message.success(formatMessage({ id: 'oal.org.setSuccessfully' }));
         this.loadOrgList();
       }
     })
@@ -259,7 +260,7 @@ class OrgList extends Component {
         payload: values,
       }).then(res => {
         if (res.res === 1) {
-          message.success('修改成功');
+          message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
           this.closeAddOrUpdateOrgModal();
           this.loadOrgList();
           callback();
@@ -271,7 +272,7 @@ class OrgList extends Component {
         payload: values,
       }).then(res => {
         if (res.res === 1) {
-          message.success('新增成功');
+          message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
           this.closeAddOrUpdateOrgModal();
           this.loadOrgList();
           callback();
@@ -293,27 +294,27 @@ class OrgList extends Component {
           }}
         >
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label="组织名称">
-              {getFieldDecorator('name')(<Input placeholder="输入组织名称" />)}
+            <FormItem label={formatMessage({ id: 'oal.org.orgName' })}>
+              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.org.enterOrgName2' })} />)}
             </FormItem>
           </Col>
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label="路径">
-              {getFieldDecorator('path')(<Input placeholder="输入路径" />)}
+            <FormItem label={formatMessage({ id: 'oal.org.path' })}>
+              {getFieldDecorator('path')(<Input placeholder={formatMessage({ id: 'oal.org.enterPath' })} />)}
             </FormItem>
           </Col>
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label="状态">
+            <FormItem label={formatMessage({ id: 'oal.common.status' })}>
               {getFieldDecorator('state')(
                 <Select
-                  placeholder="请选择"
+                  placeholder={formatMessage({ id: 'oal.common.pleaseSelect' })}
                   style={{
                     width: '100%',
                   }}
                 >
-                  <Option value="">全部</Option>
-                  <Option value="0">禁用</Option>
-                  <Option value="1">启用</Option>
+                  <Option value=""><FormattedMessage id="oal.common.all" /></Option>
+                  <Option value="0"><FormattedMessage id="oal.common.disable" /></Option>
+                  <Option value="1"><FormattedMessage id="oal.common.enable" /></Option>
                 </Select>,
               )}
             </FormItem>
@@ -321,7 +322,7 @@ class OrgList extends Component {
           <Col xxl={4} lg={4} md={4} sm={24}>
             <span className={styles.submitButtons}>
               <Button onClick={this.handleSearch} type="primary" htmlType="submit" loading={loading}>
-                查询
+                <FormattedMessage id="oal.common.query" />
               </Button>
               <Button
                 style={{
@@ -329,7 +330,7 @@ class OrgList extends Component {
                 }}
                 onClick={this.handleFormReset}
               >
-                重置
+                <FormattedMessage id="oal.common.reset" />
               </Button>
             </span>
           </Col>
@@ -372,7 +373,7 @@ class OrgList extends Component {
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <div className={styles.tableListOperator}>
               <Button icon="plus" type="primary" onClick={() => this.toAdd()}>
-                新增
+                <FormattedMessage id="oal.common.new" />
               </Button>
             </div>
             <StandardTable

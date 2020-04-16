@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, Alert, Input, Button, Icon, message } from 'antd';
 import CryptoJS from 'crypto-js';
 import { PSW_REG } from '@/utils/constants';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const SettingPsw = props => {
   const [newpsw, setNewPsw] = useState('');
@@ -22,19 +23,39 @@ const SettingPsw = props => {
   const onBlur = (key, value) => {
     if (key === 'newpsw') {
       if (value === '') {
-        setNewPswError('请输入密码');
+        setNewPswError(
+          formatMessage({
+            id: 'oal.common.enterPassword',
+          }),
+        );
       } else if (!PSW_REG.test(value)) {
-        setNewPswError('密码须包含字母、数字、特殊符号，长度不小于8位');
+        setNewPswError(
+          formatMessage({
+            id: 'oal.common.enterPasswordError',
+          }),
+        );
       } else {
         setNewPswError('');
       }
     } else if (key === 'renewpsw') {
       if (value === '') {
-        setReNewPswError('请输入密码');
+        setReNewPswError(
+          formatMessage({
+            id: 'oal.common.enterPassword',
+          }),
+        );
       } else if (!PSW_REG.test(value)) {
-        setReNewPswError('密码须包含字母、数字、特殊符号，长度不小于8位');
+        setReNewPswError(
+          formatMessage({
+            id: 'oal.common.enterPasswordError',
+          }),
+        );
       } else if (value !== newpsw) {
-        setReNewPswError('两次输入的密码不相同');
+        setReNewPswError(
+          formatMessage({
+            id: 'oal.common.enterPasswordDifferent',
+          }),
+        );
       } else {
         setReNewPswError('');
       }
@@ -44,13 +65,25 @@ const SettingPsw = props => {
   const onSubmit = () => {
     if (!newpsw) {
       // message.error('请输入密码');
-      setNewPswError('请输入密码');
-      setReNewPswError('请输入确认密码');
+      setNewPswError(
+        formatMessage({
+          id: 'oal.common.enterPassword',
+        }),
+      );
+      setReNewPswError(
+        formatMessage({
+          id: 'oal.common.enterConfirmPassword',
+        }),
+      );
       return;
     }
     if (newpsw !== renewpsw) {
       // message.error('两次输入的密码不相同');
-      setReNewPswError('两次输入的密码不相同');
+      setReNewPswError(
+        formatMessage({
+          id: 'oal.common.enterPasswordDifferent',
+        }),
+      );
       return;
     }
     const data = { newpassword: CryptoJS.MD5(newpsw).toString() };
@@ -68,14 +101,20 @@ const SettingPsw = props => {
     }}>
       <Card bordered={false} style={{ width: 400 }}>
         <Alert
-          message="设置密码"
-          description="账号初次使用需要重新设置密码，密码须包含字母、数字、特殊符号，长度不小于8位"
+          message={formatMessage({
+            id: 'oal.common.setPassword',
+          })}
+          description={formatMessage({
+            id: 'oal.common.resetPasswordTips',
+          })}
           type="error"
           showIcon
         />
         <br/>
         <Input.Password
-          placeholder="输入新密码"
+          placeholder={formatMessage({
+            id: 'oal.common.enterNewPassword',
+          })}
           value={newpsw}
           onChange={e => onChange('newpsw', e.target.value)}
           onBlur={e => onBlur('newpsw', e.target.value)}
@@ -85,7 +124,9 @@ const SettingPsw = props => {
         <br/>
         <br/>
         <Input.Password
-          placeholder="新密码确认"
+          placeholder={formatMessage({
+            id: 'oal.common.newPasswordConfirm',
+          })}
           value={renewpsw}
           onChange={e => onChange('renewpsw', e.target.value)}
           onBlur={e => onBlur('renewpsw', e.target.value)}
@@ -95,7 +136,7 @@ const SettingPsw = props => {
         <br/>
         <br/>
         <Button onClick={onSubmit} type="primary" htmlType="submit" className="login-form-button" loading={props.loading} block>
-          下一步
+          <FormattedMessage id="oal.common.nextStep" />
         </Button>
       </Card>
     </div>

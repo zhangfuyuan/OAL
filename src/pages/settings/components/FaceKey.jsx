@@ -1,12 +1,13 @@
 import React, { Fragment } from 'react';
 import { Table, Button, Popconfirm, Divider, Popover, Icon } from 'antd';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const FaceKey = props => {
     const { data, loading, toAdd, toDelete, toEdit } = props;
 
     const columns = [
         {
-            title: '名称',
+            title: formatMessage({ id: 'oal.common.name' }),
             dataIndex: 'name',
         },
         {
@@ -14,21 +15,21 @@ const FaceKey = props => {
             dataIndex: 'key',
         },
         {
-            title: '控件类型',
+            title: formatMessage({ id: 'oal.settings.controlTypes' }),
             key: 'type',
             render: (text, record) => {
                 const type = (record && record.componentInfo && record.componentInfo.type) || 1;
                 const options = (record && record.componentInfo && record.componentInfo.data) || [];
-                let spanText = '文本框';
+                let spanText = formatMessage({ id: 'oal.settings.textarea' });
                 if (type === 2) {
-                    spanText = '下拉框';
+                    spanText = formatMessage({ id: 'oal.settings.dropdown' });
                 }
                 return (
                     <span>
                         {spanText}
                         {type === 2 && options.length > 0 ?
                             <Popover
-                                title="下拉选项"
+                                title={formatMessage({ id: 'oal.settings.dropdownOption' })}
                                 content={
                                     options.map(item => <p key={`option_${item.value}`}><span style={{ marginRight: '16px' }}>value: {item.value}</span><span>text: {item.text}</span></p>)
                                 }
@@ -45,41 +46,41 @@ const FaceKey = props => {
             },
         },
         {
-            title: '是否必填',
+            title: formatMessage({ id: 'oal.settings.isRequired' }),
             key: 'required',
             render: (text, record) => (
-                <span>{record && record.required ? '是' : '否'}</span>
+                <span>{record && record.required ? formatMessage({ id: 'oal.common.yes' }) : formatMessage({ id: 'oal.common.no' })}</span>
             ),
         },
         {
-            title: '是否唯一',
+            title: formatMessage({ id: 'oal.settings.isOnly' }),
             key: 'isUnique',
             render: (text, record) => (
-                <span>{record && record.isUnique ? '是' : '否'}</span>
+                <span>{record && record.isUnique ? formatMessage({ id: 'oal.common.yes' }) : formatMessage({ id: 'oal.common.no' })}</span>
             ),
         },
         {
-            title: '报表查询',
+            title: formatMessage({ id: 'oal.settings.reportQuery' }),
             key: 'reportQuery',
             render: (text, record) => (
-                <span>{record && record.reportQuery ? '是' : '否'}</span>
+                <span>{record && record.reportQuery ? formatMessage({ id: 'oal.common.yes' }) : formatMessage({ id: 'oal.common.no' })}</span>
             ),
         },
         {
-            title: '操作',
+            title: formatMessage({ id: 'oal.common.handle' }),
             key: 'action',
             width: 120,
             render: (text, record) => (
                 <span>
-                    <a href="#" onClick={() => toEdit(record)}>编辑</a>
+                    <a href="#" onClick={() => toEdit(record)}><FormattedMessage id="oal.common.edit" /></a>
                     <Divider type="vertical" />
                     <Popconfirm
-                        title="确定删除？"
-                        okText="确定"
-                        cancelText="取消"
+                        title={formatMessage({ id: 'oal.settings.confirmDelete' })}
+                        okText={formatMessage({ id: 'oal.common.confirm' })}
+                        cancelText={formatMessage({ id: 'oal.common.cancel' })}
                         onConfirm={() => toDelete(record)}
                     >
-                        <a href="#">删除</a>
+                        <a href="#"><FormattedMessage id="oal.common.delete" /></a>
                     </Popconfirm>
                 </span>
             ),
@@ -94,7 +95,7 @@ const FaceKey = props => {
                 icon="plus"
                 onClick={toAdd}
             >
-                新增
+                <FormattedMessage id="oal.common.new" />
             </Button>
             <Table
                 rowKey={record => record._id}

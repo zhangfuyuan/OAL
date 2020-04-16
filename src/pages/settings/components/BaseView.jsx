@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Button, Form, Input } from 'antd';
 import { validateMobile } from '@/utils/utils';
 import styles from './baseView.less';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const FormItem = Form.Item;
 
@@ -16,7 +17,7 @@ class BaseView extends Component {
 
   checkMobile = (rule, value, callback) => {
     if (value && !validateMobile(value)) {
-      callback('请输入正确的手机号');
+      callback(formatMessage({ id: 'oal.common.enterPhoneNumber' }));
     }
     callback();
   };
@@ -32,36 +33,36 @@ class BaseView extends Component {
         <div className={styles.left}>
           <Form layout="vertical">
             <FormItem
-              label="姓名"
+              label={formatMessage({ id: 'oal.common.fullName' })}
             >
               {getFieldDecorator('nickName', {
                 initialValue: currentUser && currentUser.profile && currentUser.profile.nickName,
-              })(<Input placeholder="姓名" />)}
+              })(<Input placeholder={formatMessage({ id: 'oal.common.fullName' })} />)}
             </FormItem>
             <FormItem
-              label="所属组织"
+              label={formatMessage({ id: 'oal.settings.organisation' })}
             >
               {getFieldDecorator('org', {
                 initialValue: currentUser && currentUser.org && currentUser.org.saasName,
-              })(<Input placeholder="所属组织" disabled/>)}
+              })(<Input placeholder={formatMessage({ id: 'oal.settings.organisation' })} disabled/>)}
             </FormItem>
             <FormItem
-              label="联系邮箱"
+              label={formatMessage({ id: 'oal.settings.contactEmail' })}
             >
               {getFieldDecorator('email', {
                 rules: [
                   {
                     type: 'email',
-                    message: '请填写正确格式的邮箱地址',
+                    message: formatMessage({ id: 'oal.settings.enterCorrectEmailAddress' }),
                   },
                 ],
                 initialValue: currentUser && currentUser.profile && currentUser.profile.email,
               })(
-                <Input placeholder="联系邮箱" />,
+                <Input placeholder={formatMessage({ id: 'oal.settings.contactEmail' })} />,
               )}
             </FormItem>
             <FormItem
-              label="联系电话"
+              label={formatMessage({ id: 'oal.settings.contactNumber' })}
             >
               {getFieldDecorator('mobile', {
                 rules: [
@@ -71,11 +72,11 @@ class BaseView extends Component {
                 ],
                 initialValue: currentUser && currentUser.mobile && currentUser.profile.mobile,
               })(
-                <Input placeholder="联系电话" />,
+                <Input placeholder={formatMessage({ id: 'oal.settings.contactNumber' })} />,
               )}
             </FormItem>
             <Button type="primary" onClick={this.handlerSubmit}>
-              保存
+              <FormattedMessage id="oal.common.save" />
             </Button>
           </Form>
         </div>

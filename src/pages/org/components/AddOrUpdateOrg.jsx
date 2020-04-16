@@ -1,6 +1,7 @@
 import { Modal, Form, Input, Tooltip, Icon } from 'antd';
 import React from 'react';
 import { validateMobile } from '@/utils/utils';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const formItemLayout = {
   labelCol: {
@@ -19,9 +20,9 @@ const AddOrUpdateOrg = props => {
   // eslint-disable-next-line no-underscore-dangle
   const isEdit = !!(orgBean && orgBean._id);
 
-  let title = '新增组织';
+  let title = formatMessage({ id: 'oal.org.newOrg' });
   if (isEdit) {
-    title = `修改组织(${orgBean.name})`;
+    title = `${formatMessage({ id: 'oal.org.modifyOrg' })}(${orgBean.name})`;
   }
 
   const handleOk = () => {
@@ -40,7 +41,7 @@ const AddOrUpdateOrg = props => {
 
   const checkMobile = (rule, value, callback) => {
     if (value && !validateMobile(value)) {
-      callback('请输入正确的手机号');
+      callback(formatMessage({ id: 'oal.common.enterPhoneNumber' }));
     }
     callback();
   };
@@ -48,7 +49,7 @@ const AddOrUpdateOrg = props => {
   const checkPath = (rule, value, callback) => {
     const reg = /^[A-Za-z]+$/;
     if (value && !reg.test(value)) {
-      callback('请输入英文字符串');
+      callback(formatMessage({ id: 'oal.org.enterEnglishString' }));
     }
     callback();
   };
@@ -64,35 +65,35 @@ const AddOrUpdateOrg = props => {
       maskClosable={false}
     >
       <Form {...formItemLayout}>
-        <Form.Item label="组织名称">
+        <Form.Item label={formatMessage({ id: 'oal.org.orgName' })}>
           {getFieldDecorator('orgName', {
             rules: [
               {
                 required: true,
-                message: '请输入组织名称',
+                message: formatMessage({ id: 'oal.org.enterOrgName' }),
               },
             ],
             initialValue: orgBean.name,
-          })(<Input placeholder="组织名称" />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.org.orgName' })} />)}
         </Form.Item>
-        <Form.Item label="联系人名称">
+        <Form.Item label={formatMessage({ id: 'oal.org.contactName' })}>
           {getFieldDecorator('contactName', {
             rules: [],
             initialValue: orgBean && orgBean.contact && orgBean.contact.nickName,
-          })(<Input placeholder="联系人名称" />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.org.contactName' })} />)}
         </Form.Item>
-        <Form.Item label="邮箱地址">
+        <Form.Item label={formatMessage({ id: 'oal.common.emailAddress' })}>
           {getFieldDecorator('email', {
             rules: [
               {
                 type: 'email',
-                message: '请输入正确的邮箱地址',
+                message: formatMessage({ id: 'oal.common.enterCorrectEmailAddress' }),
               },
             ],
             initialValue: orgBean && orgBean.contact && orgBean.contact.email,
-          })(<Input placeholder="邮箱地址" />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.common.emailAddress' })} />)}
         </Form.Item>
-        <Form.Item label="手机号">
+        <Form.Item label={formatMessage({ id: 'oal.common.phoneNumber' })}>
           {getFieldDecorator('mobile', {
             rules: [
               {
@@ -100,13 +101,13 @@ const AddOrUpdateOrg = props => {
               },
             ],
             initialValue: orgBean && orgBean.contact && orgBean.contact.mobile,
-          })(<Input placeholder="手机号" />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.common.phoneNumber' })} />)}
         </Form.Item>
         <Form.Item
           label={
             <span>
-              访问路径&nbsp;
-              <Tooltip title="用户可以通过该路径访问自己的应用">
+              <FormattedMessage id="oal.org.accessPath" />&nbsp;
+              <Tooltip title={formatMessage({ id: 'oal.org.usersAccessAppTips' })}>
                 <Icon type="question-circle-o" />
               </Tooltip>
             </span>
@@ -114,7 +115,7 @@ const AddOrUpdateOrg = props => {
           extra={`${origin}/user/${form.getFieldValue('path') || '*'}/login`}
         >
           {getFieldDecorator('path', {
-            rules: [{ required: true, message: '请输入访问路径!' }, {
+            rules: [{ required: true, message: formatMessage({ id: 'oal.org.enterAccessPath' }) }, {
               validator: checkPath,
             }],
             initialValue: orgBean.path,

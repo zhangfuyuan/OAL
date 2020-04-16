@@ -13,6 +13,7 @@ import FaceKey from './components/FaceKey';
 import FaceKeyModal from './components/FaceKeyModal';
 import FaceLibrary from './components/FaceLibrary';
 import styles from './style.less';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const { Item } = Menu;
 
@@ -32,12 +33,12 @@ class Settings extends Component {
   constructor(props) {
     super(props);
     const menuMap = {
-      base: '基本信息',
-      security: '安全设置',
-      system: '系统信息',
-      developer: '开发者',
-      faceKey: '人脸属性',
-      faceLibrary: '人脸底库',
+      base: formatMessage({ id: 'oal.settings.menu-base' }),
+      security: formatMessage({ id: 'oal.settings.menu-security' }),
+      system: formatMessage({ id: 'oal.settings.menu-system' }),
+      developer: formatMessage({ id: 'oal.settings.menu-developer' }),
+      faceKey: formatMessage({ id: 'oal.settings.menu-faceKey' }),
+      faceLibrary: formatMessage({ id: 'oal.settings.menu-faceLibrary' }),
     };
     this.state = {
       mode: 'inline',
@@ -102,7 +103,7 @@ class Settings extends Component {
       payload: values,
     }).then(res => {
       if (res && res.res > 0) {
-        message.success('修改成功');
+        message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
       }
     });
   };
@@ -113,7 +114,7 @@ class Settings extends Component {
       type: 'settingInfo/applyDevAccount',
     }).then(res => {
       if (res && res.res > 0) {
-        message.success('申请成功');
+        message.success(formatMessage({ id: 'oal.settings.applicationApproved' }));
       }
     });
   };
@@ -124,7 +125,7 @@ class Settings extends Component {
       type: 'settingInfo/resetSecret',
     }).then(res => {
       if (res && res.res > 0) {
-        message.success('重置成功');
+        message.success(formatMessage({ id: 'oal.settings.resetSuccessfully' }));
       }
     });
   };
@@ -148,7 +149,7 @@ class Settings extends Component {
       payload: params,
     }).then(res => {
       if (res && res.res > 0) {
-        message.success('修改密码成功，请重新登录');
+        message.success(formatMessage({ id: 'oal.settings.modifyPasswordSuccessfullyTips' }));
         dispatch({
           type: 'login/logout',
         });
@@ -171,7 +172,7 @@ class Settings extends Component {
       payload: values,
     }).then(res => {
       if (res && res.res > 0) {
-        message.success('修改成功');
+        message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
         this.closeModifySysName();
         dispatch({
           type: 'settings/changeSettingName',
@@ -194,7 +195,7 @@ class Settings extends Component {
         payload: values,
       }).then(res => {
         if (res && res.res > 0) {
-          message.success('修改成功');
+          message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
           this.setFaceKeyModal(false);
           this.loadFaceKeyList();
           callback();
@@ -206,7 +207,7 @@ class Settings extends Component {
         payload: values,
       }).then(res => {
         if (res && res.res > 0) {
-          message.success('新增成功');
+          message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
           this.setFaceKeyModal(false);
           this.loadFaceKeyList();
           callback();
@@ -225,7 +226,7 @@ class Settings extends Component {
       },
     }).then(res => {
       if (res && res.res > 0) {
-        message.success('删除成功');
+        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
         this.loadFaceKeyList();
       }
     });
@@ -257,7 +258,7 @@ class Settings extends Component {
       },
     }).then(res => {
       if (res && res.res > 0) {
-        message.success('保存成功');
+        message.success(formatMessage({ id: 'oal.common.saveSuccessfully' }));
       }
     });
   };

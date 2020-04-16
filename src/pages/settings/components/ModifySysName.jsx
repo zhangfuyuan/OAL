@@ -1,5 +1,6 @@
 import { Modal, Form, Input } from 'antd';
 import React from 'react';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const formItemLayout = {
   labelCol: {
@@ -27,7 +28,7 @@ const ModifySysName = props => {
   return (
     <Modal
       destroyOnClose
-      title="修改系统名称"
+      title={formatMessage({ id: 'oal.settings.modifySysname' })}
       visible={visible}
       onOk={handleOk}
       confirmLoading={confirmLoading}
@@ -35,16 +36,16 @@ const ModifySysName = props => {
       maskClosable={false}
     >
       <Form {...formItemLayout}>
-        <Form.Item label="系统名称">
+        <Form.Item label={formatMessage({ id: 'oal.settings.sysname' })}>
           {getFieldDecorator('saasName', {
             rules: [
               {
                 required: true,
-                message: '请输入系统名称',
+                message: formatMessage({ id: 'oal.settings.enterSysname' }),
               },
             ],
             initialValue: currentUser && currentUser.org && currentUser.org.saasName,
-          })(<Input placeholder="系统名称" />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.settings.sysname' })} />)}
         </Form.Item>
       </Form>
     </Modal>

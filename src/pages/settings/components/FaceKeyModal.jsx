@@ -1,6 +1,7 @@
 import { Modal, Form, Input, Switch, Icon, Popover, Radio, Button, message } from 'antd';
 import React, { useState } from 'react';
 import OptionView from './OptionView';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const formItemLayout = {
   labelCol: {
@@ -25,10 +26,10 @@ const FaceKeyModal = props => {
   const options = (faceKey && faceKey.componentInfo && faceKey.componentInfo.data) || [];
   const [optionData, setOptionData] = useState([]);
 
-  let title = '新增人脸属性';
+  let title = formatMessage({ id: 'oal.settings.addFaceAttributes' });
   let isEdit = false;
   if (faceKey && faceKey.name) {
-    title = '修改人脸属性';
+    title = formatMessage({ id: 'oal.settings.modifyAttributes' });
     isEdit = true;
   }
 
@@ -38,7 +39,7 @@ const FaceKeyModal = props => {
       const params = fieldsValue;
       if (fieldsValue.type === 2) {
         if (options.length === 0 && optionData.length === 0) {
-          message.error('未配置下拉选项，请完成配置后再提交');
+          message.error(formatMessage({ id: 'oal.settings.dropdownOptionNotConfigTips' }));
           return;
         }
         if (options.length > 0 && optionData.length === 0) {
@@ -89,7 +90,7 @@ const FaceKeyModal = props => {
   }
 
   console.log('form-------', form.getFieldsValue());
-  const textPre = '新增或修改的值'
+  const textPre = formatMessage({ id: 'oal.settings.newOrModifyVal' });
   const values = form.getFieldsValue();
 
   return (
@@ -103,47 +104,47 @@ const FaceKeyModal = props => {
       maskClosable={false}
     >
       <Form {...formItemLayout}>
-        <Form.Item label="名称">
+        <Form.Item label={formatMessage({ id: 'oal.common.name' })}>
           {getFieldDecorator('name', {
             rules: [
               {
                 required: true,
-                message: '请输入名称',
+                message: formatMessage({ id: 'oal.common.enterName' }),
               },
               {
                 max: 50,
-                message: '最大长度为50',
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '50' }),
               },
             ],
             initialValue: faceKey && faceKey.name,
-          })(<Input placeholder="名称" />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.common.name' })} />)}
         </Form.Item>
         <Form.Item label="key">
           {getFieldDecorator('key', {
             rules: [
               {
                 required: true,
-                message: '请输入key',
+                message: formatMessage({ id: 'oal.settings.enterKey' }),
               },
               {
                 pattern: /^\w+$/,
-                message: '只能输入字母、数字、下划线',
+                message: formatMessage({ id: 'oal.settings.enterKeyError' }),
               },
               {
                 max: 50,
-                message: '最大长度为50',
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '50' }),
               },
             ],
             initialValue: faceKey && faceKey.key,
           })(<Input placeholder="key" disabled={isEdit}/>)}
         </Form.Item>
-        <Form.Item label="控件类型">
+        <Form.Item label={formatMessage({ id: 'oal.settings.controlTypes' })}>
           {getFieldDecorator('type', {
             initialValue: (faceKey && faceKey.componentInfo && faceKey.componentInfo.type) || 1,
           })(<Radio.Group>
-            <Radio value={1}>输入框</Radio>
+            <Radio value={1}><FormattedMessage id="oal.settings.inputBox" /></Radio>
             <Radio value={2}>
-              下拉选择框
+              <FormattedMessage id="oal.settings.dropdownSelectionBox" />
             </Radio>
           </Radio.Group>)}
           {
@@ -151,29 +152,29 @@ const FaceKeyModal = props => {
               null
               :
               <Button type="link" onClick={toConfigOpt}>
-                配置选项
+                <FormattedMessage id="oal.settings.configOption" />
               </Button>
           }
         </Form.Item>
-        <Form.Item extra={values.required ? `${textPre}必填` : `${textPre}非必填`} label="是否必填">
+        <Form.Item extra={values.required ? `${textPre}${formatMessage({ id: 'oal.common.required' })}` : `${textPre}${formatMessage({ id: 'oal.common.notRequired' })}`} label={formatMessage({ id: 'oal.settings.isRequired' })}>
           {getFieldDecorator('required', {
             valuePropName: 'checked',
             initialValue: (faceKey && faceKey.required) || false,
           })(<Switch />)}
         </Form.Item>
-        <Form.Item extra={values.isUnique ? `${textPre}系统中唯一` : `${textPre}不唯一`} label="唯一约束">
+        <Form.Item extra={values.isUnique ? `${textPre}${formatMessage({ id: 'oal.settings.uniqueInSystem' })}` : `${textPre}${formatMessage({ id: 'oal.settings.nonUniqueness' })}`} label={formatMessage({ id: 'oal.settings.uniqueConstraint' })}>
           {getFieldDecorator('isUnique', {
             valuePropName: 'checked',
             initialValue: (faceKey && faceKey.isUnique) || false,
           })(<Switch />)}
         </Form.Item>
-        <Form.Item extra={values.readOnly ? '已存在的数据不可被修改' : '已存在的数据可被修改'} label="只读">
+        <Form.Item extra={values.readOnly ? formatMessage({ id: 'oal.settings.existingDataCannotModify' }) : formatMessage({ id: 'oal.settings.existingDataCanModify' })} label={formatMessage({ id: 'oal.settings.readOnly' })}>
           {getFieldDecorator('readOnly', {
             valuePropName: 'checked',
             initialValue: (faceKey && faceKey.readOnly) || false,
           })(<Switch />)}
         </Form.Item>
-        <Form.Item extra={values.reportQuery ? '加入到考勤报表的过滤条件中' : ''} label="报表查询">
+        <Form.Item extra={values.reportQuery ? formatMessage({ id: 'oal.settings.addToFilterConditionOfAttendanceReport' }) : ''} label={formatMessage({ id: 'oal.settings.reportQuery' })}>
           {getFieldDecorator('reportQuery', {
             valuePropName: 'checked',
             initialValue: (faceKey && faceKey.reportQuery) || false,

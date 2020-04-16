@@ -22,13 +22,14 @@ import { find, findIndex } from 'lodash';
 import StandardTable from '../../components/StandardTable';
 import AddOrUpdateUser from './components/AddOrUpdateUser';
 import styles from './style.less';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const { confirm } = Modal;
 const FormItem = Form.Item;
 const { Option } = Select;
 
 const statusMap = ['error', 'success'];
-const status = ['失效', '正常'];
+const status = ['oal.user-manage.failure', 'oal.user-manage.normal'];
 
 @connect(({ userManagement, loading }) => ({
     userManagement,
@@ -49,12 +50,12 @@ class UserManagement extends Component {
 
     columns = [
         {
-          title: '用户名',
+          title: formatMessage({ id: 'oal.common.username' }),
           dataIndex: 'userName',
           ellipsis: true,
         },
         {
-          title: '昵称',
+          title: formatMessage({ id: 'oal.common.nickname' }),
           ellipsis: true,
           render: (text, record) => (
             <span>
@@ -63,7 +64,7 @@ class UserManagement extends Component {
           ),
         },
         {
-          title: '手机号',
+          title: formatMessage({ id: 'oal.common.phoneNumber' }),
           ellipsis: true,
           render: (text, record) => (
             <span>
@@ -72,7 +73,7 @@ class UserManagement extends Component {
           ),
         },
         {
-          title: '邮箱',
+          title: formatMessage({ id: 'oal.common.email' }),
           ellipsis: true,
           render: (text, record) => (
             <span>
@@ -81,24 +82,24 @@ class UserManagement extends Component {
           ),
         },
         {
-          title: '状态',
+          title: formatMessage({ id: 'oal.common.status' }),
           dataIndex: 'state',
           width: 120,
           render(val) {
-            return <Badge status={statusMap[val]} text={status[val]} />;
+            return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
           },
         },
         {
-          title: '操作',
+          title: formatMessage({ id: 'oal.common.handle' }),
           width: 140,
           render: (text, record) => (
             <Fragment>
-              <Popconfirm title="确定删除该用户？" okText="确定" cancelText="取消" onConfirm={() => this.deleteUser(record)}>
-                <a href="#" disabled={!record.type}>删除</a>
+              <Popconfirm title={formatMessage({ id: 'oal.user-manage.confirmDeleteUser' })} okText={formatMessage({ id: 'oal.common.confirm' })} cancelText={formatMessage({ id: 'oal.common.cancel' })} onConfirm={() => this.deleteUser(record)}>
+                <a href="#" disabled={!record.type}><FormattedMessage id="oal.common.delete" /></a>
               </Popconfirm>
               <Divider type="vertical" />
-              <Popconfirm title="确定重置该用户密码？" okText="确定" cancelText="取消" onConfirm={() => this.resetPsw(record)}>
-                <a href="#">重置密码</a>
+              <Popconfirm title={formatMessage({ id: 'oal.user-manage.confirmResetUserPassword' })} okText={formatMessage({ id: 'oal.common.confirm' })} cancelText={formatMessage({ id: 'oal.common.cancel' })} onConfirm={() => this.resetPsw(record)}>
+                <a href="#"><FormattedMessage id="oal.user-manage.resetPassword" /></a>
               </Popconfirm>
             </Fragment>
           ),
@@ -132,7 +133,7 @@ class UserManagement extends Component {
         }).then(res => {
           if (res.res === 1) {
             this.loadUserList();
-            message.success('删除成功');
+            message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
           }
         });
     };
@@ -149,7 +150,7 @@ class UserManagement extends Component {
       }).then(res => {
         if (res.res === 1) {
           this.loadUserList();
-          message.success('重置密码成功');
+          message.success(formatMessage({ id: 'oal.user-manage.resetPasswordSuccessfully' }));
         }
       });
     };
@@ -216,7 +217,7 @@ class UserManagement extends Component {
             payload: values,
           }).then(res => {
             if (res.res === 1) {
-                message.success('新增成功');
+                message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
                 this.closeAddOrUpdateModal();
                 this.loadUserList();
                 callback();
@@ -238,22 +239,22 @@ class UserManagement extends Component {
               }}
             >
               <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-                <FormItem label="用户名">
-                  {getFieldDecorator('userName')(<Input placeholder="输入用户名" />)}
+                <FormItem label={formatMessage({ id: 'oal.common.username' })}>
+                  {getFieldDecorator('userName')(<Input placeholder={formatMessage({ id: 'oal.user-manage.enterUsername2' })} />)}
                 </FormItem>
               </Col>
               <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-                <FormItem label="状态">
+                <FormItem label={formatMessage({ id: 'oal.common.status' })}>
                   {getFieldDecorator('state')(
                     <Select
-                      placeholder="请选择"
+                      placeholder={formatMessage({ id: 'oal.common.pleaseSelect' })}
                       style={{
                         width: '100%',
                       }}
                     >
-                      <Option value="">全部</Option>
-                      <Option value="0">失效</Option>
-                      <Option value="1">正常</Option>
+                      <Option value=""><FormattedMessage id="oal.common.all" /></Option>
+                      <Option value="0"><FormattedMessage id="oal.user-manage.failure" /></Option>
+                      <Option value="1"><FormattedMessage id="oal.user-manage.normal" /></Option>
                     </Select>,
                   )}
                 </FormItem>
@@ -261,7 +262,7 @@ class UserManagement extends Component {
               <Col xxl={4} lg={4} md={4} sm={24}>
                 <span className={styles.submitButtons}>
                   <Button onClick={this.handleSearch} type="primary" htmlType="submit" loading={loading}>
-                    查询
+                    <FormattedMessage id="oal.common.query" />
                   </Button>
                   <Button
                     style={{
@@ -269,7 +270,7 @@ class UserManagement extends Component {
                     }}
                     onClick={this.handleFormReset}
                   >
-                    重置
+                    <FormattedMessage id="oal.common.reset" />
                   </Button>
                 </span>
               </Col>
@@ -315,7 +316,7 @@ class UserManagement extends Component {
                 <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
                 <div className={styles.tableListOperator}>
                   <Button icon="plus" type="primary" onClick={() => this.toAdd()}>
-                    新增
+                    <FormattedMessage id="oal.common.new" />
                   </Button>
                 </div>
                 <StandardTable

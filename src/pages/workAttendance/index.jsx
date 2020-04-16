@@ -17,6 +17,7 @@ import StandardTable from '../../components/StandardTable';
 import DetailDrawer from './components/DetailDrawer';
 import styles from './style.less';
 import { exportCSV } from '@/utils/utils';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -100,7 +101,7 @@ class AttendanceList extends Component {
     columns = () => {
         const { faceKeyList } = this.props;
         const cl = [{
-            title: '考勤设备',
+            title: formatMessage({ id: 'oal.work.attendanceDevice' }),
             key: 'deviceName',
             dataIndex: 'deviceInfo_name',
             ellipsis: true,
@@ -111,7 +112,7 @@ class AttendanceList extends Component {
             ),
         },
         {
-            title: '姓名',
+            title: formatMessage({ id: 'oal.common.fullName' }),
             key: 'faceName',
             dataIndex: 'faceInfo_name',
             ellipsis: true,
@@ -150,7 +151,7 @@ class AttendanceList extends Component {
             }
         });
         cl.push({
-            title: '进出次数',
+            title: formatMessage({ id: 'oal.work.turnoverCount' }),
             key: 'count',
             dataIndex: 'count',
             width: 100,
@@ -159,7 +160,7 @@ class AttendanceList extends Component {
             ),
         },
             {
-                title: '时间',
+                title: formatMessage({ id: 'oal.common.time' }),
                 key: 'time',
                 width: 200,
                 render: (_text, record) => (
@@ -252,9 +253,9 @@ class AttendanceList extends Component {
             beginDate = moment(formValues.date[0]).format('YYYY-MM-DD');
             endDate = moment(formValues.date[1]).format('YYYY-MM-DD');
         }
-        let fileName = `${beginDate}到${endDate}_考勤.csv`;
+        let fileName = `${formatMessage({ id: 'oal.work.exportFileName' }, { beginDate, endDate })}.csv`;
         if (faceName) {
-            fileName = `${faceName}_${beginDate}到${endDate}_考勤.csv`;
+            fileName = `${faceName}_${formatMessage({ id: 'oal.work.exportFileName' }, { beginDate, endDate })}.csv`;
         }
         const headers = this.columns();
         const index = headers.findIndex(h => h.dataIndex === 'count');
@@ -262,19 +263,19 @@ class AttendanceList extends Component {
             headers.splice(index, 2)
         }
         headers.push({
-            title: '日期',
+            title: formatMessage({ id: 'oal.common.date' }),
             dataIndex: 'date',
         }, {
-            title: '上班时间',
+            title: formatMessage({ id: 'oal.work.attendanceTime' }),
             dataIndex: 'beginTime',
         }, {
-            title: '下班时间',
+            title: formatMessage({ id: 'oal.work.closingTime' }),
             dataIndex: 'endTime',
         }, {
-            title: '进入次数',
+            title: formatMessage({ id: 'oal.work.enterCount' }),
             dataIndex: 'inCount',
         }, {
-            title: '离开次数',
+            title: formatMessage({ id: 'oal.work.leaveCount' }),
             dataIndex: 'outCount',
         });
         exportCSV(headers, data, fileName);
@@ -354,18 +355,18 @@ class AttendanceList extends Component {
             <Form layout="inline">
                 <Row gutter={{ md: 4, lg: 24, xl: 48 }}>
                     <Col md={6} sm={24}>
-                        <FormItem label="姓名">
+                        <FormItem label={formatMessage({ id: 'oal.common.fullName' })}>
                             {getFieldDecorator('faceName')(
-                                <Input placeholder="请输入" />,
+                                <Input placeholder={formatMessage({ id: 'oal.common.pleaseEnter' })} />,
                             )}
                         </FormItem>
                     </Col>
                     <Col md={10} sm={24}>
-                        <FormItem label="考勤设备">
+                        <FormItem label={formatMessage({ id: 'oal.work.attendanceDevice' })}>
                             {getFieldDecorator('deviceRegion')(
                                 <Select
                                     mode="multiple"
-                                    placeholder="请选择"
+                                    placeholder={formatMessage({ id: 'oal.common.pleaseSelect' })}
                                     style={{
                                         width: '100%',
                                     }}
@@ -377,7 +378,7 @@ class AttendanceList extends Component {
                         </FormItem>
                     </Col>
                     <Col md={8} sm={24}>
-                        <FormItem label="时间">
+                        <FormItem label={formatMessage({ id: 'oal.common.time' })}>
                             {getFieldDecorator('date', {
                                 initialValue: this.initialDate(),
                             })(
@@ -392,18 +393,18 @@ class AttendanceList extends Component {
                 <div style={{ overflow: 'hidden' }}>
                     <div style={{ float: 'left', marginBottom: 24 }}>
                         <Button type="primary" onClick={() => this.toExport()}>
-                            导出
+                            <FormattedMessage id="oal.common.export" />
                         </Button>
                     </div>
                     <div style={{ float: 'right', marginBottom: 24 }}>
                         <Button onClick={this.handleSearch} type="primary" htmlType="submit" loading={attendListLoading}>
-                            查询
+                            <FormattedMessage id="oal.common.query" />
                         </Button>
                         <Button
                             style={{ marginLeft: 8 }}
                             onClick={this.handleFormReset}
                         >
-                            重置
+                            <FormattedMessage id="oal.common.reset" />
                         </Button>
                         {
                             hasExpand ?
@@ -411,7 +412,7 @@ class AttendanceList extends Component {
                                     style={{ marginLeft: 8 }}
                                     onClick={this.toggleForm}
                                 >
-                                    展开 <Icon type="down" />
+                                    <FormattedMessage id="oal.common.expand" /> <Icon type="down" />
                                 </a>
                                 :
                                 null
@@ -429,18 +430,18 @@ class AttendanceList extends Component {
             <Form layout="inline">
                 <Row gutter={{ md: 4, lg: 24, xl: 48 }}>
                     <Col md={6} sm={24}>
-                        <FormItem label="姓名">
+                        <FormItem label={formatMessage({ id: 'oal.common.fullName' })}>
                             {getFieldDecorator('faceName')(
-                                <Input placeholder="请输入" />,
+                                <Input placeholder={formatMessage({ id: 'oal.common.pleaseEnter' })} />,
                             )}
                         </FormItem>
                     </Col>
                     <Col md={10} sm={24}>
-                        <FormItem label="考勤设备">
+                        <FormItem label={formatMessage({ id: 'oal.work.attendanceDevice' })}>
                             {getFieldDecorator('deviceRegion')(
                                 <Select
                                     mode="multiple"
-                                    placeholder="请选择"
+                                    placeholder={formatMessage({ id: 'oal.common.pleaseSelect' })}
                                     style={{
                                         width: '100%',
                                     }}
@@ -452,7 +453,7 @@ class AttendanceList extends Component {
                         </FormItem>
                     </Col>
                     <Col md={8} sm={24}>
-                        <FormItem label="时间">
+                        <FormItem label={formatMessage({ id: 'oal.common.time' })}>
                             {getFieldDecorator('date', {
                                 initialValue: this.initialDate(),
                             })(
@@ -474,10 +475,10 @@ class AttendanceList extends Component {
                                     <FormItem label={item.name}>
                                         {getFieldDecorator(item.key)(
                                             type === 1 ?
-                                                <Input placeholder="请输入" />
+                                                <Input placeholder={formatMessage({ id: 'oal.common.pleaseEnter' })} />
                                                 :
                                                 <Select
-                                                    placeholder="请选择"
+                                                    placeholder={formatMessage({ id: 'oal.common.pleaseSelect' })}
                                                     style={{
                                                         width: '100%',
                                                     }}
@@ -497,24 +498,24 @@ class AttendanceList extends Component {
                 <div style={{ overflow: 'hidden' }}>
                     <div style={{ float: 'left', marginBottom: 24 }}>
                         <Button type="primary" onClick={() => this.toExport()}>
-                            导出
+                            <FormattedMessage id="oal.common.export" />
                         </Button>
                     </div>
                     <div style={{ float: 'right', marginBottom: 24 }}>
                         <Button onClick={this.handleSearch} type="primary" htmlType="submit" loading={attendListLoading}>
-                            查询
+                            <FormattedMessage id="oal.common.query" />
                         </Button>
                         <Button
                             style={{ marginLeft: 8 }}
                             onClick={this.handleFormReset}
                         >
-                            重置
+                            <FormattedMessage id="oal.common.reset" />
                         </Button>
                         <a
                             style={{ marginLeft: 8 }}
                             onClick={this.toggleForm}
                         >
-                            收起 <Icon type="up" />
+                            <FormattedMessage id="oal.common.collapse" /> <Icon type="up" />
                         </a>
                     </div>
                 </div>

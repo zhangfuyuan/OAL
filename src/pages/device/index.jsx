@@ -7,14 +7,14 @@ import io from 'socket.io-client';
 import { AUTH_TOKEN } from '@/utils/constants';
 import DeviceList from './components/DeviceList';
 import RenameModal from './components/RenameModal';
-
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const { TabPane } = Tabs;
 
 const tabArray = [
-    { key: 'pass', name: '审核通过', value: 1 },
-    { key: 'wait', name: '待审核', value: 0 },
-    { key: 'fail', name: '审核不通过', value: -1 },
+    { key: 'pass', name: 'oal.device.approve', value: 1 },
+    { key: 'wait', name: 'oal.device.toAudit', value: 0 },
+    { key: 'fail', name: 'oal.device.notApprove', value: -1 },
 ];
 
 @connect(({ device, loading, user }) => ({
@@ -97,7 +97,7 @@ class Device extends Component {
             payload: params,
         }).then(res => {
             if (res.res === 1) {
-                message.success('修改成功');
+                message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
                 this.closeRenameModal();
                 this.loadData();
                 callback();
@@ -112,7 +112,7 @@ class Device extends Component {
             payload: { deviceId: bean._id },
         }).then(res => {
             if (res.res === 1) {
-                message.success('删除成功');
+                message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
                 this.loadData();
             }
         });
@@ -125,7 +125,7 @@ class Device extends Component {
             payload: { deviceId: bean._id, result: type === 'pass' ? 1 : -1 },
         }).then(res => {
             if (res.res === 1) {
-                message.success('审核成功');
+                message.success(formatMessage({ id: 'oal.device.auditSuccessfully' }));
                 this.loadData();
             }
         });
@@ -147,13 +147,13 @@ class Device extends Component {
         return (
             <PageHeaderWrapper>
                 {loginUser.currentUser && loginUser.currentUser.org && alertVisible ? (
-                    <Alert message={<div>您的设备注册路径为: <span style={{ color: 'red', marginLeft: 12 }}>{loginUser.currentUser.org.path}</span></div>} type="info" showIcon style={{ marginBottom: 8 }} closable afterClose={this.handleClose} />
+                    <Alert message={<div><FormattedMessage id="oal.device.deviceRegistrationPath" />: <span style={{ color: 'red', marginLeft: 12 }}>{loginUser.currentUser.org.path}</span></div>} type="info" showIcon style={{ marginBottom: 8 }} closable afterClose={this.handleClose} />
                 ) : null}
                 <Card bordered={false}>
                     <Tabs activeKey={type} onChange={this.changeTab}>
                         {
                             tabArray.map(item => (
-                                <TabPane tab={item.name} key={item.key}>
+                                <TabPane tab={item.name && formatMessage({ id: item.name }) || '--'} key={item.key}>
                                     <DeviceList
                                         type={item.key}
                                         data={deviceList}

@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { List, Button, Result, message, Popconfirm, Spin } from 'antd';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 class DeveloperView extends Component {
   state = {
@@ -12,12 +13,12 @@ class DeveloperView extends Component {
     try {
       if (document.execCommand('copy', false, null)) {
         document.execCommand('Copy');
-        message.success('复制成功');
+        message.success(formatMessage({ id: 'oal.common.copySuccessfully' }));
       } else {
-        message.error('复制失败,可以尝试手动复制');
+        message.error(formatMessage({ id: 'oal.common.copyFailedTips' }));
       }
     } catch (error) {
-      message.error('复制失败,可以尝试手动复制');
+      message.error(formatMessage({ id: 'oal.common.copyFailedTips' }));
     }
   };
 
@@ -44,23 +45,23 @@ class DeveloperView extends Component {
       ),
       actions: [
         <a href="#" onClick={() => this.handleCopy('key')}>
-          复制
+          <FormattedMessage id="oal.common.copy" />
         </a>,
       ],
     },
     {
-      title: '密钥',
+      title: formatMessage({ id: 'oal.settings.secretKey' }),
       description: (
         <Fragment>
           {this.setSecret(devInfo.secret)}
         </Fragment>
       ),
       actions: [
-        <Popconfirm title="确定重置密钥？" okText="确定" cancelText="取消" onConfirm={() => this.handleReset()}>
-          <a href="#">重置</a>
+        <Popconfirm title={formatMessage({ id: 'oal.settings.confirmResetKey' })} okText={formatMessage({ id: 'oal.common.confirm' })} cancelText={formatMessage({ id: 'oal.common.cancel' })} onConfirm={() => this.handleReset()}>
+          <a href="#"><FormattedMessage id="oal.common.reset" /></a>
         </Popconfirm>,
         <a key="copy" onClick={() => this.handleCopy('secret')}>
-          复制
+          <FormattedMessage id="oal.common.copy" />
         </a>,
       ],
     },
@@ -80,8 +81,8 @@ class DeveloperView extends Component {
       return (
         <Result
           status="404"
-          title="未申请开发者账号"
-          extra={<Button type="primary" onClick={toApply}>点击申请</Button>}
+          title={formatMessage({ id: 'oal.settings.noApplicationForDeveloperAccount' })}
+          extra={<Button type="primary" onClick={toApply}><FormattedMessage id="oal.settings.clickApplication" /></Button>}
         />
       )
     }

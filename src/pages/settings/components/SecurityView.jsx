@@ -1,20 +1,21 @@
 import React, { Component, Fragment } from 'react';
 import { List } from 'antd';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const passwordStrength = {
   strong: (
     <span className="strong">
-      强
+      <FormattedMessage id="oal.settings.strong" />
     </span>
   ),
   medium: (
     <span className="medium">
-      中
+      <FormattedMessage id="oal.settings.medium" />
     </span>
   ),
   weak: (
     <span className="weak">
-      弱
+      <FormattedMessage id="oal.settings.weak" />
     </span>
   ),
 };
@@ -30,16 +31,16 @@ class SecurityView extends Component {
 
   getData = () => [
     {
-      title: '密码',
+      title: formatMessage({ id: 'oal.common.password' }),
       description: (
         <Fragment>
-          当前密码强度
+          <FormattedMessage id="oal.settings.currentPasswordStrength" />
           ：{passwordStrength.strong}
         </Fragment>
       ),
       actions: [
         <a href="#" onClick={() => this.handleModify()}>
-          修改
+          <FormattedMessage id="oal.common.modify" />
         </a>,
       ],
     },

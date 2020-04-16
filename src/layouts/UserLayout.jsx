@@ -38,10 +38,10 @@ const UserLayout = props => {
       </DocumentTitle>
     );
   }
-  let subTitle = '门禁管理系统';
+  let subTitle = formatMessage({ id: 'oal.common.accessControlSystem' });
   let oemName = 'Face ID';
   if (login.org && login.org.name) {
-    subTitle = `门禁管理系统(${login.org.name})`;
+    subTitle = `${formatMessage({ id: 'oal.common.accessControlSystem' })}(${login.org.name})`;
   }
   if (login.agent.saasName) {
     oemName = login.agent.saasName;
@@ -56,7 +56,7 @@ const UserLayout = props => {
       })}
     >
       <div className={styles.container}>
-        <div className={styles.lang}>{/* <SelectLang /> */}</div>
+        <div className={styles.lang}><SelectLang /></div>
         <div className={styles.content}>
           <div className={styles.top}>
             <div className={styles.header}>

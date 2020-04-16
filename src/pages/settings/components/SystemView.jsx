@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { List, Button, Result, message, Popconfirm, Avatar } from 'antd';
 import logo from '@/assets/logo.svg';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 class SystemView extends Component {
   setUrl = path => {
@@ -21,7 +22,7 @@ class SystemView extends Component {
     const orgInfo = (currentUser && currentUser.org) || {};
     const items = [
       {
-        title: '访问地址',
+        title: formatMessage({ id: 'oal.settings.accessAddress' }),
         description: (
           <Fragment>
             {this.setUrl((orgInfo && orgInfo.path) || '')}
@@ -33,7 +34,7 @@ class SystemView extends Component {
 
     if (currentUser.type === 0 && orgInfo.type === 0) {
       items.push({
-        title: '系统名称',
+        title: formatMessage({ id: 'oal.settings.sysname' }),
         description: (
           <Fragment>
             {orgInfo.saasName}
@@ -41,13 +42,13 @@ class SystemView extends Component {
         ),
         actions: [
           <a key="copy" onClick={() => this.handleModify()}>
-            修改
+            <FormattedMessage id="oal.common.modify" />
           </a>,
         ],
       }, {
         title: (
           <Fragment>
-            <span style={{ marginRight: '16px' }}>系统图标</span>
+            <span style={{ marginRight: '16px' }}><FormattedMessage id="oal.settings.systemIcons" /></span>
             <Avatar src={logo} />
           </Fragment>
         ),
@@ -56,7 +57,7 @@ class SystemView extends Component {
       })
     }
     items.push({
-      title: '系统版本',
+      title: formatMessage({ id: 'oal.settings.systemVersion' }),
       description: (
         <Fragment>{version}</Fragment>
       ),

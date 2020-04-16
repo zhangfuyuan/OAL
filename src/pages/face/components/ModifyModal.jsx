@@ -1,5 +1,6 @@
 import { Modal, Form, Input, Select } from 'antd';
 import React from 'react';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const { Option } = Select;
 
@@ -17,7 +18,7 @@ const ModifyModal = props => {
   const { form, bean, visible, handleSubmit, confirmLoading, handleCancel, faceKeyList } = props;
   const { getFieldDecorator } = form;
 
-  const title = '修改人脸信息';
+  const title = formatMessage({ id: 'oal.face.modifyFaceInfo' });
 
   const handleOk = () => {
     form.validateFields((err, fieldsValue) => {
@@ -47,16 +48,16 @@ const ModifyModal = props => {
       maskClosable={false}
     >
       <Form {...formItemLayout}>
-        <Form.Item label="姓名">
+        <Form.Item label={formatMessage({ id: 'oal.common.fullName' })}>
           {getFieldDecorator('name', {
             rules: [
               {
                 required: true,
-                message: '请输入姓名',
+                message: formatMessage({ id: 'oal.face.enterFullName' }),
               },
             ],
             initialValue: bean.name,
-          })(<Input placeholder="请输入姓名" />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
         </Form.Item>
         {faceKeyList && faceKeyList.length > 0 && faceKeyList.map(item => {
           const type = item.componentInfo && item.componentInfo.type;
@@ -69,13 +70,13 @@ const ModifyModal = props => {
                     item.required ?
                     {
                       required: true,
-                      message: `请选择${item.name}`,
+                      message: `${formatMessage({ id: 'oal.common.pleaseSelect' })}${item.name}`,
                     }
                     :
                     {},
                   ],
                   initialValue: bean.profile && bean.profile[item.key],
-                })(<Select placeholder={`请选择${item.name}`} disabled={item.readOnly && bean.profile && bean.profile[item.key]}>
+                })(<Select placeholder={`${formatMessage({ id: 'oal.common.pleaseSelect' })}${item.name}`} disabled={item.readOnly && bean.profile && bean.profile[item.key]}>
                     {data.map(option => (
                       <Option value={option.value} key={`option_${option.value}`}>{option.text}</Option>
                     ))}
@@ -90,13 +91,13 @@ const ModifyModal = props => {
                   item.required ?
                   {
                     required: true,
-                    message: `请输入${item.name}`,
+                    message: `${formatMessage({ id: 'oal.common.pleaseEnter' })}${item.name}`,
                   }
                   :
                   {},
                 ],
                 initialValue: bean.profile && bean.profile[item.key],
-              })(<Input placeholder={`请输入${item.name}`} disabled={item.readOnly && bean.profile && bean.profile[item.key]}/>)}
+              })(<Input placeholder={`${formatMessage({ id: 'oal.common.pleaseEnter' })}${item.name}`} disabled={item.readOnly && bean.profile && bean.profile[item.key]}/>)}
             </Form.Item>
           )
         })}

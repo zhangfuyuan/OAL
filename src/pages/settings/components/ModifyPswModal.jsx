@@ -1,6 +1,7 @@
 import { Modal, Form, Input } from 'antd';
 import React from 'react';
 import { PSW_REG } from '@/utils/constants';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const formItemLayout = {
   labelCol: {
@@ -27,7 +28,7 @@ const ModifyPswModal = props => {
 
   const compareToNewPassword = (rule, value, callback) => {
     if (value && value !== form.getFieldValue('newpassword')) {
-      callback('和新密码输入不一致');
+      callback(formatMessage({ id: 'oal.settings.differentFromNewPassword' }));
     } else {
       callback();
     }
@@ -36,7 +37,7 @@ const ModifyPswModal = props => {
   return (
     <Modal
       destroyOnClose
-      title="修改密码"
+      title={formatMessage({ id: 'oal.settings.modifyPassword' })}
       visible={visible}
       onOk={handleOk}
       confirmLoading={confirmLoading}
@@ -44,46 +45,54 @@ const ModifyPswModal = props => {
       maskClosable={false}
     >
       <Form {...formItemLayout}>
-        <Form.Item label="旧密码">
+        <Form.Item label={formatMessage({ id: 'oal.settings.oldPassword' })}>
           {getFieldDecorator('oldpassword', {
             rules: [
               {
                 required: true,
-                message: '请输入旧密码',
+                message: formatMessage({ id: 'oal.settings.enterOldPassword' }),
               },
             ],
-          })(<Input.Password placeholder="旧密码" />)}
+          })(<Input.Password placeholder={formatMessage({ id: 'oal.settings.oldPassword' })} />)}
         </Form.Item>
-        <Form.Item label="新密码">
+        <Form.Item label={formatMessage({ id: 'oal.settings.newPassword' })}>
           {getFieldDecorator('newpassword', {
             rules: [
               {
                 required: true,
-                message: '请输入新密码',
+                message: formatMessage({
+                  id: 'oal.common.enterNewPassword',
+                }),
               },
               {
                 pattern: PSW_REG,
-                message: '密码须包含字母、数字、特殊符号，长度不小于8位',
+                message: formatMessage({
+                  id: 'oal.common.enterPasswordError',
+                }),
               },
             ],
-          })(<Input.Password placeholder="新密码" />)}
+          })(<Input.Password placeholder={formatMessage({ id: 'oal.settings.newPassword' })} />)}
         </Form.Item>
-        <Form.Item label="确认密码">
+        <Form.Item label={formatMessage({ id: 'oal.settings.confirmPassword' })}>
           {getFieldDecorator('confirmpassword', {
             rules: [
               {
                 required: true,
-                message: '请输入确认密码',
+                message: formatMessage({
+                  id: 'oal.common.enterConfirmPassword',
+                }),
               },
               {
                 pattern: PSW_REG,
-                message: '密码须包含字母、数字、特殊符号，长度不小于8位',
+                message: formatMessage({
+                  id: 'oal.common.enterPasswordError',
+                }),
               },
               {
                 validator: compareToNewPassword,
               },
             ],
-          })(<Input.Password placeholder="确认密码" />)}
+          })(<Input.Password placeholder={formatMessage({ id: 'oal.settings.confirmPassword' })} />)}
         </Form.Item>
       </Form>
     </Modal>

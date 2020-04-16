@@ -1,5 +1,6 @@
 import { Modal, Input, Row, Col, Icon, message } from 'antd';
 import React, { Component } from 'react';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const styles = {
     row: {
@@ -66,7 +67,7 @@ class OptionView extends Component {
         }
         const index1 = optionData.findIndex(item => item.value === '' || item.text === '');
         if (index1 >= 0) {
-            message.error('请填写完整信息');
+            message.error(formatMessage({ id: 'oal.settings.completeInfo' }));
         } else {
             handleSubmit(optionData, () => {
                 this.setState({ optionData: [{ value: '', text: '' }] });
@@ -97,14 +98,14 @@ class OptionView extends Component {
         if (type === 'value') {
             _optionData[index].value = value;
             if (value && (!reg.test(value) || value.length > 50)) {
-                _optionData[index].errorMsg.value = '只能输入字母、数字、下划线，最大长度为50';
+                _optionData[index].errorMsg.value = formatMessage({ id: 'oal.settings.optionDataError' }, { num: '50' });
             } else {
                 _optionData[index].errorMsg.value = '';
             }
         } else {
             _optionData[index].text = value;
             if (value && value.length > 50) {
-                _optionData[index].errorMsg.text = '最大长度为50';
+                _optionData[index].errorMsg.text = formatMessage({ id: 'oal.common.maxLength' }, { num: '50' });
             } else {
                 _optionData[index].errorMsg.text = '';
             }
@@ -118,7 +119,7 @@ class OptionView extends Component {
         return (
             <Modal
                 destroyOnClose
-                title="配置下拉选项"
+                title={formatMessage({ id: 'oal.settings.configDropdownOptions' })}
                 width={600}
                 visible={visible}
                 onOk={this.handleOk}

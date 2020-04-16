@@ -1,13 +1,13 @@
 import React from 'react';
 import { Result, Statistic, Row, Col, Card, Button } from 'antd';
 import { CheckOutlined, CloseOutlined, LoadingOutlined } from '@ant-design/icons';
-
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const UploadInfo = (fileList, successList, errorList, resetUpload, excludeNum) => {
     const onUpload = fileList.length > successList.length + errorList.length
     // console.log('----', successList, errorList, excludeNum)
     const result = {
-        title: onUpload ? <div>人脸上传中: {successList.length + errorList.length}/{fileList.length} </div> : <div>上传完毕，共 {fileList.length} 张</div>,
+        title: onUpload ? <div><FormattedMessage id="oal.face.crossFace" />: {successList.length + errorList.length}/{fileList.length} </div> : <div><FormattedMessage id="oal.face.afterUploadTips" values={{ length: fileList.length }} /></div>,
     }
     if (onUpload) {
         result.icon = <LoadingOutlined />
@@ -15,7 +15,7 @@ const UploadInfo = (fileList, successList, errorList, resetUpload, excludeNum) =
         result.status = 'success'
         result.extra = [
             <Button type="primary" key="console" onClick={resetUpload}>
-                确定
+                <FormattedMessage id="oal.common.confirm" />
             </Button>,
         ]
     }
@@ -36,7 +36,7 @@ const UploadProgress = props => {
                     <Col span={12}>
                         <Card hoverable={true} onClick={() => openDetail('success')}>
                         <Statistic
-                            title="成功"
+                            title={formatMessage({ id: 'oal.common.succeed' })}
                             value={successList.length}
                             precision={0}
                             valueStyle={{ color: '#3f8600' }}
@@ -47,7 +47,7 @@ const UploadProgress = props => {
                     <Col span={12}>
                         <Card hoverable={true} onClick={() => openDetail('error')}>
                         <Statistic
-                            title="失败"
+                            title={formatMessage({ id: 'oal.common.fail' })}
                             value={errorList.length}
                             precision={0}
                             valueStyle={{ color: '#cf1322' }}
