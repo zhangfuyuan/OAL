@@ -129,7 +129,7 @@ export default {
   'oal.face.missingRequiredValuesDesc': '缺少人脸扩展属性中必填的字段',
   'oal.face.uniquenessConstraint': '唯一性约束',
   'oal.face.uniquenessConstraintDesc': '人脸信息中存在值必须唯一的字段，请检查冲突',
-  'oal.face.size': '大小(KB)',
+  'oal.face.size': '大小',
   'oal.face.reason': '原因',
   'oal.face.uploadDetails': '上传详情',
   'oal.face.uploadSuccessfully': '上传成功',
@@ -311,4 +311,6 @@ export default {
   'oal.ajax.requestError': '请求错误',
   'oal.ajax.requestErrorDescription': '您的网络发生异常，无法连接服务器',
   'oal.ajax.requestErrorMessage': '网络异常',
+  '工号': '工号',
+  'oal.common.notSupportBrowserTips': '系统检测到您正在使用 Internet Explorer 内核的浏览器，不能实现完美体验，请更换浏览器访问！',
 };

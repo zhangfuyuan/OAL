@@ -39,7 +39,7 @@ const UserLayout = props => {
     );
   }
   let subTitle = formatMessage({ id: 'oal.common.accessControlSystem' });
-  let oemName = 'Face ID';
+  let oemName = 'LangoAI';
   if (login.org && login.org.name) {
     subTitle = `${formatMessage({ id: 'oal.common.accessControlSystem' })}(${login.org.name})`;
   }

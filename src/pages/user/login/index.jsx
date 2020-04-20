@@ -38,6 +38,13 @@ class Login extends Component {
     });
   }
 
+  componentDidMount() {
+    // 暂不能很好兼容 IE 浏览器
+    if (!!window.ActiveXObject || 'ActiveXObject' in window) {
+      alert(formatMessage({ id: 'oal.common.notSupportBrowserTips' }));
+    }
+  }
+
   changeAutoLogin = e => {
     this.setState({
       autoLogin: e.target.checked,

@@ -1,4 +1,5 @@
 import { getFaceKeyList, addFaceKey, updateFaceKey, deleteFaceKey } from '@/services/faceKey';
+import { formatMessage } from 'umi-plugin-react/locale';
 
 const Model = {
   namespace: 'faceKey',
@@ -34,7 +35,11 @@ const Model = {
     saveFaceKey(state, action) {
       return {
         ...state,
-        faceKeyList: action.payload,
+        faceKeyList: action.payload && action.payload.map(item => {
+          const _item = item;
+          _item && _item.name && (_item.name = formatMessage({ id: _item.name }));
+          return _item;
+        }) || action.payload,
       };
     },
   },

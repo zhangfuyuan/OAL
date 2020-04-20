@@ -11,7 +11,7 @@ export default {
   menu: {
     locale: true,
   },
-  title: 'Face ID',
+  title: 'LangoAI',
   pwa: false,
   iconfontUrl: '',
 };

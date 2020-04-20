@@ -18,10 +18,12 @@ import DetailDrawer from './components/DetailDrawer';
 import styles from './style.less';
 import { exportCSV } from '@/utils/utils';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import defaultSettings from '../../../config/defaultSettings';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
+const { publicPath } = defaultSettings;
 
 const day = moment().date();
 const begin = moment().subtract(day - 1, 'days').format('YYYY-MM-DD');
@@ -172,7 +174,7 @@ class AttendanceList extends Component {
 
     openWin = path => {
         const { origin } = window.location;
-        const href = `${origin}/user/${path}/login`;
+        const href = `${origin}${publicPath}user/${path}/login`;
         window.open(href);
     };
 

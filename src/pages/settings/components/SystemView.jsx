@@ -2,6 +2,9 @@ import React, { Component, Fragment } from 'react';
 import { List, Button, Result, message, Popconfirm, Avatar } from 'antd';
 import logo from '@/assets/logo.svg';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import defaultSettings from '../../../../config/defaultSettings';
+
+const { publicPath } = defaultSettings;
 
 class SystemView extends Component {
   setUrl = path => {
@@ -9,7 +12,7 @@ class SystemView extends Component {
       return ''
     }
     const { origin } = window.location;
-    const href = `${origin}/user/${path}/login`;
+    const href = `${origin}${publicPath}user/${path}/login`;
     return href;
   };
 

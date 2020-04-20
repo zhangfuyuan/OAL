@@ -129,7 +129,7 @@ export default {
   'oal.face.missingRequiredValuesDesc': 'Missing required fields in face extension attributes',
   'oal.face.uniquenessConstraint': 'Unique constraint',
   'oal.face.uniquenessConstraintDesc': 'There must be a unique field in the face information, please check for conflicts',
-  'oal.face.size': 'Size(KB)',
+  'oal.face.size': 'Size',
   'oal.face.reason': 'Reason',
   'oal.face.uploadDetails': 'Upload details',
   'oal.face.uploadSuccessfully': 'Uploaded successfully',
@@ -311,4 +311,6 @@ export default {
   'oal.ajax.requestError': 'Request error',
   'oal.ajax.requestErrorDescription': 'Your network is abnormal and cannot connect to the server',
   'oal.ajax.requestErrorMessage': 'Network anomaly',
+  '工号': 'Staffid',
+  'oal.common.notSupportBrowserTips': 'System detected that you are using the Internet Explorer kernel browser, can not achieve a perfect experience, please change the browser access!',
 };

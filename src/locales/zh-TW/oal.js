@@ -129,7 +129,7 @@ export default {
   'oal.face.missingRequiredValuesDesc': '缺少人臉擴展屬性中必填的字段',
   'oal.face.uniquenessConstraint': '唯一性約束',
   'oal.face.uniquenessConstraintDesc': '人臉資訊中存在值必須唯一的字段，請檢查衝突',
-  'oal.face.size': '大小(KB)',
+  'oal.face.size': '大小',
   'oal.face.reason': '原因',
   'oal.face.uploadDetails': '上傳詳情',
   'oal.face.uploadSuccessfully': '上傳成功',
@@ -311,4 +311,6 @@ export default {
   'oal.ajax.requestError': '請求錯誤',
   'oal.ajax.requestErrorDescription': '您的網路發生異常，無法連接伺服器',
   'oal.ajax.requestErrorMessage': '網路異常',
+  '工号': '工號',
+  'oal.common.notSupportBrowserTips': '系統檢測到您正在使用 Internet Explorer 內核的瀏覽器，不能實現完美體驗，請更換瀏覽器訪問！',
 };

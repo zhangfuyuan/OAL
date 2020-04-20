@@ -2,7 +2,9 @@ import { Modal, Form, Input, Tooltip, Icon } from 'antd';
 import React from 'react';
 import { validateMobile } from '@/utils/utils';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import defaultSettings from '../../../../config/defaultSettings';
 
+const { publicPath } = defaultSettings;
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -112,7 +114,7 @@ const AddOrUpdateOrg = props => {
               </Tooltip>
             </span>
           }
-          extra={`${origin}/user/${form.getFieldValue('path') || '*'}/login`}
+          extra={`${window.location.origin}${publicPath}user/${form.getFieldValue('path') || '*'}/login`}
         >
           {getFieldDecorator('path', {
             rules: [{ required: true, message: formatMessage({ id: 'oal.org.enterAccessPath' }) }, {
