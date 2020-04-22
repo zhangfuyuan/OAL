@@ -82,11 +82,16 @@ const UserModel = {
   },
   reducers: {
     saveCurrentUser(state, action) {
-      return {
+      const _data = action.payload.data || {};
+      const { user: _user, menus: _menuList } = _data;
+      const _res = {
         ...state,
-        currentUser: action.payload.data.user || action.payload.data || {},
-        menuList: action.payload.data.menus || [],
+        currentUser: _user || _data,
       };
+
+      if (_menuList) _res.menuList = _menuList;
+
+      return _res;
     },
     setPswVersion(state, action) {
       const { currentUser } = state;
