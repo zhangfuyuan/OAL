@@ -8,6 +8,9 @@ const routers = [
         path: '/user/:org/login',
         component: './user/login',
       },
+      {
+        component: './404',
+      },
     ],
   },
   {
@@ -20,8 +23,10 @@ const routers = [
         authority: ['admin', 'user'],
         routes: [
           {
-            path: '/',
-            redirect: '/userManagement',
+            path: 'dashboard',
+            name: 'dashboard',
+            icon: 'dashboard',
+            component: './dashboard',
           },
           {
             path: 'org',
@@ -46,6 +51,7 @@ const routers = [
               },
               {
                 path: '/device/:type',
+                name: 'deviceType',
                 component: './device'
               },
             ],
@@ -54,13 +60,54 @@ const routers = [
             path: 'face',
             name: 'faceManger',
             icon: 'smile',
-            component: './face',
+            routes: [
+              {
+                path: '/face',
+                redirect: '/face/manger'
+              },
+              {
+                path: '/face/manger',
+                name: 'faceMangerIndex',
+                component: './face',
+              },
+              {
+                path: '/face/blacklist',
+                name: 'faceBlacklist',
+                component: './face/blacklist'
+              },
+              {
+                path: '/face/visitor',
+                name: 'faceVisitor',
+                component: './face/visitor'
+              },
+            ],
           },
           {
             path: 'workAttendance',
             name: 'workAttendance',
             icon: 'table',
-            component: './workAttendance',
+            routes: [
+              {
+                path: '/workAttendance',
+                redirect: '/workAttendance/rule'
+              },
+              {
+                path: '/workAttendance/rule',
+                name: 'workAttendanceRule',
+                component: './workAttendance/rule',
+              },
+              {
+                path: '/workAttendance/manger',
+                name: 'workAttendanceManger',
+                component: './workAttendance',
+              },
+            ],
+          },
+          {
+            path: 'log',
+            name: 'log',
+            icon: 'global',
+            component: './log',
           },
           {
             path: 'settings',

@@ -2,7 +2,7 @@ import { routerRedux } from 'dva/router';
 import router from 'umi/router';
 import { stringify } from 'querystring';
 import { fakeAccountLogin, getFakeCaptcha, getOrg, signin } from '@/services/login';
-import { setAuthority } from '@/utils/authority';
+import { setAuthority, authorityRouter } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import CONSTANTS from '@/utils/constants';
 
@@ -46,22 +46,26 @@ const Model = {
           type: 'saveCurrentUser',
           payload: response,
         });
-        const urlParams = new URL(window.location.href);
-        const params = getPageQuery();
-        let { redirect } = params;
-        console.log('redirect-----------', redirect)
-        if (redirect) {
-          const redirectUrlParams = new URL(redirect);
-          if (redirectUrlParams.origin === urlParams.origin) {
-            redirect = redirect.substr(urlParams.origin.length);
-            if (redirect.match(/^\/.*#/)) {
-              redirect = redirect.substr(redirect.indexOf('#') + 1);
-            }
-          } else {
-            window.location.href = redirect;
-            return;
-          }
-        }
+        // const urlParams = new URL(window.location.href);
+        // const params = getPageQuery();
+        // let { redirect } = params;
+        // console.log('redirect-----------', redirect)
+        // if (redirect) {
+        //   const redirectUrlParams = new URL(redirect);
+        //   if (redirectUrlParams.origin === urlParams.origin) {
+        //     redirect = redirect.substr(urlParams.origin.length);
+        //     if (redirect.match(/^\/.*#/)) {
+        //       redirect = redirect.substr(redirect.indexOf('#') + 1);
+        //     }
+        //   } else {
+        //     window.location.href = redirect;
+        //     return;
+        //   }
+        // }
+
+        const { type, org } = response.data.user || { org: {} };
+        const { redirect } = authorityRouter(type, org.type);
+
         yield put(routerRedux.replace(redirect || '/'));
       } else {
         console.error('login error:', response);

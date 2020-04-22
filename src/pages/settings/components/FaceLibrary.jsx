@@ -30,7 +30,7 @@ class FaceLibrary extends Component {
         } = this.props;
         const faceSizeBean = data.find(item => item.key === 'faceSize');
         const maxFaceCountBean = data.find(item => item.key === 'maxFaceCount');
-        console.log('faceSize=======>', data, faceSizeBean);
+        // console.log('faceSize=======>', data, faceSizeBean);
         return (
             <div className={styles.baseView} ref={this.getViewDom}>
                 <div style={{ width: '100%' }}>

@@ -23,7 +23,7 @@ const UserLayout = props => {
     },
   } = props;
   const { breadcrumb } = getMenuData(routes);
-  console.log('login---------------------->', login);
+  // console.log('login---------------------->', login);
   if (login.org === 'error') {
     return (
       <DocumentTitle

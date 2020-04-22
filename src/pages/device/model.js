@@ -9,7 +9,7 @@ const Model = {
     effects: {
         *fetch({ payload }, { call, put }) {
             const response = yield call(getDeviceList, payload);
-            console.log('fetch response-->', response);
+            // console.log('fetch response-->', response);
             const { res, data } = response;
             if (res > 0) {
                 yield put({
@@ -21,21 +21,21 @@ const Model = {
         },
         *rename({ payload }, { call, put }) {
             const response = yield call(renameDevice, payload);
-            console.log('rename response-->', response);
+            // console.log('rename response-->', response);
             return Promise.resolve(response);
         },
         *delete({ payload }, { call, put }) {
             const response = yield call(removeDevice, payload);
-            console.log('remove response-->', response);
+            // console.log('remove response-->', response);
             return Promise.resolve(response);
         },
         *verify({ payload }, { call, put }) {
             const response = yield call(verifyDevice, payload);
-            console.log('verify response-->', response);
+            // console.log('verify response-->', response);
             return Promise.resolve(response);
         },
         *setDeviceInfo({ payload }, { call, put }) {
-            console.log('setNetState payload:', payload)
+            // console.log('setNetState payload:', payload)
             yield put({
                 type: 'setDevice',
                 payload,
@@ -44,7 +44,7 @@ const Model = {
     },
     reducers: {
         save(state, action) {
-            console.log('save deviceList-:', action.payload);
+            // console.log('save deviceList-:', action.payload);
             return {
                 ...state,
                 deviceList: action.payload,
@@ -53,7 +53,7 @@ const Model = {
         setDevice(state, action) {
             const { deviceList } = state;
             const deviceIndex = findIndex(deviceList, item => item._id === action.payload._id)
-            console.log('setDevice deviceIndex:', deviceIndex);
+            // console.log('setDevice deviceIndex:', deviceIndex);
             if (deviceIndex !== -1) {
               deviceList[deviceIndex] = action.payload
             }

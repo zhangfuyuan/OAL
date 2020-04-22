@@ -43,7 +43,7 @@ class Device extends Component {
 
     initSocket = () => {
       if (!this.scoket) {
-        console.log(AUTH_TOKEN, '--scoket--5345345--->', `/?auth_token=${sessionStorage.getItem(AUTH_TOKEN) || localStorage.getItem(AUTH_TOKEN)}`)
+        // console.log(AUTH_TOKEN, '--scoket--5345345--->', `/?auth_token=${sessionStorage.getItem(AUTH_TOKEN) || localStorage.getItem(AUTH_TOKEN)}`)
         this.socket = io(`/?auth_token=${sessionStorage.getItem(AUTH_TOKEN) || localStorage.getItem(AUTH_TOKEN)}`, { forceNew: true })
         // console.log(io, '--scoket----->', this.socket)
         this.socket.on('connect', () => {
@@ -143,7 +143,7 @@ class Device extends Component {
         } = this.props;
         const { modalVisible, deviceBean, alertVisible } = this.state;
         const { type } = this.props.match.params;
-        console.log('loginUser----', loginUser)
+        // console.log('loginUser----', loginUser)
         return (
             <PageHeaderWrapper>
                 {loginUser.currentUser && loginUser.currentUser.org && alertVisible ? (

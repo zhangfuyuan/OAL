@@ -89,7 +89,7 @@ const FaceKeyModal = props => {
     callback();
   }
 
-  console.log('form-------', form.getFieldsValue());
+  // console.log('form-------', form.getFieldsValue());
   const textPre = formatMessage({ id: 'oal.settings.newOrModifyVal' });
   const values = form.getFieldsValue();
 

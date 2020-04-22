@@ -27,7 +27,7 @@ class BaseView extends Component {
       form: { getFieldDecorator },
       currentUser,
     } = this.props;
-    console.log('currentUser-------', currentUser);
+    // console.log('currentUser-------', currentUser);
     return (
       <div className={styles.baseView} ref={this.getViewDom}>
         <div className={styles.left}>

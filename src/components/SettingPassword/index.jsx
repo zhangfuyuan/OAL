@@ -11,7 +11,7 @@ const SettingPsw = props => {
   const [renewpswError, setReNewPswError] = useState('');
 
   const onChange = (key, value) => {
-    console.log(key, value);
+    // console.log(key, value);
     if (key === 'newpsw') {
       setNewPsw(value);
       setNewPswError('');

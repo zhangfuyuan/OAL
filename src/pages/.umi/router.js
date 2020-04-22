@@ -24,6 +24,10 @@ const routes = [
         exact: true,
       },
       {
+        component: require('../404').default,
+        exact: true,
+      },
+      {
         component: () =>
           React.createElement(
             require('E:/web/guarderClient/guarderClient/node_modules/umi-build-dev/lib/plugins/404/NotFound.js')
@@ -43,8 +47,10 @@ const routes = [
         authority: ['admin', 'user'],
         routes: [
           {
-            path: '/',
-            redirect: '/userManagement',
+            path: '/dashboard',
+            name: 'dashboard',
+            icon: 'dashboard',
+            component: require('../dashboard').default,
             exact: true,
           },
           {
@@ -73,6 +79,7 @@ const routes = [
               },
               {
                 path: '/device/:type',
+                name: 'deviceType',
                 component: require('../device').default,
                 exact: true,
               },
@@ -90,14 +97,77 @@ const routes = [
             path: '/face',
             name: 'faceManger',
             icon: 'smile',
-            component: require('../face').default,
-            exact: true,
+            routes: [
+              {
+                path: '/face',
+                redirect: '/face/manger',
+                exact: true,
+              },
+              {
+                path: '/face/manger',
+                name: 'faceMangerIndex',
+                component: require('../face').default,
+                exact: true,
+              },
+              {
+                path: '/face/blacklist',
+                name: 'faceBlacklist',
+                component: require('../face/blacklist').default,
+                exact: true,
+              },
+              {
+                path: '/face/visitor',
+                name: 'faceVisitor',
+                component: require('../face/visitor').default,
+                exact: true,
+              },
+              {
+                component: () =>
+                  React.createElement(
+                    require('E:/web/guarderClient/guarderClient/node_modules/umi-build-dev/lib/plugins/404/NotFound.js')
+                      .default,
+                    { pagesPath: 'src/pages', hasRoutesInConfig: true },
+                  ),
+              },
+            ],
           },
           {
             path: '/workAttendance',
             name: 'workAttendance',
             icon: 'table',
-            component: require('../workAttendance').default,
+            routes: [
+              {
+                path: '/workAttendance',
+                redirect: '/workAttendance/rule',
+                exact: true,
+              },
+              {
+                path: '/workAttendance/rule',
+                name: 'workAttendanceRule',
+                component: require('../workAttendance/rule').default,
+                exact: true,
+              },
+              {
+                path: '/workAttendance/manger',
+                name: 'workAttendanceManger',
+                component: require('../workAttendance').default,
+                exact: true,
+              },
+              {
+                component: () =>
+                  React.createElement(
+                    require('E:/web/guarderClient/guarderClient/node_modules/umi-build-dev/lib/plugins/404/NotFound.js')
+                      .default,
+                    { pagesPath: 'src/pages', hasRoutesInConfig: true },
+                  ),
+              },
+            ],
+          },
+          {
+            path: '/log',
+            name: 'log',
+            icon: 'global',
+            component: require('../log').default,
             exact: true,
           },
           {

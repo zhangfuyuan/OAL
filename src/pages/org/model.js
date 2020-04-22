@@ -8,7 +8,7 @@ const Model = {
   effects: {
     *fetch({ payload }, { call, put }) {
       const response = yield call(getOrg, payload);
-      console.log('fetch response-->', response);
+      // console.log('fetch response-->', response);
       if (response.res > 0) {
         yield put({
           type: 'save',
@@ -19,23 +19,23 @@ const Model = {
     },
     *add({ payload }, { call }) {
       const response = yield call(add, payload);
-      console.log('add response-->', response);
+      // console.log('add response-->', response);
       return Promise.resolve(response);
     },
     *update({ payload }, { call }) {
       const response = yield call(modifyOrg, payload);
-      console.log('update response-->', response);
+      // console.log('update response-->', response);
       return Promise.resolve(response);
     },
     *handleState({ payload }, { call }) {
       const response = yield call(handleState, payload);
-      console.log('handleState response-->', response);
+      // console.log('handleState response-->', response);
       return Promise.resolve(response);
     },
   },
   reducers: {
     save(state, action) {
-      console.log('save org-:', action.payload);
+      // console.log('save org-:', action.payload);
       return {
         ...state,
         orgList: action.payload,

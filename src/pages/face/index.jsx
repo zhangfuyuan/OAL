@@ -281,7 +281,7 @@ class Face extends Component {
   }
 
   onBeforeUploadbak = (file, fList, isDirectory, uniqueIndex) => {
-    console.log('beforeUploadFile-------', fList);
+    // console.log('beforeUploadFile-------', fList);
     // 这里只校验会影响数据的那种唯一性约束的字段，其他均无校验的必要，如果唯一性校验失败，终止上传
     const { fileList, errorList } = this.state;
     if (fileList.length === 0) {
@@ -371,14 +371,14 @@ class Face extends Component {
       showUploadList: false,
       beforeUpload: (file, fList) => this.onBeforeUpload(file, fList, isDirectory, uniqueIndex),
       onError: (err, res, file) => {
-        console.log('onError file:', typeof err)
+        // console.log('onError file:', typeof err)
         // console.log('fList status:', res) // <h2>400 Bad Request</h2>
         // console.log('event:', oc.event)
         errorList.push({ name: file.name, size: file.size, uploadRes: 400, uid: file.uid })
         this.setState({ errorList });
       },
       onSuccess: (result, file) => {
-        console.log('onSuccess oc:', result, file)
+        // console.log('onSuccess oc:', result, file)
         const temp = { name: file.name, size: file.size, uploadRes: result, uid: file.uid }
         if (result.res < 1) {
           errorList.push(temp)

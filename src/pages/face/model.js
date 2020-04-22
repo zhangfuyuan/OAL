@@ -10,7 +10,7 @@ const Model = {
     effects: {
       *fetch({ payload }, { call, put }) {
         const response = yield call(fetchList, payload);
-        console.log('fetch response-->', response);
+        // console.log('fetch response-->', response);
         if (response.res > 0) {
           yield put({
             type: 'save',
@@ -26,22 +26,22 @@ const Model = {
       // },
       *delete({ payload }, { call }) {
         const response = yield call(deleteFace, payload);
-        console.log('deleteFace response-->', response);
+        // console.log('deleteFace response-->', response);
         return Promise.resolve(response);
       },
       *removeAll(_, { call }) {
         const response = yield call(removeAllFace);
-        console.log('removeAll response-->', response);
+        // console.log('removeAll response-->', response);
         return Promise.resolve(response);
       },
       *modify({ payload }, { call }) {
         const response = yield call(modifyFaceInfo, payload);
-        console.log('modifyFaceInfo response-->', response);
+        // console.log('modifyFaceInfo response-->', response);
         return Promise.resolve(response);
       },
       *toGetSysConfigs(_, { call, put }) {
         const response = yield call(getSysConfig);
-        console.log('toGetSysConfigs response-->', response);
+        // console.log('toGetSysConfigs response-->', response);
         const { res, data } = response;
         if (res > 0) {
           yield put({
@@ -53,7 +53,7 @@ const Model = {
     },
     reducers: {
       save(state, action) {
-        console.log('save org-:', action.payload);
+        // console.log('save org-:', action.payload);
         return {
           ...state,
           faceList: action.payload,

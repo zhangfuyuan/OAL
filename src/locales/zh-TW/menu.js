@@ -53,4 +53,12 @@ export default {
   'menu.device': '設備管理',
   'menu.settings': '設置',
   'menu.workAttendance': '考勤報表',
+  'menu.dashboard2': '首頁',
+  'menu.device.deviceType': '設備管理',
+  'menu.faceManger.faceMangerIndex': '人員管理',
+  'menu.faceManger.faceBlacklist': '黑名單',
+  'menu.faceManger.faceVisitor': '訪客',
+  'menu.workAttendance.workAttendanceRule': '考勤規則',
+  'menu.workAttendance.workAttendanceManger': '考勤管理',
+  'menu.log': '通行記錄',
 };

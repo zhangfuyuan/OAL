@@ -42,7 +42,7 @@ const errorCode = {
  * 全局的处理
  */
 request.interceptors.response.use(async (response, options) => {
-  console.log('response-->', response);
+  // console.log('response-->', response);
   if (response.status !== 200) {
     if (response.status === 401) {
       // 鉴权失败，跳转到登录
@@ -57,7 +57,7 @@ request.interceptors.response.use(async (response, options) => {
     return { res: -1, status: response.status }
   }
   const data = await response.clone().json();
-  console.info('http response:', data);
+  // console.info('http response:', data);
   if (data.res < 0) {
     notification.error({
       message: formatMessage({ id: 'oal.ajax.requestFailed' }),

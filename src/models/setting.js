@@ -79,7 +79,7 @@ const SettingModel = {
       return { ...state, ...payload };
     },
     changeSettingName(state = defaultSettings, { payload }) {
-      console.log('changeSettingName---->', payload);
+      // console.log('changeSettingName---->', payload);
       return { ...state, ...payload };
     },
   },

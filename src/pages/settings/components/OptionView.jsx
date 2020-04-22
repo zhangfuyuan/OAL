@@ -43,7 +43,7 @@ class OptionView extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log('nextProps.optionData----->', nextProps.optionData);
+        // console.log('nextProps.optionData----->', nextProps.optionData);
         if (nextProps.visible && nextProps.visible !== this.props.visible) {
             this.setState({
                 optionData: nextProps.optionData.length > 0 ? nextProps.optionData : [{ value: '', text: '' }],

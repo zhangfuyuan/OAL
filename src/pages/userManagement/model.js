@@ -15,7 +15,7 @@ const Model = {
   effects: {
     *fetch({ payload }, { call, put }) {
       const response = yield call(getUserList, payload);
-      console.log('fetch response-->', response);
+      // console.log('fetch response-->', response);
       const { res, data } = response;
       if (res > 0) {
         yield put({
@@ -27,18 +27,18 @@ const Model = {
     },
     *add({ payload }, { call }) {
       const response = yield call(addUser, payload);
-      console.log('add response-->', response);
+      // console.log('add response-->', response);
       return Promise.resolve(response);
     },
     *operate({ payload }, { call, put }) {
-      console.log('operate payload--->', payload);
+      // console.log('operate payload--->', payload);
       const response = yield call(operateUser, payload);
       return Promise.resolve(response);
     },
   },
   reducers: {
     save(state, action) {
-      console.log('save userList-:', action.payload);
+      // console.log('save userList-:', action.payload);
       return {
         ...state,
         userList: action.payload,

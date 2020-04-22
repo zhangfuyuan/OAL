@@ -210,7 +210,7 @@ class UserManagement extends Component {
         const { selectedUser } = this.state;
         // eslint-disable-next-line no-underscore-dangle
         if (selectedUser && selectedUser._id) {
-          console.log('修改走这边---');
+          // console.log('修改走这边---');
         } else {
           dispatch({
             type: 'userManagement/add',
@@ -281,7 +281,7 @@ class UserManagement extends Component {
 
     handleSelectRows = rows => {
         // eslint-disable-next-line no-console
-        console.log('rows-------', rows);
+        // console.log('rows-------', rows);
         this.setState({
           selectedRows: rows,
         });

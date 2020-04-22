@@ -27,7 +27,7 @@ class Login extends Component {
   // eslint-disable-next-line react/sort-comp
   UNSAFE_componentWillMount() {
     const { org } = this.props.match.params;
-    console.log('login page org:', org);
+    // console.log('login page org:', org);
     const { dispatch } = this.props;
     dispatch({
       type: 'global/getSystemVersion',
@@ -145,7 +145,7 @@ class Login extends Component {
     const { userLogin, submitting, orgLoading, systemVersion } = this.props;
     const { status } = userLogin;
     const { type, autoLogin } = this.state;
-    console.log('render org-->', orgLoading, userLogin);
+    // console.log('render org-->', orgLoading, userLogin);
     if (orgLoading) {
       return this.loadingCom();
     }

@@ -53,4 +53,12 @@ export default {
   'menu.device': 'device',
   'menu.settings': 'settings',
   'menu.workAttendance': 'workAttendance',
+  'menu.dashboard2': 'home',
+  'menu.device.deviceType': 'device manger',
+  'menu.faceManger.faceMangerIndex': 'people manger',
+  'menu.faceManger.faceBlacklist': 'blacklist',
+  'menu.faceManger.faceVisitor': 'visitor',
+  'menu.workAttendance.workAttendanceRule': 'workAttendance rules',
+  'menu.workAttendance.workAttendanceManger': 'workAttendance manger',
+  'menu.log': 'access records',
 };

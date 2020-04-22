@@ -5,8 +5,8 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 const SettingPsw = (props) => {
   let self = {};
   const onSubmit = () => {
-    console.log('this.saasName---', self.saasName);
-    console.log('this.refs.email.refs.input.value=', self.saasName.input.value);
+    // console.log('this.saasName---', self.saasName);
+    // console.log('this.refs.email.refs.input.value=', self.saasName.input.value);
     if (!self.saasName.input.value) {
       message.error(
         formatMessage({

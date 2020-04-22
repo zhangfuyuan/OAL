@@ -10,7 +10,7 @@ const Model = {
   effects: {
     *getDevInfo(_, { call, put }) {
       const response = yield call(getDevInfo);
-      console.log('getDevInfo response-->', response);
+      // console.log('getDevInfo response-->', response);
       const { res, data } = response;
       if (res > 0) {
         yield put({
@@ -22,7 +22,7 @@ const Model = {
     },
     *applyDevAccount(_, { call, put }) {
       const response = yield call(applyDevAccount);
-      console.log('applyDevAccount response-->', response);
+      // console.log('applyDevAccount response-->', response);
       const { res, data } = response;
       if (res > 0) {
         yield put({
@@ -34,7 +34,7 @@ const Model = {
     },
     *resetSecret(_, { call, put }) {
       const response = yield call(resetSecret);
-      console.log('resetSecret response-->', response);
+      // console.log('resetSecret response-->', response);
       const { res, data } = response;
       if (res > 0) {
         yield put({
@@ -46,7 +46,7 @@ const Model = {
     },
     *toGetSysConfigs(_, { call, put }) {
       const response = yield call(getSysConfig);
-      console.log('toGetSysConfigs response-->', response);
+      // console.log('toGetSysConfigs response-->', response);
       const { res, data } = response;
       if (res > 0) {
         yield put({
@@ -57,7 +57,7 @@ const Model = {
     },
     *toSetSysConfigs({ payload }, { call, put }) {
       const response = yield call(setSysConfig, payload);
-      console.log('toSetSysConfigs response-->', response);
+      // console.log('toSetSysConfigs response-->', response);
       const { res, data } = response;
       if (res > 0) {
         yield put({
@@ -70,7 +70,7 @@ const Model = {
   },
   reducers: {
     saveDevInfo(state, action) {
-      console.log('save org-:', action.payload);
+      // console.log('save org-:', action.payload);
       return {
         ...state,
         devInfo: action.payload,

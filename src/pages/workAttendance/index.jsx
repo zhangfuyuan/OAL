@@ -183,7 +183,7 @@ class AttendanceList extends Component {
         const { page } = this.state;
 
         form.validateFields((err, fieldsValue) => {
-            console.log('fieldValues------>', fieldsValue);
+            // console.log('fieldValues------>', fieldsValue);
             if (err) return;
             this.setState({
                 formValues: fieldsValue,
@@ -530,7 +530,7 @@ class AttendanceList extends Component {
         const { faceKeyList } = this.props;
         let hasExpand = false; // 人脸属性列表里面是否有reportQuery为true的属性
         const index = faceKeyList.findIndex(item => item && item.reportQuery);
-        console.log('index=====>', index);
+        // console.log('index=====>', index);
         if (index > -1) {
             hasExpand = true;
         }
