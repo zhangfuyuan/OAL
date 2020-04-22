@@ -1,4 +1,4 @@
-import { post, get, remove } from '@/utils/ajax';
+import { post, get, remove, capture } from '@/utils/ajax';
 import { async } from 'q';
 
 /**
@@ -15,10 +15,14 @@ export async function fetchList(query) {
  * @param data
  */
 export async function deleteFace(data) {
+    capture('5', {
+        faceId: data.faceId,
+    });
     return get(`/api/face/manage/${data.faceId}/remove`);
 }
 
 export async function removeAllFace() {
+    capture('6');
     return remove('/api/face/manage/removeAll')
 }
 
@@ -27,6 +31,10 @@ export async function removeAllFace() {
  * @param data
  */
 export async function renameFace(data) {
+    capture('7', {
+        faceId: data.faceId,
+        name: data.name,
+    });
     return get(`/api/face/manage/${data.faceId}/rename/${data.name}`);
 }
 
@@ -34,5 +42,6 @@ export async function renameFace(data) {
  * 修改人脸信息
  */
 export async function modifyFaceInfo(data) {
+    capture('8', data);
     return post(`/api/face/manage/${data.faceId}/modify`, data);
 }

@@ -1,5 +1,5 @@
 export default {
-  publicPath: process.env.NODE_ENV === 'production' ? '/OAL/' : '/',
+  publicPath: '/OAL/',
   navTheme: 'dark',
   primaryColor: '#1890FF',
   layout: 'sidemenu',

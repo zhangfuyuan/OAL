@@ -1,4 +1,4 @@
-import { post, get } from '@/utils/ajax';
+import { post, get, capture } from '@/utils/ajax';
 
 /**
  * 查询设备
@@ -14,6 +14,10 @@ export async function getDeviceList(data) {
  *
  */
 export async function verifyDevice(data) {
+    capture('1', {
+        deviceId: data.deviceId,
+        result: data.result,
+    });
     return get(`/api/device/${data.deviceId}/verify/${data.result}`);
 }
 
@@ -21,6 +25,9 @@ export async function verifyDevice(data) {
  * 删除设备
  */
 export async function removeDevice(data) {
+    capture('2', {
+        deviceId: data.deviceId,
+    });
     return get(`/api/device/${data.deviceId}/remove`);
 }
 
@@ -28,5 +35,9 @@ export async function removeDevice(data) {
  * 设备重命名
  */
 export async function renameDevice(data) {
+    capture('3', {
+        deviceId: data.deviceId,
+        name: data.name,
+    });
     return get(`/api/device/${data.deviceId}/rename/${data.name}`);
 }

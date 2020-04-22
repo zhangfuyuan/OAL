@@ -5,6 +5,9 @@ import { fakeAccountLogin, getFakeCaptcha, getOrg, signin } from '@/services/log
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import CONSTANTS from '@/utils/constants';
+import defaultSettings from '../../config/defaultSettings';
+
+const { publicPath } = defaultSettings;
 
 const Model = {
   namespace: 'login',
@@ -83,8 +86,9 @@ const Model = {
     *logout() {
       const { redirect } = getPageQuery(); // redirect
 
-      if (window.location.pathname !== `/user/${localStorage.getItem(CONSTANTS.SYSTEM_PATH)}/login` && !redirect) {
+      if (window.location.pathname !== `${publicPath}user/${localStorage.getItem(CONSTANTS.SYSTEM_PATH)}/login` && !redirect) {
         localStorage.removeItem(CONSTANTS.AUTH_TOKEN);
+        sessionStorage.removeItem(CONSTANTS.AUTH_TOKEN);
         router.replace({
           pathname: `/user/${localStorage.getItem(CONSTANTS.SYSTEM_PATH)}/login`,
         });

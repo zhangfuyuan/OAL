@@ -24,6 +24,10 @@ const routes = [
         exact: true,
       },
       {
+        component: require('../404').default,
+        exact: true,
+      },
+      {
         component: () =>
           React.createElement(
             require('E:/web/guarderClient/guarderClient/node_modules/umi-build-dev/lib/plugins/404/NotFound.js')

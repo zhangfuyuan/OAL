@@ -142,5 +142,9 @@ export default {
       target: 'http://52.82.123.38:8999/',
       changeOrigin: true,
     },
+    '/guard-web/': {
+      target: 'http://192.168.14.53:8081/',
+      changeOrigin: true,
+    },
   },
 };

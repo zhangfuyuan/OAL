@@ -12,6 +12,7 @@ import UploadProgress from './components/UploadProgress';
 import UploadDetail from './components/UploadDetail';
 import StandardTable from '@/components/StandardTable'
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import { capture } from '@/utils/ajax';
 
 const { Search } = Input;
 const { confirm } = Modal;
@@ -386,6 +387,10 @@ class Face extends Component {
         } else {
           successList.push(temp)
           this.setState({ successList });
+          capture('4', {
+            ...result.data,
+            fName: file.name,
+          });
         }
       },
     }

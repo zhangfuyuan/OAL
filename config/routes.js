@@ -8,6 +8,9 @@ const routers = [
         path: '/user/:org/login',
         component: './user/login',
       },
+      {
+        component: './404',
+      },
     ],
   },
   {

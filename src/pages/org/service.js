@@ -1,4 +1,4 @@
-import { post, get } from '@/utils/ajax';
+import { post, get, capture } from '@/utils/ajax';
 
 /**
  * 新增组织
@@ -6,6 +6,7 @@ import { post, get } from '@/utils/ajax';
  * @returns {Promise<*>}
  */
 export async function add(data) {
+  capture('9', data);
   return post('/api/org/add', data);
 }
 
@@ -22,6 +23,7 @@ export async function getOrg(query) {
  * 修改组织
  */
 export async function modifyOrg(data) {
+  capture('10', data);
   return post('/api/org/update', data);
 }
 
@@ -29,5 +31,9 @@ export async function modifyOrg(data) {
  * 禁用&&启用
  */
 export async function handleState(data) {
+  capture('11', {
+    orgId: data.orgId,
+    state: data.state,
+  });
   return get(`/api/org/${data.orgId}/setState/${data.state}`);
 }

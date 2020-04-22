@@ -1,4 +1,4 @@
-import { post, get } from '@/utils/ajax';
+import { post, get, capture } from '@/utils/ajax';
 
 /**
  * 新增用户
@@ -6,6 +6,7 @@ import { post, get } from '@/utils/ajax';
  * @returns {Promise<*>}
  */
 export async function addUser(data) {
+  capture('12', data);
   return post('/api/user/add', data);
 }
 
@@ -23,5 +24,9 @@ export async function getUserList(query) {
  * action：delete，resetPsw
  */
 export async function operateUser(data) {
+  capture('13', {
+    userId: data.userId,
+    action: data.action,
+  });
   return get(`/api/user/${data.userId}/${data.action}`);
 }

@@ -77,4 +77,8 @@ const get = path => request(path, {
 const remove = path => request(path, {
   method: 'delete',
 });
-export { post, get, remove };
+const capture = (ctype, params) => request('/guard-web/f/com/capture', {
+  method: 'post',
+  data: { ctype, ...(params || {}) },
+});
+export { post, get, remove, capture };
