@@ -313,4 +313,5 @@ export default {
   'oal.ajax.requestErrorMessage': '网络异常',
   '工号': '工号',
   'oal.common.notSupportBrowserTips': '系统检测到您正在使用 Internet Explorer 内核的浏览器，不能实现完美体验，请更换浏览器访问！',
+  'oal.common.addItems': '添加子项',
 };

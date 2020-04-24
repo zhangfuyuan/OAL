@@ -2,9 +2,12 @@ import { routerRedux } from 'dva/router';
 import router from 'umi/router';
 import { stringify } from 'querystring';
 import { fakeAccountLogin, getFakeCaptcha, getOrg, signin } from '@/services/login';
-import { setAuthority, authorityRouter } from '@/utils/authority';
+import { setAuthority, getPermissionRoutes } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import CONSTANTS from '@/utils/constants';
+import defaultSettings from '../../config/defaultSettings';
+
+const { publicPath } = defaultSettings;
 
 const Model = {
   namespace: 'login',
@@ -64,7 +67,7 @@ const Model = {
         // }
 
         const { type, org } = response.data.user || { org: {} };
-        const { redirect } = authorityRouter(type, org.type);
+        const { redirect } = getPermissionRoutes(type, org.type);
 
         yield put(routerRedux.replace(redirect || '/'));
       } else {
@@ -87,8 +90,9 @@ const Model = {
     *logout() {
       const { redirect } = getPageQuery(); // redirect
 
-      if (window.location.pathname !== `/user/${localStorage.getItem(CONSTANTS.SYSTEM_PATH)}/login` && !redirect) {
+      if (window.location.pathname !== `${publicPath}user/${localStorage.getItem(CONSTANTS.SYSTEM_PATH)}/login` && !redirect) {
         localStorage.removeItem(CONSTANTS.AUTH_TOKEN);
+        sessionStorage.removeItem(CONSTANTS.AUTH_TOKEN);
         router.replace({
           pathname: `/user/${localStorage.getItem(CONSTANTS.SYSTEM_PATH)}/login`,
         });

@@ -35,10 +35,10 @@ const { Option } = Select;
 const statusMap = ['error', 'success'];
 const status = ['oal.common.disable', 'oal.common.enable'];
 
-@connect(({ setting, dashboard, loading }) => ({
+@connect(({ setting, workAttendanceStatistics, loading }) => ({
   setting,
-  dashboard,
-  demoListLoading: loading.effects['dashboard/fetchList'],
+  workAttendanceStatistics,
+  demoListLoading: loading.effects['workAttendanceStatistics/fetchList'],
 }))
 class Demo extends Component {
 
@@ -74,7 +74,7 @@ class Demo extends Component {
   tree_loadData = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'dashboard/fetch',
+      type: 'workAttendanceStatistics/fetch',
     }).then(res => {
       if (res && res.res > 0) {
         this.setState({
@@ -244,7 +244,7 @@ class Demo extends Component {
     const { dispatch } = this.props;
     const { page } = this.state;
     dispatch({
-      type: 'dashboard/fetchList',
+      type: 'workAttendanceStatistics/fetchList',
       payload: {
         ...page,
       },
@@ -424,12 +424,12 @@ class Demo extends Component {
 
   render() {
     const {
-      dashboard: { demoList },
+      workAttendanceStatistics: { demoList },
       demoListLoading,
     } = this.props;
 
     return (
-      <PageHeaderWrapper /* title=" " */ className={styles.myPageHeaderWrapper} >
+      <PageHeaderWrapper title=" " className={styles.myPageHeaderWrapper} >
         <Card bordered={false}>
           <div className={styles.main} >
             <div

@@ -1,6 +1,6 @@
 import { authByToken, query as queryUsers, modifyPsw, editSaasInfo, modifyUser } from '@/services/user';
 import { AUTH_TOKEN, AUTH_AUTO_LOGIN } from '@/utils/constants';
-import { authorityRouter } from '@/utils/authority';
+import { getPermissionRoutes } from '@/utils/authority';
 
 const UserModel = {
   namespace: 'user',
@@ -89,10 +89,10 @@ const UserModel = {
         // menuList: action.payload.data.menus || [],
         menuList: (user => {
           const { type, org } = user || { org: {} };
-          const { menuList: _menuList } = authorityRouter(type, org.type);
+          const { menuList: _menuList } = getPermissionRoutes(type, org.type);
 
           return _menuList;
-        })(action.payload.data.user),
+        })(action.payload.data.user || action.payload.data),
       };
     },
     setPswVersion(state, action) {

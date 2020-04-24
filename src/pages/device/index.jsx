@@ -67,7 +67,7 @@ class Device extends Component {
             key = this.props.match.params.type;
         }
         const tabBean = tabArray.find(item => item.key === key);
-        const verity = tabBean.value;
+        const verity = tabBean ? tabBean.value : 1;
         const { dispatch } = this.props;
         dispatch({
             type: 'device/fetch',
@@ -142,7 +142,7 @@ class Device extends Component {
             loginUser,
         } = this.props;
         const { modalVisible, deviceBean, alertVisible } = this.state;
-        const { type } = this.props.match.params;
+        const { type } = this.props.match.params.type ? this.props.match.params : { type: 'pass' };
         // console.log('loginUser----', loginUser)
         return (
             <PageHeaderWrapper>

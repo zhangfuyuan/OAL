@@ -23,97 +23,116 @@ const routers = [
         authority: ['admin', 'user'],
         routes: [
           {
-            path: 'dashboard',
-            name: 'dashboard',
-            icon: 'dashboard',
-            component: './dashboard',
-          },
-          {
-            path: 'org',
+            path: '/org',
             name: 'orgManger',
             icon: 'idcard',
             component: './org',
           },
           {
-            path: 'userManagement',
+            path: '/userManagement',
             name: 'userManagement',
             icon: 'user',
             component: './userManagement',
           },
           {
-            path: 'device',
-            name: 'device',
-            icon: 'hdd',
-            routes: [
-              {
-                path: '/device',
-                redirect: '/device/pass'
-              },
-              {
-                path: '/device/:type',
-                name: 'deviceType',
-                component: './device'
-              },
-            ],
+            path: '/settings',
+            name: 'settings',
+            icon: 'setting',
+            component: './settings',
           },
           {
-            path: 'face',
+            path: '/dashboard',
+            name: 'dashboard2',
+            icon: 'dashboard',
+            component: './dashboard',
+          },
+          {
+            path: '/device',
+            name: 'device',
+            icon: 'hdd',
+            component: './device',
+          },
+          {
+            path: '/face',
             name: 'faceManger',
             icon: 'smile',
             routes: [
               {
                 path: '/face',
-                redirect: '/face/manger'
+                redirect: '/face/group',
               },
               {
-                path: '/face/manger',
-                name: 'faceMangerIndex',
+                path: '/face/group',
+                name: 'faceGroup',
                 component: './face',
               },
               {
                 path: '/face/blacklist',
                 name: 'faceBlacklist',
-                component: './face/blacklist'
+                component: './face/blacklist',
               },
               {
                 path: '/face/visitor',
                 name: 'faceVisitor',
-                component: './face/visitor'
+                component: './face/visitor',
+              },
+              {
+                component: './404',
               },
             ],
           },
           {
-            path: 'workAttendance',
+            path: '/log',
+            name: 'log',
+            icon: 'global',
+            routes: [
+              {
+                path: '/log',
+                redirect: '/log/authory',
+              },
+              {
+                path: '/log/authory',
+                name: 'logAuthory',
+                component: './log',
+              },
+              {
+                path: '/log/query',
+                name: 'logQuery',
+                component: './log/query',
+              },
+              {
+                component: './404',
+              },
+            ],
+          },
+          {
+            path: '/workAttendance',
             name: 'workAttendance',
             icon: 'table',
             routes: [
               {
                 path: '/workAttendance',
-                redirect: '/workAttendance/rule'
+                redirect: '/workAttendance/rule',
               },
               {
                 path: '/workAttendance/rule',
                 name: 'workAttendanceRule',
-                component: './workAttendance/rule',
-              },
-              {
-                path: '/workAttendance/manger',
-                name: 'workAttendanceManger',
                 component: './workAttendance',
               },
+              {
+                path: '/workAttendance/statistics',
+                name: 'workAttendanceStatistics',
+                component: './workAttendance/statistics',
+              },
+              {
+                path: '/workAttendance/record',
+                name: 'workAttendanceRecord',
+                component: './workAttendance/record',
+              },
+              {
+                component: './404',
+              },
             ],
-          },
-          {
-            path: 'log',
-            name: 'log',
-            icon: 'global',
-            component: './log',
-          },
-          {
-            path: 'settings',
-            name: 'settings',
-            icon: 'setting',
-            component: './settings',
           },
           {
             component: './404',

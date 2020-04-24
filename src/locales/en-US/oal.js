@@ -313,4 +313,5 @@ export default {
   'oal.ajax.requestErrorMessage': 'Network anomaly',
   '工号': 'Staffid',
   'oal.common.notSupportBrowserTips': 'System detected that you are using the Internet Explorer kernel browser, can not achieve a perfect experience, please change the browser access!',
+  'oal.common.addItems': 'Add item',
 };

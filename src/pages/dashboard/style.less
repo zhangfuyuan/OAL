@@ -1,0 +1,144 @@
+@import '~antd/es/style/themes/default.less';
+// @import '../../utils/utils.less';
+
+.myPageHeaderWrapper {
+  :global {
+    .ant-page-header.has-breadcrumb {
+      padding-top: 16px;
+    }
+
+    .ant-breadcrumb + .ant-page-header-heading {
+      margin-top: 0;
+    }
+
+    .ant-page-header-heading-title {
+      color: rgba(0, 0, 0, 0.65);
+      font-variant: tabular-nums;
+      line-height: 1.5;
+      list-style: none;
+      font-feature-settings: 'tnum';
+      font-weight: normal;
+      font-size: 14px;
+    }
+
+    .ant-card-body {
+      padding: 0;
+    }
+
+    .ant-tree li .ant-tree-node-content-wrapper {
+      margin-right: 100px;
+    }
+  }
+}
+
+.main {
+  display: flex;
+  width: 100%;
+  overflow: auto;
+  background-color: @menu-bg;
+
+  .left {
+    width: 27.7%;
+    padding: 24px;
+    border-right: @border-width-base @border-style-base @border-color-split;
+    overflow: auto;
+    position: relative;
+  }
+
+  .right {
+    flex: 1;
+    padding: 24px;
+    position: relative;
+  }
+}
+
+.tableListOperator {
+  margin-bottom: 16px;
+  button {
+    margin-right: 8px;
+  }
+}
+
+.tableListForm {
+  :global {
+    .ant-form-item {
+      display: flex;
+      margin-right: 0;
+      margin-bottom: 24px;
+      > .ant-form-item-label {
+        width: auto;
+        padding-right: 8px;
+        line-height: 32px;
+      }
+      .ant-form-item-control {
+        line-height: 32px;
+      }
+    }
+    .ant-form-item-control-wrapper {
+      flex: 1;
+    }
+  }
+  .submitButtons {
+    display: block;
+    margin-bottom: 24px;
+    white-space: nowrap;
+  }
+}
+
+.card {
+  :global {
+    .ant-card-meta-title {
+      margin-bottom: 12px;
+      & > a {
+        display: inline-block;
+        max-width: 100%;
+        color: @heading-color;
+      }
+    }
+    .ant-card-body:hover {
+      .ant-card-meta-title > a {
+        color: @primary-color;
+      }
+    }
+  }
+}
+
+// Media queries breakpoints
+// Extra small screen / phone
+// @screen-xs: 480px;
+
+// Small screen / tablet
+// @screen-sm: 576px;
+
+// Medium screen / desktop
+// @screen-md: 768px;
+
+// Large screen / wide desktop
+// @screen-lg: 992px;
+
+// Extra large screen / full hd
+// @screen-xl: 1200px;
+
+// Extra extra large screen / large desktop
+// @screen-xxl: 1600px;
+
+@media screen and (max-width: @screen-lg) {
+  .tableListForm :global(.ant-form-item) {
+    margin-right: 24px;
+  }
+}
+
+@media screen and (max-width: @screen-md) {
+  .main {
+    flex-direction: column;
+
+    .left {
+      width: 100%;
+      border: none;
+    }
+  }
+
+  .tableListForm :global(.ant-form-item) {
+    margin-right: 8px;
+  }
+}
