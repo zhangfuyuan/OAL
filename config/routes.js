@@ -51,6 +51,9 @@ const routers = [
                 path: '/device/:type',
                 component: './device'
               },
+              {
+                component: './404',
+              },
             ],
           },
           {

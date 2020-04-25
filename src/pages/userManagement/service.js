@@ -6,8 +6,9 @@ import { post, get, capture } from '@/utils/ajax';
  * @returns {Promise<*>}
  */
 export async function addUser(data) {
-  capture('12', data);
-  return post('/api/user/add', data);
+  const _promise = post('/api/user/add', data);
+  _promise.then(res => { if (res && res.res > 0) capture('12', data); });
+  return _promise;
 }
 
 /**
@@ -24,9 +25,13 @@ export async function getUserList(query) {
  * action：delete，resetPsw
  */
 export async function operateUser(data) {
-  capture('13', {
-    userId: data.userId,
-    action: data.action,
+  const _promise = get(`/api/user/${data.userId}/${data.action}`);
+  _promise.then(res => {
+    if (res && res.res > 0)
+      capture('13', {
+        userId: data.userId,
+        action: data.action,
+      });
   });
-  return get(`/api/user/${data.userId}/${data.action}`);
+  return _promise;
 }

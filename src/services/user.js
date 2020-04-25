@@ -13,13 +13,13 @@ export async function authByToken() {
   return get('/api/user/authByToken');
 }
 export async function modifyPsw(data) {
-  capture('17', data);
   return post('/api/user/modifyPsw', data);
 }
 
 export async function modifyUser(data) {
-  capture('18', data);
-  return post('/api/user/update', data);
+  const _promise = post('/api/user/update', data);
+  _promise.then(res => { if (res && res.res > 0) capture('18', data); });
+  return _promise;
 }
 
 /**
@@ -28,7 +28,8 @@ export async function modifyUser(data) {
  * @returns {Promise<*>}
  */
 export async function editSaasInfo(data) {
-  capture('19', data);
-  return post('/api/org/editSaasInfo', data)
+  const _promise = post('/api/org/editSaasInfo', data);
+  _promise.then(res => { if (res && res.res > 0) capture('19', data); });
+  return _promise;
 }
 // /api/user/modifyPsw

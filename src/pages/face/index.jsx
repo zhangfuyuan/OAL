@@ -390,6 +390,7 @@ class Face extends Component {
           capture('4', {
             ...result.data,
             fName: file.name,
+            oalhost: window.location.host,
           });
         }
       },

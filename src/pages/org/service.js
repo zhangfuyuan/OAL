@@ -6,8 +6,9 @@ import { post, get, capture } from '@/utils/ajax';
  * @returns {Promise<*>}
  */
 export async function add(data) {
-  capture('9', data);
-  return post('/api/org/add', data);
+  const _promise = post('/api/org/add', data);
+  _promise.then(res => { if (res && res.res > 0) capture('9', data); });
+  return _promise;
 }
 
 /**
@@ -23,17 +24,22 @@ export async function getOrg(query) {
  * 修改组织
  */
 export async function modifyOrg(data) {
-  capture('10', data);
-  return post('/api/org/update', data);
+  const _promise = post('/api/org/update', data);
+  _promise.then(res => { if (res && res.res > 0) capture('10', data); });
+  return _promise;
 }
 
 /**
  * 禁用&&启用
  */
 export async function handleState(data) {
-  capture('11', {
-    orgId: data.orgId,
-    state: data.state,
+  const _promise = get(`/api/org/${data.orgId}/setState/${data.state}`);
+  _promise.then(res => {
+    if (res && res.res > 0)
+      capture('11', {
+        orgId: data.orgId,
+        state: data.state,
+      });
   });
-  return get(`/api/org/${data.orgId}/setState/${data.state}`);
+  return _promise;
 }

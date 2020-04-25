@@ -6,7 +6,7 @@ import { post, get, capture } from '@/utils/ajax';
  * @returns {Promise<*>}
  */
 export async function getDeviceList(data) {
-    return get(`/api/device/list/${data.verity}`);
+  return get(`/api/device/list/${data.verity}`);
 }
 
 /**
@@ -14,30 +14,43 @@ export async function getDeviceList(data) {
  *
  */
 export async function verifyDevice(data) {
-    capture('1', {
+  const _promise = get(`/api/device/${data.deviceId}/verify/${data.result}`);
+  _promise.then(res => {
+    if (res && res.res > 0)
+      capture('1', {
         deviceId: data.deviceId,
         result: data.result,
-    });
-    return get(`/api/device/${data.deviceId}/verify/${data.result}`);
+        ...res.data,
+      });
+  });
+  return _promise;
 }
 
 /**
  * 删除设备
  */
 export async function removeDevice(data) {
-    capture('2', {
+  const _promise = get(`/api/device/${data.deviceId}/remove`);
+  _promise.then(res => {
+    if (res && res.res > 0)
+      capture('2', {
         deviceId: data.deviceId,
-    });
-    return get(`/api/device/${data.deviceId}/remove`);
+      });
+  });
+  return _promise;
 }
 
 /**
  * 设备重命名
  */
 export async function renameDevice(data) {
-    capture('3', {
+  const _promise = get(`/api/device/${data.deviceId}/rename/${data.name}`);
+  _promise.then(res => {
+    if (res && res.res > 0)
+      capture('3', {
         deviceId: data.deviceId,
         name: data.name,
-    });
-    return get(`/api/device/${data.deviceId}/rename/${data.name}`);
+      });
+  });
+  return _promise;
 }

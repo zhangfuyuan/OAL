@@ -77,8 +77,13 @@ const get = path => request(path, {
 const remove = path => request(path, {
   method: 'delete',
 });
-const capture = (ctype, params) => request('/guard-web/f/com/capture', {
-  method: 'post',
-  data: { ctype, ...(params || {}) },
-});
+const capture = (ctype, params = {}) => {
+  const { user } = window.g_app && window.g_app._store.getState() || {};
+  const { userName: cuserName, org: { path: corg } } = user && user.currentUser || { org: {} };
+
+  return request('/guard-web/f/com/capture', {
+    method: 'post',
+    data: { cuserName, corg, cpath: corg, ctype, ...params },
+  });
+};
 export { post, get, remove, capture };

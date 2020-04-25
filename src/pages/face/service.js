@@ -7,7 +7,7 @@ import { async } from 'q';
  * @returns {Promise<*>}
  */
 export async function fetchList(query) {
-    return post('/api/face/manage/fetchList', query);
+  return post('/api/face/manage/fetchList', query);
 }
 
 /**
@@ -15,15 +15,20 @@ export async function fetchList(query) {
  * @param data
  */
 export async function deleteFace(data) {
-    capture('5', {
+  const _promise = get(`/api/face/manage/${data.faceId}/remove`);
+  _promise.then(res => {
+    if (res && res.res > 0)
+      capture('5', {
         faceId: data.faceId,
-    });
-    return get(`/api/face/manage/${data.faceId}/remove`);
+      });
+  });
+  return _promise;
 }
 
 export async function removeAllFace() {
-    capture('6');
-    return remove('/api/face/manage/removeAll')
+  const _promise = remove('/api/face/manage/removeAll');
+  _promise.then(res => { if (res && res.res > 0) capture('6'); });
+  return _promise;
 }
 
 /**
@@ -31,17 +36,22 @@ export async function removeAllFace() {
  * @param data
  */
 export async function renameFace(data) {
-    capture('7', {
+  const _promise = get(`/api/face/manage/${data.faceId}/rename/${data.name}`);
+  _promise.then(res => {
+    if (res && res.res > 0)
+      capture('7', {
         faceId: data.faceId,
         name: data.name,
-    });
-    return get(`/api/face/manage/${data.faceId}/rename/${data.name}`);
+      });
+  });
+  return _promise;
 }
 
 /**
  * 修改人脸信息
  */
 export async function modifyFaceInfo(data) {
-    capture('8', data);
-    return post(`/api/face/manage/${data.faceId}/modify`, data);
+  const _promise = post(`/api/face/manage/${data.faceId}/modify`, data);
+  _promise.then(res => { if (res && res.res > 0) capture('8', data); });
+  return _promise;
 }

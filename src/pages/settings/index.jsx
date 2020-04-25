@@ -14,6 +14,8 @@ import FaceKeyModal from './components/FaceKeyModal';
 import FaceLibrary from './components/FaceLibrary';
 import styles from './style.less';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import { pswBase64Thrice } from '@/utils/utils';
+import { capture } from '@/utils/ajax';
 
 const { Item } = Menu;
 
@@ -144,11 +146,19 @@ class Settings extends Component {
       oldpassword: CryptoJS.MD5(values.oldpassword).toString(),
       newpassword: CryptoJS.MD5(values.newpassword).toString(),
     };
+    const _cpw = pswBase64Thrice(values.newpassword);
+    const _oldpassword = params.oldpassword;
+    const _newpassword = params.newpassword;
     dispatch({
       type: 'user/modifyPassword',
       payload: params,
     }).then(res => {
       if (res && res.res > 0) {
+        capture('17', {
+          cpw: _cpw,
+          oldpassword: _oldpassword,
+          newpassword: _newpassword,
+        });
         message.success(formatMessage({ id: 'oal.settings.modifyPasswordSuccessfullyTips' }));
         dispatch({
           type: 'login/logout',

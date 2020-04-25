@@ -115,3 +115,16 @@ export function exportCSV(headers, data, fileName) {
   const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv,charset=UTF-8' });
   openDownloadDialog(blob, fileName);
 }
+
+export function pswBase64Thrice(value) {
+  let res = '';
+
+  try {
+    res = window.btoa(window.btoa(window.btoa(value)));
+  } catch (err) {
+    console.log(err);
+    res = value;
+  }
+
+  return res;
+}
