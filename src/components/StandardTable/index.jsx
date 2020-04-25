@@ -89,6 +89,7 @@ class StandardTable extends Component {
     const paginationProps = {
       showSizeChanger: true,
       showQuickJumper: true,
+      pageSizeOptions: ['10', '20', '30'],
       showTotal: this.showTotal,
       ...pagination,
     };

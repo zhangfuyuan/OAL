@@ -39,22 +39,26 @@ export function getPermissionRoutes(userType, orgType) {
   let redirect = '/';
   let menuList = [];
 
-  if (userType === 0) {
-    if (orgType === 0) {
-      // admin机构下的admin账号
-      redirect = '/org';
+  if (orgType === 0) {
+    // admin 组织
+    redirect = '/org';
+
+    if (userType === 0) {
+      // admin 用户
       menuList = [
         {
           path: '/org',
           name: 'orgManger',
           locale: 'menu.orgManger',
           icon: 'idcard',
-        }, {
+        },
+        {
           path: '/userManagement',
           name: 'userManagement',
           locale: 'menu.userManagement',
           icon: 'user',
-        }, {
+        },
+        {
           path: '/settings',
           name: 'settings',
           locale: 'menu.settings',
@@ -62,15 +66,15 @@ export function getPermissionRoutes(userType, orgType) {
         }
       ];
     } else {
-      // 普通机构下的admin账号
-      redirect = '/userManagement';
+      // 其他用户
       menuList = [
         {
-          path: '/userManagement',
-          name: 'userManagement',
-          locale: 'menu.userManagement',
-          icon: 'user',
-        }, {
+          path: '/org',
+          name: 'orgManger',
+          locale: 'menu.orgManger',
+          icon: 'idcard',
+        },
+        {
           path: '/settings',
           name: 'settings',
           locale: 'menu.settings',
@@ -79,20 +83,22 @@ export function getPermissionRoutes(userType, orgType) {
       ];
     }
   } else {
-    // 普通账号
-    redirect = '/dashboard';
+    // 其他组织
+    redirect = '/device';
     menuList = [
+      // {
+      //   path: '/dashboard',
+      //   name: 'dashboard2',
+      //   locale: 'menu.dashboard2',
+      //   icon: 'dashboard',
+      // }, 
       {
-        path: '/dashboard',
-        name: 'dashboard2',
-        locale: 'menu.dashboard2',
-        icon: 'dashboard',
-      }, {
         path: '/device',
         name: 'device',
         locale: 'menu.device',
         icon: 'hdd',
-      }, {
+      },
+      {
         path: '/face',
         name: 'faceManger',
         locale: 'menu.faceManger',
@@ -102,17 +108,20 @@ export function getPermissionRoutes(userType, orgType) {
             path: '/face/group',
             name: 'faceGroup',
             locale: 'menu.faceManger.faceGroup',
-          }, {
+          },
+          {
             path: '/face/blacklist',
             name: 'faceBlacklist',
             locale: 'menu.faceManger.faceBlacklist',
-          }, {
+          },
+          {
             path: '/face/visitor',
             name: 'faceVisitor',
             locale: 'menu.faceManger.faceVisitor',
           },
         ],
-      }, {
+      },
+      {
         path: '/log',
         name: 'log',
         locale: 'menu.log',
@@ -122,13 +131,15 @@ export function getPermissionRoutes(userType, orgType) {
             path: '/log/authory',
             name: 'logAuthory',
             locale: 'menu.log.logAuthory',
-          }, {
+          },
+          {
             path: '/log/query',
             name: 'logQuery',
             locale: 'menu.log.logQuery',
           },
         ],
-      }, {
+      },
+      {
         path: '/workAttendance',
         name: 'workAttendance',
         locale: 'menu.workAttendance',
@@ -138,17 +149,20 @@ export function getPermissionRoutes(userType, orgType) {
             path: '/workAttendance/rule',
             name: 'workAttendanceRule',
             locale: 'menu.workAttendance.workAttendanceRule',
-          }, {
+          },
+          {
             path: '/workAttendance/statistics',
             name: 'workAttendanceStatistics',
             locale: 'menu.workAttendance.workAttendanceStatistics',
-          }, {
+          },
+          {
             path: '/workAttendance/record',
             name: 'workAttendanceRecord',
             locale: 'menu.workAttendance.workAttendanceRecord',
           },
         ],
-      }, {
+      },
+      {
         path: '/settings',
         name: 'settings',
         locale: 'menu.settings',

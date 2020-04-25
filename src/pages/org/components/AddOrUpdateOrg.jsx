@@ -49,7 +49,7 @@ const AddOrUpdateOrg = props => {
   };
 
   const checkPath = (rule, value, callback) => {
-    const reg = /^[A-Za-z]+$/;
+    const reg = /^[0-9A-Za-z]+$/;
     if (value && !reg.test(value)) {
       callback(formatMessage({ id: 'oal.org.enterEnglishString' }));
     }
@@ -72,19 +72,25 @@ const AddOrUpdateOrg = props => {
             rules: [
               {
                 required: true,
-                message: formatMessage({ id: 'oal.org.enterOrgName' }),
+                max: 40,
+                message: formatMessage({ id: 'oal.org.enterOrgNameTips' }),
               },
             ],
             initialValue: orgBean.name,
           })(<Input placeholder={formatMessage({ id: 'oal.org.orgName' })} />)}
         </Form.Item>
-        <Form.Item label={formatMessage({ id: 'oal.org.contactName' })}>
+        <Form.Item label={formatMessage({ id: 'oal.org.contacts' })}>
           {getFieldDecorator('contactName', {
-            rules: [],
+            rules: [
+              {
+                max: 20,
+                message: formatMessage({ id: 'oal.org.enterContactsTips' }),
+              }
+            ],
             initialValue: orgBean && orgBean.contact && orgBean.contact.nickName,
           })(<Input placeholder={formatMessage({ id: 'oal.org.contactName' })} />)}
         </Form.Item>
-        <Form.Item label={formatMessage({ id: 'oal.common.emailAddress' })}>
+        {/* <Form.Item label={formatMessage({ id: 'oal.common.emailAddress' })}>
           {getFieldDecorator('email', {
             rules: [
               {
@@ -94,7 +100,7 @@ const AddOrUpdateOrg = props => {
             ],
             initialValue: orgBean && orgBean.contact && orgBean.contact.email,
           })(<Input placeholder={formatMessage({ id: 'oal.common.emailAddress' })} />)}
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item label={formatMessage({ id: 'oal.common.phoneNumber' })}>
           {getFieldDecorator('mobile', {
             rules: [
@@ -108,20 +114,27 @@ const AddOrUpdateOrg = props => {
         <Form.Item
           label={
             <span>
-              <FormattedMessage id="oal.org.accessPath" />&nbsp;
+              <FormattedMessage id="oal.org.orgPath" />&nbsp;
               <Tooltip title={formatMessage({ id: 'oal.org.usersAccessAppTips' })}>
                 <Icon type="question-circle-o" />
               </Tooltip>
             </span>
           }
-          extra={`${window.location.origin}${publicPath}user/${form.getFieldValue('path') || '*'}/login`}
+          className="oal-form-item"
+          extra={`${formatMessage({ id: 'oal.org.accessPath' })} : ${window.location.origin}${publicPath}user/${form.getFieldValue('path') || '*'}/login`}
         >
           {getFieldDecorator('path', {
-            rules: [{ required: true, message: formatMessage({ id: 'oal.org.enterAccessPath' }) }, {
-              validator: checkPath,
-            }],
+            rules: [
+              {
+                required: true,
+                message: formatMessage({ id: 'oal.org.enterAccessPathTips' }),
+              },
+              {
+                validator: checkPath,
+              }
+            ],
             initialValue: orgBean.path,
-          })(<Input disabled={isEdit}/>)}
+          })(<Input placeholder={formatMessage({ id: 'oal.org.orgPath' })} disabled={isEdit} />)}
         </Form.Item>
       </Form>
     </Modal>

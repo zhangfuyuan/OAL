@@ -1,4 +1,4 @@
-import { add, getOrg, modifyOrg, handleState } from './service';
+import { add, getOrg, modifyOrg, handleState, resetPsw } from './service';
 
 const Model = {
   namespace: 'org',
@@ -29,6 +29,11 @@ const Model = {
     },
     *handleState({ payload }, { call }) {
       const response = yield call(handleState, payload);
+      // console.log('handleState response-->', response);
+      return Promise.resolve(response);
+    },
+    *resetPsw({ payload }, { call }) {
+      const response = yield call(resetPsw, payload);
       // console.log('handleState response-->', response);
       return Promise.resolve(response);
     },

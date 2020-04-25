@@ -29,5 +29,14 @@ export async function modifyOrg(data) {
  * 禁用&&启用
  */
 export async function handleState(data) {
+  // 8126TODO 参数放在body里
+  return get(`/api/org/${data.orgId}/setState/${data.state}`);
+}
+
+/**
+ * 重置密码
+ */
+export async function resetPsw(data) {
+  // 8126TODO 修改成 /api/org/updatePwd
   return get(`/api/org/${data.orgId}/setState/${data.state}`);
 }

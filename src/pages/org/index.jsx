@@ -19,6 +19,7 @@ import { connect } from 'dva';
 import StandardTable from '../../components/StandardTable';
 import AddOrUpdateOrg from './components/AddOrUpdateOrg';
 import OrgDetailModal from './components/OrgDetailModal';
+import OrgResetModal from './components/OrgResetModal';
 import styles from './style.less';
 import defaultSettings from '../../../config/defaultSettings';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
@@ -38,6 +39,7 @@ const { publicPath } = defaultSettings;
 class OrgList extends Component {
   state = {
     detailVisible: false,
+    resetVisible: false,
     modalVisible: false,
     formValues: {},
     selectedRows: [],
@@ -119,7 +121,7 @@ class OrgList extends Component {
         dataIndex: 'name',
       },
       {
-        title: formatMessage({ id: 'oal.common.status' }),
+        title: formatMessage({ id: 'oal.org.orgStatus' }),
         dataIndex: 'state',
         render(val) {
           return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
@@ -140,13 +142,27 @@ class OrgList extends Component {
         render: (text, record) => <span>{(record && record.contact && record.contact.nickName) || formatMessage({ id: 'oal.org.notFill' })}</span>,
       },
       {
+        title: formatMessage({ id: 'oal.org.creator' }),
+        dataIndex: 'creator',
+        render: (text, record) => <span>{text || '--'}</span>,
+      },
+      {
         title: formatMessage({ id: 'oal.common.handle' }),
-        width: 150,
+        width: 250,
         render: (text, record) => (
           <Fragment>
             <a onClick={() => this.openDetailModal(record)}><FormattedMessage id="oal.common.view" /></a>
             <Divider type="vertical" />
-            <MoreBtn item={record} />
+            <a onClick={() => this.moreAction('modify', record)}><FormattedMessage id="oal.common.modify" /></a>
+            <Divider type="vertical" />
+            <a onClick={() => this.openResetModal(record)}><FormattedMessage id="oal.org.resetPassword" /></a>
+            <Divider type="vertical" />
+            {
+              record.state === 1 ?
+                <a onClick={() => this.moreAction('close', record)}><FormattedMessage id="oal.common.disable" /></a> :
+                <a onClick={() => this.moreAction('open', record)}><FormattedMessage id="oal.common.enable" /></a>
+            }
+            {/* <MoreBtn item={record} /> */}
           </Fragment>
         ),
       },
@@ -230,12 +246,38 @@ class OrgList extends Component {
     this.setState({ detailVisible: true, selectedOrg: record });
   };
 
+  openResetModal = record => {
+    this.setState({ resetVisible: true, selectedOrg: record });
+  };
+
   closeDetailModal = () => {
     this.setState({ detailVisible: false, selectedOrg: {} });
   };
 
+  closeResetModal = () => {
+    this.setState({ resetVisible: false, selectedOrg: {} });
+  };
+
   submitCopy = () => {
     this.closeDetailModal();
+  };
+
+  submitReset = () => {
+    const { dispatch } = this.props;
+    const { selectedOrg } = this.state;
+    // 8126TODO 参数需要修改
+    dispatch({
+      type: 'org/resetPsw',
+      payload: {
+        orgId: selectedOrg._id,
+        state: 1,
+      },
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.org.resetSuccessfully' }));
+        this.closeResetModal();
+      }
+    });
   };
 
   handleUpdateModalVisible = record => {
@@ -295,12 +337,17 @@ class OrgList extends Component {
         >
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.org.orgName' })}>
-              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.org.enterOrgName2' })} />)}
+              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.org.enterOrgName' })} />)}
             </FormItem>
           </Col>
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.org.path' })}>
               {getFieldDecorator('path')(<Input placeholder={formatMessage({ id: 'oal.org.enterPath' })} />)}
+            </FormItem>
+          </Col>
+          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
+            <FormItem label={formatMessage({ id: 'oal.org.creator' })}>
+              {getFieldDecorator('creator')(<Input placeholder={formatMessage({ id: 'oal.org.enterCreator' })} />)}
             </FormItem>
           </Col>
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
@@ -359,15 +406,22 @@ class OrgList extends Component {
     });
   };
 
+  org_showTotal = (total, range) => (formatMessage({
+    id: 'oal.org.currentToTotal',
+  }, {
+    total,
+  }));
+
   render() {
     const {
       org: { orgList },
       loading,
       addOrUpdateOrgLoading,
     } = this.props;
-    const { selectedRows, modalVisible, selectedOrg, detailVisible } = this.state;
+    orgList && orgList.pagination && (orgList.pagination.showTotal = this.org_showTotal);
+    const { selectedRows, modalVisible, selectedOrg, detailVisible, resetVisible } = this.state;
     return (
-      <PageHeaderWrapper>
+      <PageHeaderWrapper className={styles.myPageHeaderWrapper}>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
@@ -401,6 +455,12 @@ class OrgList extends Component {
           orgBean={selectedOrg}
           handleCancel={this.closeDetailModal}
           handleSubmit={this.submitCopy}
+        />
+        <OrgResetModal
+          visible={resetVisible}
+          orgBean={selectedOrg}
+          handleCancel={this.closeResetModal}
+          handleSubmit={this.submitReset}
         />
       </PageHeaderWrapper>
     );

@@ -372,7 +372,7 @@ class Demo extends Component {
         >
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.org.orgName' })}>
-              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.org.enterOrgName2' })} />)}
+              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.org.enterOrgName' })} />)}
             </FormItem>
           </Col>
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>

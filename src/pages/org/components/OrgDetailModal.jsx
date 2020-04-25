@@ -1,4 +1,4 @@
-import { Modal, message } from 'antd';
+import { Modal, message, Divider } from 'antd';
 import React from 'react';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import defaultSettings from '../../../../config/defaultSettings';
@@ -12,7 +12,7 @@ const OrgDetailModal = props => {
 
   const { origin } = window.location;
   const href = `${origin}${publicPath}user/${orgBean.path}/login`;
-  const copyText = `${formatMessage({ id: 'oal.org.visit' })}${href},${formatMessage({ id: 'oal.org.login' })}admin/admin`
+  const copyText = `${formatMessage({ id: 'oal.org.accessAddress' })} : ${href}\n${formatMessage({ id: 'oal.org.loginAccount' })} : admin\n${formatMessage({ id: 'oal.org.initialPassword' })} : admin`;
 
   const handleOk = () => {
     const copyArea = document.getElementById('copyArea');
@@ -41,9 +41,14 @@ const OrgDetailModal = props => {
       okText={formatMessage({ id: 'oal.common.copy' })}
       cancelText={formatMessage({ id: 'oal.common.close' })}
     >
-        <p><FormattedMessage id="oal.org.giveUserFollowingInfo" /></p>
-        <p><FormattedMessage id="oal.org.visit" />{href}</p>
-        <p><FormattedMessage id="oal.org.login" />admin/admin</p>
+        <p><FormattedMessage id="oal.org.orgName" /> : {orgBean.name}</p>
+        <p><FormattedMessage id="oal.org.contacts" /> : {orgBean.contact && orgBean.contact.nickName}</p>
+        <p><FormattedMessage id="oal.common.phoneNumber" /> : {orgBean.contact && orgBean.contact.mobile}</p>
+        <Divider />
+        <p><FormattedMessage id="oal.org.giveUserFollowingInfo" /> : </p>
+        <p><FormattedMessage id="oal.org.accessAddress" /> : {href}</p>
+        <p><FormattedMessage id="oal.org.loginAccount" /> : admin</p>
+        <p><FormattedMessage id="oal.org.initialPassword" /> : admin</p>
         <textarea cols="40" rows="5" id="copyArea" defaultValue={copyText} style={{ position: 'absolute', top: '-999px', left: '-999px' }}/>
     </Modal>
   );
