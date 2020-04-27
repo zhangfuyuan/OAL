@@ -42,46 +42,46 @@ export function getPermissionRoutes(userType, orgType) {
   if (orgType === 0) {
     // admin 组织
     redirect = '/org';
+    menuList = [
+      {
+        path: '/org',
+        name: 'orgManger',
+        locale: 'menu.orgManger',
+        icon: 'idcard',
+      },
+      {
+        path: '/userManagement',
+        name: 'userManagement',
+        locale: 'menu.userManagement',
+        icon: 'user',
+      },
+      {
+        path: '/settings',
+        name: 'settings',
+        locale: 'menu.settings',
+        icon: 'setting',
+      }
+    ];
 
-    if (userType === 0) {
-      // admin 用户
-      menuList = [
-        {
-          path: '/org',
-          name: 'orgManger',
-          locale: 'menu.orgManger',
-          icon: 'idcard',
-        },
-        {
-          path: '/userManagement',
-          name: 'userManagement',
-          locale: 'menu.userManagement',
-          icon: 'user',
-        },
-        {
-          path: '/settings',
-          name: 'settings',
-          locale: 'menu.settings',
-          icon: 'setting',
-        }
-      ];
-    } else {
-      // 其他用户
-      menuList = [
-        {
-          path: '/org',
-          name: 'orgManger',
-          locale: 'menu.orgManger',
-          icon: 'idcard',
-        },
-        {
-          path: '/settings',
-          name: 'settings',
-          locale: 'menu.settings',
-          icon: 'setting',
-        }
-      ];
-    }
+    // if (userType === 0) {
+    //   // admin 用户
+    // } else {
+    //   // 其他用户
+    //   menuList = [
+    //     {
+    //       path: '/org',
+    //       name: 'orgManger',
+    //       locale: 'menu.orgManger',
+    //       icon: 'idcard',
+    //     },
+    //     {
+    //       path: '/settings',
+    //       name: 'settings',
+    //       locale: 'menu.settings',
+    //       icon: 'setting',
+    //     }
+    //   ];
+    // }
   } else {
     // 其他组织
     redirect = '/device';

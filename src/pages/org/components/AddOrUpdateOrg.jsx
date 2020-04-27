@@ -72,8 +72,11 @@ const AddOrUpdateOrg = props => {
             rules: [
               {
                 required: true,
-                max: 40,
                 message: formatMessage({ id: 'oal.org.enterOrgNameTips' }),
+              },
+              {
+                max: 40,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '40' }),
               },
             ],
             initialValue: orgBean.name,
@@ -84,7 +87,7 @@ const AddOrUpdateOrg = props => {
             rules: [
               {
                 max: 20,
-                message: formatMessage({ id: 'oal.org.enterContactsTips' }),
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
               }
             ],
             initialValue: orgBean && orgBean.contact && orgBean.contact.nickName,
@@ -127,7 +130,7 @@ const AddOrUpdateOrg = props => {
             rules: [
               {
                 required: true,
-                message: formatMessage({ id: 'oal.org.enterAccessPathTips' }),
+                message: formatMessage({ id: 'oal.org.enterPathTips' }),
               },
               {
                 validator: checkPath,

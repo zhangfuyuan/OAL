@@ -21,15 +21,15 @@ import router from 'umi/router';
 import { find, findIndex } from 'lodash';
 import StandardTable from '../../components/StandardTable';
 import AddOrUpdateUser from './components/AddOrUpdateUser';
+import UserResetModal from './components/UserResetModal';
+import UserDelModal from './components/UserDelModal';
 import styles from './style.less';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import Link from 'umi/link';
 
 const { confirm } = Modal;
 const FormItem = Form.Item;
 const { Option } = Select;
-
-const statusMap = ['error', 'success'];
-const status = ['oal.user-manage.failure', 'oal.user-manage.normal'];
 
 @connect(({ userManagement, loading }) => ({
     userManagement,
@@ -39,6 +39,8 @@ const status = ['oal.user-manage.failure', 'oal.user-manage.normal'];
 class UserManagement extends Component {
     state = {
         modalVisible: false,
+        resetVisible: false,
+        delVisible: false,
         formValues: {},
         selectedRows: [],
         selectedUser: {},
@@ -50,7 +52,7 @@ class UserManagement extends Component {
 
     columns = [
         {
-          title: formatMessage({ id: 'oal.common.username' }),
+          title: formatMessage({ id: 'oal.common.account' }),
           dataIndex: 'userName',
           ellipsis: true,
         },
@@ -59,7 +61,7 @@ class UserManagement extends Component {
           ellipsis: true,
           render: (text, record) => (
             <span>
-              {record && record.profile && record.profile.nickName ? record.profile.nickName : ''}
+              {record && record.profile && record.profile.nickName ? record.profile.nickName : '--'}
             </span>
           ),
         },
@@ -82,25 +84,33 @@ class UserManagement extends Component {
           ),
         },
         {
-          title: formatMessage({ id: 'oal.common.status' }),
-          dataIndex: 'state',
+          title: formatMessage({ id: 'oal.user-manage.orgNum' }),
+          dataIndex: 'orgNum',
           width: 120,
-          render(val) {
-            return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
-          },
+          render: (text, record) => (
+            <Fragment>
+              {/* <a onClick={() => this.openWin(record.orgNum)}>{record.orgNum}</a> */}
+              <Link to={`/org?creator=${record && record.profile && record.profile.nickName || ''}`}>{record.orgNum || 0}</Link>
+            </Fragment>
+          ),
         },
         {
           title: formatMessage({ id: 'oal.common.handle' }),
-          width: 140,
+          width: 200,
           render: (text, record) => (
             <Fragment>
-              <Popconfirm title={formatMessage({ id: 'oal.user-manage.confirmDeleteUser' })} okText={formatMessage({ id: 'oal.common.confirm' })} cancelText={formatMessage({ id: 'oal.common.cancel' })} onConfirm={() => this.deleteUser(record)}>
+              <a onClick={() => this.handleUpdateModalVisible(record)}><FormattedMessage id="oal.common.modify" /></a>
+              <Divider type="vertical" />
+              <a onClick={() => this.openResetModal(record)}><FormattedMessage id="oal.user-manage.resetPassword" /></a>
+              <Divider type="vertical" />
+              <a onClick={() => this.openDelModal(record)} disabled={!record.type}><FormattedMessage id="oal.common.delete" /></a>
+              {/* <Popconfirm title={formatMessage({ id: 'oal.user-manage.confirmDeleteUser' })} okText={formatMessage({ id: 'oal.common.confirm' })} cancelText={formatMessage({ id: 'oal.common.cancel' })} onConfirm={() => this.deleteUser(record)}>
                 <a href="#" disabled={!record.type}><FormattedMessage id="oal.common.delete" /></a>
               </Popconfirm>
               <Divider type="vertical" />
               <Popconfirm title={formatMessage({ id: 'oal.user-manage.confirmResetUserPassword' })} okText={formatMessage({ id: 'oal.common.confirm' })} cancelText={formatMessage({ id: 'oal.common.cancel' })} onConfirm={() => this.resetPsw(record)}>
                 <a href="#"><FormattedMessage id="oal.user-manage.resetPassword" /></a>
-              </Popconfirm>
+              </Popconfirm> */}
             </Fragment>
           ),
         },
@@ -131,9 +141,10 @@ class UserManagement extends Component {
               action: 'delete',
           },
         }).then(res => {
-          if (res.res === 1) {
-            this.loadUserList();
+          if (res && res.res > 0) {
             message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+            this.closeDelModal();
+            this.loadUserList();
           }
         });
     };
@@ -148,9 +159,10 @@ class UserManagement extends Component {
             action: 'resetPsw',
         },
       }).then(res => {
-        if (res.res === 1) {
+        if (res && res.res > 0) {
+          message.success(formatMessage({ id: 'oal.org.resetSuccessfully' }));
+          this.closeResetModal();
           this.loadUserList();
-          message.success(formatMessage({ id: 'oal.user-manage.resetPasswordSuccessfully' }));
         }
       });
     };
@@ -201,8 +213,24 @@ class UserManagement extends Component {
         this.setState({ modalVisible: true });
     };
 
+    openResetModal = record => {
+      this.setState({ resetVisible: true, selectedUser: record });
+    };
+
+    openDelModal = record => {
+      this.setState({ delVisible: true, selectedUser: record });
+    };
+
     closeAddOrUpdateModal = () => {
         this.setState({ modalVisible: false, selectedUser: {} });
+    };
+
+    closeResetModal = () => {
+      this.setState({ resetVisible: false, selectedUser: {} });
+    };
+
+    closeDelModal = () => {
+      this.setState({ delVisible: false, selectedUser: {} });
     };
 
     submitAddOrUpdate = (values, callback) => {
@@ -210,17 +238,33 @@ class UserManagement extends Component {
         const { selectedUser } = this.state;
         // eslint-disable-next-line no-underscore-dangle
         if (selectedUser && selectedUser._id) {
-          // console.log('修改走这边---');
+          console.log(8126, '修改用户信息', values);
+          // 8126TODO 对接修改账号信息接口
+          // dispatch({
+          //   type: 'userManagement/modify',
+          //   payload: values,
+          // }).then(res => {
+          //   if (res && res.res > 0) {
+          //     message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+          //     this.closeAddOrUpdateModal();
+          //     this.loadUserList();
+          //     callback();
+          //   }
+          // });
+          message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+          this.closeAddOrUpdateModal();
+          this.loadUserList();
+          callback();
         } else {
           dispatch({
             type: 'userManagement/add',
             payload: values,
           }).then(res => {
-            if (res.res === 1) {
-                message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
-                this.closeAddOrUpdateModal();
-                this.loadUserList();
-                callback();
+            if (res && res.res > 0) {
+              message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
+              this.closeAddOrUpdateModal();
+              this.loadUserList();
+              callback();
             }
           });
         }
@@ -239,24 +283,13 @@ class UserManagement extends Component {
               }}
             >
               <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-                <FormItem label={formatMessage({ id: 'oal.common.username' })}>
-                  {getFieldDecorator('userName')(<Input placeholder={formatMessage({ id: 'oal.user-manage.enterUsername2' })} />)}
+                <FormItem label={formatMessage({ id: 'oal.common.nickname' })}>
+                  {getFieldDecorator('nickname')(<Input placeholder={formatMessage({ id: 'oal.user-manage.enterNickname' })} />)}
                 </FormItem>
               </Col>
               <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-                <FormItem label={formatMessage({ id: 'oal.common.status' })}>
-                  {getFieldDecorator('state')(
-                    <Select
-                      placeholder={formatMessage({ id: 'oal.common.pleaseSelect' })}
-                      style={{
-                        width: '100%',
-                      }}
-                    >
-                      <Option value=""><FormattedMessage id="oal.common.all" /></Option>
-                      <Option value="0"><FormattedMessage id="oal.user-manage.failure" /></Option>
-                      <Option value="1"><FormattedMessage id="oal.user-manage.normal" /></Option>
-                    </Select>,
-                  )}
+                <FormItem label={formatMessage({ id: 'oal.org.orgPath' })}>
+                  {getFieldDecorator('orgPath')(<Input placeholder={formatMessage({ id: 'oal.org.enterPath' })} />)}
                 </FormItem>
               </Col>
               <Col xxl={4} lg={4} md={4} sm={24}>
@@ -308,9 +341,9 @@ class UserManagement extends Component {
           loading,
           addOrUpdateLoading,
         } = this.props;
-        const { selectedRows, modalVisible, selectedUser } = this.state;
+        const { selectedRows, modalVisible, selectedUser, resetVisible, delVisible } = this.state;
         return (
-          <PageHeaderWrapper>
+          <PageHeaderWrapper className={styles.myPageHeaderWrapper}>
             <Card bordered={false}>
               <div className={styles.tableList}>
                 <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
@@ -338,6 +371,18 @@ class UserManagement extends Component {
               userBean={selectedUser}
               handleCancel={this.closeAddOrUpdateModal}
               handleSubmit={this.submitAddOrUpdate}
+            />
+            <UserResetModal
+              visible={resetVisible}
+              userBean={selectedUser}
+              handleCancel={this.closeResetModal}
+              handleSubmit={this.resetPsw}
+            />
+            <UserDelModal
+              visible={delVisible}
+              userBean={selectedUser}
+              handleCancel={this.closeDelModal}
+              handleSubmit={this.deleteUser}
             />
           </PageHeaderWrapper>
         );

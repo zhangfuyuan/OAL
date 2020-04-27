@@ -21,7 +21,12 @@ class SystemView extends Component {
     openModal();
   };
 
-  getData = (currentUser, version) => {
+  handleModifyIcons = () => {
+    const { openUploadModal } = this.props;
+    openUploadModal();
+  };
+
+  getData = (currentUser, version, icons) => {
     const orgInfo = (currentUser && currentUser.org) || {};
     const items = [
       {
@@ -44,7 +49,7 @@ class SystemView extends Component {
           </Fragment>
         ),
         actions: [
-          <a key="copy" onClick={() => this.handleModify()}>
+          <a key="sysname" onClick={() => this.handleModify()}>
             <FormattedMessage id="oal.common.modify" />
           </a>,
         ],
@@ -52,11 +57,16 @@ class SystemView extends Component {
         title: (
           <Fragment>
             <span style={{ marginRight: '16px' }}><FormattedMessage id="oal.settings.systemIcons" /></span>
-            <Avatar src={logo} />
+            {/* 8126TODO 动态显示系统图标 */}
+            <Avatar src={orgInfo.img ? logo : (icons || '/faceImg/8081/4,0c734d7546')} />
           </Fragment>
         ),
         description: '',
-        actions: [],
+        actions: [
+          <a key="systemIcons" onClick={() => this.handleModifyIcons()}>
+            <FormattedMessage id="oal.common.modify" />
+          </a>,
+        ],
       })
     }
     items.push({
@@ -70,8 +80,8 @@ class SystemView extends Component {
   };
 
   render() {
-    const { currentUser, version } = this.props;
-    const data = this.getData(currentUser, version);
+    const { currentUser, version, icons } = this.props;
+    const data = this.getData(currentUser, version, icons);
     return (
       <Fragment>
         <List

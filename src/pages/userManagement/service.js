@@ -23,5 +23,14 @@ export async function getUserList(query) {
  * action：delete，resetPsw
  */
 export async function operateUser(data) {
+  // 8126TODO 不在uri中传参
   return get(`/api/user/${data.userId}/${data.action}`);
+}
+
+/**
+ * 修改用户信息
+ * action：delete，resetPsw
+ */
+export async function modifyUser(data) {
+  return post('/api/user/update', data);
 }

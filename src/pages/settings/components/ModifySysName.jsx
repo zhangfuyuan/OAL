@@ -41,7 +41,11 @@ const ModifySysName = props => {
             rules: [
               {
                 required: true,
-                message: formatMessage({ id: 'oal.settings.enterSysname' }),
+                message: formatMessage({ id: 'oal.settings.enterSysnameTips' }),
+              },
+              {
+                max: 20,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
               },
             ],
             initialValue: currentUser && currentUser.org && currentUser.org.saasName,

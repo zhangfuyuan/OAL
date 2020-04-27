@@ -16,10 +16,11 @@ const formItemLayout = {
 const AddOrUpdateUser = props => {
   const { form, userBean, visible, handleSubmit, confirmLoading, handleCancel } = props;
   const { getFieldDecorator } = form;
+  const isEdit = !!(userBean && userBean._id);
 
   let title = formatMessage({ id: 'oal.user-manage.newUsers' });
-  if (userBean && userBean.name) {
-    title = `${formatMessage({ id: 'oal.user-manage.modifyUsers' })}(${userBean.name})`;
+  if (isEdit) {
+    title = `${formatMessage({ id: 'oal.user-manage.modifyUsers' })}(${userBean.userName})`;
   }
 
   const handleOk = () => {
@@ -27,10 +28,6 @@ const AddOrUpdateUser = props => {
       // console.log('---------fieldsValue----------', fieldsValue)
       if (err) return;
       const params = fieldsValue;
-      if (userBean) {
-        // eslint-disable-next-line no-underscore-dangle
-        params.id = userBean._id;
-      }
       handleSubmit(params, () => {
         form.resetFields();
       });
@@ -55,28 +52,38 @@ const AddOrUpdateUser = props => {
       maskClosable={false}
     >
       <Form {...formItemLayout}>
-        <Form.Item label={formatMessage({ id: 'oal.common.username' })}>
+        <Form.Item label={formatMessage({ id: 'oal.user-manage.accountName' })}>
           {getFieldDecorator('userName', {
             rules: [
               {
                 required: true,
-                message: formatMessage({ id: 'oal.user-manage.enterUsername' }),
+                message: formatMessage({ id: 'oal.user-manage.enterAccountNameTips' }),
               },
               {
-                pattern: /^[a-zA-Z]+$/,
+                pattern: /^[a-zA-Z0-9]+$/,
                 message: formatMessage({ id: 'oal.user-manage.enterUsernameError' }),
               },
               {
-                max: 50,
-                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '50' }),
+                max: 10,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '10' }),
               },
             ],
-            initialValue: userBean.name,
-          })(<Input placeholder={formatMessage({ id: 'oal.common.username' })} />)}
+            initialValue: userBean.userName,
+          })(<Input placeholder={formatMessage({ id: 'oal.user-manage.accountName' })} disabled={isEdit} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.common.nickname' })}>
           {getFieldDecorator('nickName', {
-            initialValue: userBean.nickName,
+            rules: [
+              {
+                required: true,
+                message: formatMessage({ id: 'oal.user-manage.enterNicknameTips' }),
+              },
+              {
+                max: 20,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
+              },
+            ],
+            initialValue: userBean.profile && userBean.profile.nickName || '',
           })(<Input placeholder={formatMessage({ id: 'oal.common.nickname' })} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.common.phoneNumber' })}>
@@ -86,7 +93,7 @@ const AddOrUpdateUser = props => {
                 validator: checkMobile,
               },
             ],
-            initialValue: userBean.mobile,
+            initialValue: userBean.profile && userBean.profile.mobile || '',
           })(<Input placeholder={formatMessage({ id: 'oal.common.phoneNumber' })} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.common.emailAddress' })}>
@@ -97,7 +104,7 @@ const AddOrUpdateUser = props => {
                 message: formatMessage({ id: 'oal.common.enterCorrectEmailAddress' }),
               },
             ],
-            initialValue: userBean.email,
+            initialValue: userBean.profile && userBean.profile.email || '',
           })(<Input placeholder={formatMessage({ id: 'oal.common.emailAddress' })} />)}
         </Form.Item>
       </Form>

@@ -1,4 +1,4 @@
-import { addUser, getUserList, operateUser } from './service';
+import { addUser, getUserList, operateUser, modifyUser } from './service';
 
 const Model = {
   namespace: 'userManagement',
@@ -33,6 +33,11 @@ const Model = {
     *operate({ payload }, { call, put }) {
       // console.log('operate payload--->', payload);
       const response = yield call(operateUser, payload);
+      return Promise.resolve(response);
+    },
+    *modify({ payload }, { call }) {
+      const response = yield call(modifyUser, payload);
+      // console.log('add response-->', response);
       return Promise.resolve(response);
     },
   },

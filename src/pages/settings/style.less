@@ -1,10 +1,60 @@
 @import '~antd/es/style/themes/default.less';
 
+:global {
+  .oal-avatar-uploader-alone {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .oal-progress {
+    .ant-progress-line {
+      width: 90%;
+    }
+
+    .ant-progress-bg {
+      height: 5px !important;
+    }
+  }
+}
+
+.myPageHeaderWrapper {
+  :global {
+    .ant-page-header-heading-title {
+      color: rgba(0, 0, 0, 0.65);
+      font-variant: tabular-nums;
+      line-height: 1.5;
+      list-style: none;
+      font-feature-settings: 'tnum';
+      font-weight: normal;
+      font-size: 14px;
+    }
+
+    .ant-list-item-meta-title {
+      font-weight: bold;
+    }
+
+    .ant-list-item-meta-description {
+      .strong {
+        color: @success-color;
+      }
+
+      .medium {
+        color: @warning-color;
+      }
+
+      .weak {
+        color: @error-color;
+      }
+    }
+  }
+}
+
 .main {
   display: flex;
   width: 100%;
   height: 100%;
-  min-height: calc(100vh - 112px);
+  min-height: calc(100vh - 112px - 53px);
   padding-top: 16px;
   padding-bottom: 16px;
   overflow: auto;
@@ -30,7 +80,7 @@
     .title {
       margin-bottom: 12px;
       color: @heading-color;
-      font-weight: 500;
+      font-weight: bold;
       font-size: 20px;
       line-height: 28px;
     }

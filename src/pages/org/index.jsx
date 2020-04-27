@@ -23,6 +23,7 @@ import OrgResetModal from './components/OrgResetModal';
 import styles from './style.less';
 import defaultSettings from '../../../config/defaultSettings';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import { getPageQuery } from '@/utils/utils';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -41,7 +42,9 @@ class OrgList extends Component {
     detailVisible: false,
     resetVisible: false,
     modalVisible: false,
-    formValues: {},
+    formValues: {
+      creator: getPageQuery().creator,
+    },
     selectedRows: [],
     selectedOrg: {},
     page: {
@@ -90,11 +93,13 @@ class OrgList extends Component {
 
   loadOrgList = () => {
     const { dispatch } = this.props;
-    const { page } = this.state;
+    const { page, formValues } = this.state;
+
     dispatch({
       type: 'org/fetch',
       payload: {
         ...page,
+        creator: formValues.creator,
       },
     });
   };
@@ -227,7 +232,9 @@ class OrgList extends Component {
   handleFormReset = () => {
     const { form, dispatch } = this.props;
     form.resetFields();
-    form.setFieldsValue({});
+    form.setFieldsValue({
+      creator: '',
+    });
     const { page } = this.state;
     this.setState({
       formValues: {},
@@ -325,6 +332,7 @@ class OrgList extends Component {
 
   renderSimpleForm = () => {
     const { form, loading } = this.props;
+    const { formValues } = this.state;
     const { getFieldDecorator } = form;
     return (
       <Form layout="inline">
@@ -347,7 +355,9 @@ class OrgList extends Component {
           </Col>
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.org.creator' })}>
-              {getFieldDecorator('creator')(<Input placeholder={formatMessage({ id: 'oal.org.enterCreator' })} />)}
+              {getFieldDecorator('creator', {
+                initialValue: formValues && formValues.creator || '',
+              })(<Input placeholder={formatMessage({ id: 'oal.org.enterCreator' })} />)}
             </FormItem>
           </Col>
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>

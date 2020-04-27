@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { GridContent } from '@ant-design/pro-layout';
+import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Menu, message } from 'antd';
 import { connect } from 'dva';
 import CryptoJS from 'crypto-js';
@@ -9,6 +10,7 @@ import SystemView from './components/SystemView';
 import DeveloperView from './components/DeveloperView';
 import ModifyPswModal from './components/ModifyPswModal';
 import ModifySysName from './components/ModifySysName';
+import ModifySysIcons from './components/ModifySysIcons';
 import FaceKey from './components/FaceKey';
 import FaceKeyModal from './components/FaceKeyModal';
 import FaceLibrary from './components/FaceLibrary';
@@ -36,9 +38,9 @@ class Settings extends Component {
       base: formatMessage({ id: 'oal.settings.menu-base' }),
       security: formatMessage({ id: 'oal.settings.menu-security' }),
       system: formatMessage({ id: 'oal.settings.menu-system' }),
-      developer: formatMessage({ id: 'oal.settings.menu-developer' }),
-      faceKey: formatMessage({ id: 'oal.settings.menu-faceKey' }),
-      faceLibrary: formatMessage({ id: 'oal.settings.menu-faceLibrary' }),
+      // developer: formatMessage({ id: 'oal.settings.menu-developer' }),
+      // faceKey: formatMessage({ id: 'oal.settings.menu-faceKey' }),
+      // faceLibrary: formatMessage({ id: 'oal.settings.menu-faceLibrary' }),
     };
     this.state = {
       mode: 'inline',
@@ -46,8 +48,10 @@ class Settings extends Component {
       selectKey: 'base',
       modifyPswVisible: false,
       modifySysNameVisible: false,
+      modifySysIconsVisible: false,
       faceKeyVisible: false,
       selectedFaceKey: {},
+      updateSysIcons: null,
     };
   }
 
@@ -75,7 +79,8 @@ class Settings extends Component {
   getMenu = (isAdmin = false) => {
     const { menuMap } = this.state;
     return Object.keys(menuMap).map(item => {
-      if (!isAdmin && item === 'faceKey') return null;
+      // if (!isAdmin && item === 'faceKey') return null;
+      if (!isAdmin && item === 'system') return null;
       return <Item key={item}>{menuMap[item]}</Item>
     });
   };
@@ -161,8 +166,16 @@ class Settings extends Component {
     this.setState({ modifySysNameVisible: true });
   };
 
+  openModifySysIcons = () => {
+    this.setState({ modifySysIconsVisible: true });
+  };
+
   closeModifySysName = () => {
     this.setState({ modifySysNameVisible: false });
+  };
+
+  closeModifySysIcons = () => {
+    this.setState({ modifySysIconsVisible: false });
   };
 
   submitSysName = values => {
@@ -180,6 +193,12 @@ class Settings extends Component {
         });
       }
     });
+  };
+
+  submitSysIcons = values => {
+    // 8126TODO 上传系统图标
+    this.setState({ updateSysIcons: values });
+    this.closeModifySysIcons();
   };
 
   setFaceKeyModal = flag => {
@@ -265,7 +284,7 @@ class Settings extends Component {
 
   renderChildren = () => {
     const { currentUser, devInfo, devInfoLoading, faceKeyList, faceKeyListLoading, sysConfigs, systemVersion } = this.props;
-    const { selectKey } = this.state;
+    const { selectKey, updateSysIcons } = this.state;
     switch (selectKey) {
       case 'base':
         return <BaseView
@@ -281,6 +300,8 @@ class Settings extends Component {
           version={systemVersion}
           currentUser={currentUser}
           openModal={this.openModifySysName}
+          openUploadModal={this.openModifySysIcons}
+          icons={updateSysIcons}
         />;
       case 'developer':
         return <DeveloperView
@@ -299,7 +320,7 @@ class Settings extends Component {
         />
       case 'faceLibrary':
         return <FaceLibrary
-          data ={sysConfigs}
+          data={sysConfigs}
           toEdit={this.toEditConfigs}
         />
       default:
@@ -323,11 +344,12 @@ class Settings extends Component {
       selectKey,
       modifyPswVisible,
       modifySysNameVisible,
+      modifySysIconsVisible,
       faceKeyVisible,
       selectedFaceKey,
     } = this.state;
     return (
-      <GridContent>
+      <PageHeaderWrapper className={styles.myPageHeaderWrapper}>
         <div
           className={styles.main}
           ref={ref => {
@@ -361,6 +383,12 @@ class Settings extends Component {
           handleCancel={this.closeModifySysName}
           handleSubmit={this.submitSysName}
         />
+        <ModifySysIcons
+          visible={modifySysIconsVisible}
+          currentUser={currentUser}
+          handleCancel={this.closeModifySysIcons}
+          handleSubmit={this.submitSysIcons}
+        />
         <FaceKeyModal
           visible={faceKeyVisible}
           handleSubmit={this.submitFaceKey}
@@ -369,7 +397,7 @@ class Settings extends Component {
           setOptionVisible={() => this.setOptionVisible(true)}
           faceKey={selectedFaceKey}
         />
-      </GridContent>
+      </PageHeaderWrapper>
     )
   }
 }

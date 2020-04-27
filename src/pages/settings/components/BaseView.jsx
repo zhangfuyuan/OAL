@@ -33,11 +33,21 @@ class BaseView extends Component {
         <div className={styles.left}>
           <Form layout="vertical">
             <FormItem
-              label={formatMessage({ id: 'oal.common.fullName' })}
+              label={formatMessage({ id: 'oal.common.nickname' })}
             >
               {getFieldDecorator('nickName', {
+                rules: [
+                  {
+                    required: true,
+                    message: formatMessage({ id: 'oal.user-manage.enterNicknameTips' }),
+                  },
+                  {
+                    max: 20,
+                    message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
+                  },
+                ],
                 initialValue: currentUser && currentUser.profile && currentUser.profile.nickName,
-              })(<Input placeholder={formatMessage({ id: 'oal.common.fullName' })} />)}
+              })(<Input placeholder={formatMessage({ id: 'oal.common.nickname' })} />)}
             </FormItem>
             <FormItem
               label={formatMessage({ id: 'oal.settings.organisation' })}

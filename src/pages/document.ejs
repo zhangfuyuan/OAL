@@ -165,4 +165,19 @@
       </div>
     </div>
   </body>
+
+  <script charset="utf-8" src="<%= context.publicPath %>lib/jquery.js"></script>
+  <script charset="utf-8" src="<%= context.publicPath %>lib/webuploader/webuploader.min.js"></script>
+  <script charset="utf-8" >
+    window.WebUploader && window.WebUploader.Uploader.register({'before-send-file': 'beforeSendFile'},{
+      beforeSendFile: function(file) {
+        var deferred = window.WebUploader.Deferred();
+        new window.WebUploader.Uploader().md5File(file).then(function(val) {
+          file.md5 = val;
+          return deferred.resolve();
+        });
+        return deferred.promise();
+      }
+    });
+  </script>
 </html>

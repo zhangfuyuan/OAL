@@ -31,7 +31,7 @@ class SecurityView extends Component {
 
   getData = () => [
     {
-      title: formatMessage({ id: 'oal.common.password' }),
+      title: formatMessage({ id: 'oal.settings.accountPassword' }),
       description: (
         <Fragment>
           <FormattedMessage id="oal.settings.currentPasswordStrength" />
