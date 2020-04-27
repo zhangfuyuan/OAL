@@ -36,3 +36,12 @@ export async function renameFace(data) {
 export async function modifyFaceInfo(data) {
     return post(`/api/face/manage/${data.faceId}/modify`, data);
 }
+
+/**
+ * 获取用户分组树
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function fetchGroup(data) {
+  return get('/api/user/authByToken');
+}

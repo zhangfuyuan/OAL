@@ -1,20 +1,24 @@
 import React, { Component, Fragment } from 'react';
 import { findDOMNode } from 'react-dom';
-import { Avatar, Upload, Button, Icon, Card, Radio, Input, Drawer, Badge, Alert, Dropdown, Menu, Popconfirm, message, Modal, Divider, notification } from 'antd';
+import { Avatar, Upload, Button, Icon, Card, Radio, Input, Drawer, Badge, Alert, Dropdown, Menu, Popconfirm, message, Modal, Divider, notification, Col, Form, Row, Select, Spin, Tree, Tooltip } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { connect } from 'dva';
 import { findIndex, groupBy } from 'lodash';
-import { AUTH_TOKEN } from '../../utils/constants';
+import { AUTH_TOKEN, SYSTEM_PATH } from '../../utils/constants';
 import styles from './style.less';
 import ModifyModal from './components/ModifyModal';
-import UploadProgress from './components/UploadProgress';
-import UploadDetail from './components/UploadDetail';
+// import UploadProgress from './components/UploadProgress';
+// import UploadDetail from './components/UploadDetail';
 import StandardTable from '@/components/StandardTable'
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import router from 'umi/router';
+import Link from 'umi/link';
 
 const { Search } = Input;
 const { confirm } = Modal;
+const { TreeNode } = Tree;
 
 const renderStatusText = data => {
   let statusText = <Badge status="processing" text={formatMessage({ id: 'oal.face.authorization' })} />
@@ -52,6 +56,7 @@ const listSubName = data => {
 class Face extends Component {
   state = {
     uploadVisible: false,
+    uploadBatchVisible: false,
     featureState: 'all',
     modifyVisible: false,
     selectedBean: {},
@@ -63,18 +68,202 @@ class Face extends Component {
     successList: [],
     childrenDrawer: false, // 上传的明细右侧栏
     childrenTabIndex: 'success', // 明细中展示的tab类型
+    treeLoading: true,
+    treeData: [],
+    nodeTreeItem: null,
+    searchName: '',
+    sortedInfo: {},
   };
 
+  ref_leftDom = null;
+
   componentDidMount() {
+    this.tree_loadData();
     this.loadFaceList();
     this.loadFaceKeyList();
     this.loadSysConfig();
     // this.errorList = [];
-    this.excludeNum = 0
+    this.excludeNum = 0;
   }
+
+  componentWillUnmount() {
+    this.tree_clearMenu();
+  }
+
+  /************************************************* Tree Start *************************************************/
+
+  tree_loadData = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'face/fetchGroupTree',
+    }).then(res => {
+      if (res && res.res > 0) {
+        this.setState({
+          treeLoading: false,
+          treeData: [
+            { title: 'Expand to load', key: '0' },
+            { title: 'Expand to load', key: '1' },
+            { title: 'Tree Node', key: '2', isLeaf: true },
+          ],
+        });
+      }
+    }).catch(err => {
+      console.log(err);
+    })
+  };
+
+  tree_onLoadData = treeNode =>
+    new Promise(resolve => {
+      if (treeNode.props.children) {
+        resolve();
+        return;
+      }
+      setTimeout(() => {
+        treeNode.props.dataRef.children = [
+          { title: 'Child Node', key: `${treeNode.props.eventKey}-0` },
+          { title: 'Child Node', key: `${treeNode.props.eventKey}-1` },
+        ];
+        this.setState({
+          treeData: [...this.state.treeData],
+        });
+        resolve();
+      }, 1000);
+    });
+
+  tree_renderNodes = data =>
+    data.map(item => {
+      if (item.children) {
+        return (
+          <TreeNode title={item.title} key={item.key} dataRef={item}>
+            {this.tree_renderNodes(item.children)}
+          </TreeNode>
+        );
+      }
+      return <TreeNode key={item.key} {...item} dataRef={item} />;
+    });
+
+  tree_onMouseEnter = (e) => {
+    if (this.ref_leftDom && (!this.state.nodeTreeItem || !this.state.nodeTreeItem.isEditing)) {
+      const { left: pLeft, top: pTop } = this.ref_leftDom.getBoundingClientRect();
+      const { left, width, top } = e.event.currentTarget.getBoundingClientRect();
+      const x = left - pLeft + width + this.ref_leftDom.scrollLeft;
+      const y = top - pTop;
+      const { eventKey, dataRef } = e.node.props;
+
+      this.setState({
+        nodeTreeItem: {
+          nodeWidth: width,
+          pageX: x,
+          pageY: y,
+          id: eventKey,
+          dataRef,
+        }
+      });
+    }
+  };
+
+  tree_getNodeTreeMenu() {
+    if (this.state.nodeTreeItem) {
+      const { pageX, pageY, isEditing, nodeWidth, dataRef } = { ...this.state.nodeTreeItem };
+      const tmpStyle = {
+        position: 'absolute',
+        maxHeight: 40,
+        textAlign: 'center',
+        left: `${pageX + 10 - (isEditing ? nodeWidth + 10 : 0)}px`,
+        top: `${pageY}px`,
+        display: 'flex',
+        flexDirection: 'row',
+      };
+      const menu = (
+        <div
+          style={tmpStyle}
+          onClick={e => e.stopPropagation()}
+        >
+          {
+            isEditing ?
+              <Input
+                size="small"
+                defaultValue={dataRef && dataRef.title || ''}
+                style={{ width: `${nodeWidth}px`, minWidth: `56px`, marginRight: '10px', }}
+                autoFocus={true}
+                onBlur={this.tree_handleEditSubInput}
+                onPressEnter={this.tree_handleEditSubInput}
+              /> : ''
+          }
+          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleEditSub}>
+            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.modify' })}>
+              <Icon type='edit' />
+            </Tooltip>
+          </div>
+          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleDeleteSub}>
+            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.delete' })}>
+              <Icon type='minus-circle-o' />
+            </Tooltip>
+          </div>
+          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleAddSub}>
+            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.addItems' })}>
+              <Icon type='plus-circle-o' />
+            </Tooltip>
+          </div>
+        </div>
+      );
+
+      return menu;
+    }
+
+    return '';
+  }
+
+  tree_handleAddSub = (e) => {
+    if (this.state.nodeTreeItem) {
+      console.log("click add id :", this.state.nodeTreeItem.id);
+    }
+  };
+
+  tree_handleEditSub = (e) => {
+    if (this.state.nodeTreeItem) {
+      console.log("click edit id :", this.state.nodeTreeItem.id);
+      this.setState({
+        nodeTreeItem: {
+          ...this.state.nodeTreeItem,
+          isEditing: true,
+        },
+      });
+    }
+  };
+
+  tree_handleEditSubInput = (e) => {
+    if (this.state.nodeTreeItem) {
+      console.log("click edit value :", e.target.value);
+      this.state.nodeTreeItem.dataRef.title = e.target.value;
+      this.setState({
+        nodeTreeItem: null,
+        treeData: [...this.state.treeData],
+      });
+    }
+  };
+
+  tree_handleDeleteSub = (e) => {
+    if (this.state.nodeTreeItem) {
+      console.log("click delete id :", this.state.nodeTreeItem.id);
+    }
+  };
+
+  tree_clearMenu = () => {
+    this.setState({
+      nodeTreeItem: null,
+    });
+  };
+
+  tree_onSelect = (selectedKeys, e) => {
+    console.log('selectedKeys : ', selectedKeys, e);
+  };
+
+  /************************************************* Tree End *************************************************/
 
   loadFaceList = (pagination, fs) => {
     const { dispatch } = this.props;
+    const { featureState, searchName } = this.state;
     if (!pagination) {
       // eslint-disable-next-line no-param-reassign
       pagination = {
@@ -84,11 +273,9 @@ class Face extends Component {
     }
     const payload = {
       ...pagination,
-      featureState: (fs || fs === '0') ? fs : this.state.featureState,
+      featureState: (fs || fs === '0') ? fs : featureState,
     }
-    if (this.nameRef.input && this.nameRef.input.input && this.nameRef.input.input.value) {
-      payload.name = this.nameRef.input.input.value
-    }
+    if (searchName) payload.name = searchName;
     dispatch({
       type: 'face/fetch',
       payload,
@@ -111,32 +298,35 @@ class Face extends Component {
 
   columns = () => {
     const { user, faceKeyList } = this.props;
-    const MoreBtn = ({ item }) => (
-      <Dropdown
-        overlay={
-          <Menu onClick={({ key }) => this.editAndDelete(key, item)}>
-            <Menu.Item key="modify"><FormattedMessage id="oal.common.modify" /></Menu.Item>
-            <Menu.Item key="editPhoto"><FormattedMessage id="oal.face.modifyPhoto" /></Menu.Item>
-          </Menu>
-        }
-      >
-        <a>
-          <FormattedMessage id="oal.common.edit" /> <Icon type="down" />
-        </a>
-      </Dropdown>
-    );
+    // const MoreBtn = ({ item }) => (
+    //   <Dropdown
+    //     overlay={
+    //       <Menu onClick={({ key }) => this.editAndDelete(key, item)}>
+    //         <Menu.Item key="modify"><FormattedMessage id="oal.common.modify" /></Menu.Item>
+    //         <Menu.Item key="editPhoto"><FormattedMessage id="oal.face.modifyPhoto" /></Menu.Item>
+    //       </Menu>
+    //     }
+    //   >
+    //     <a>
+    //       <FormattedMessage id="oal.common.edit" /> <Icon type="down" />
+    //     </a>
+    //   </Dropdown>
+    // );
     const cl = [
       {
         title: formatMessage({ id: 'oal.common.photo' }),
         key: 'avatar',
         width: 100,
-        render: (text, record) => <Avatar src={`${record.imgPath}.jpg?height=64&width=64&mode=fit`} shape="square" size="large" onClick={() => this.openViewModal(record)} />,
+        render: (text, record) => <Avatar src={`${record.imgPath}.jpg?height=64&width=64&mode=fit`} shape="square" size="large" onClick={() => this.openViewModal(record)} style={{ cursor: 'pointer' }} />,
       },
       {
         title: formatMessage({ id: 'oal.common.fullName' }),
         key: 'name',
         dataIndex: 'name',
         ellipsis: true,
+        key: 'name',
+        sorter: (a, b) => a.name - b.name,
+        sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
       },
       // {
       //   title: '状态',
@@ -147,8 +337,8 @@ class Face extends Component {
     ];
     // 遍历人脸属性列表，根据人脸列表字段profile里面的进行对应渲染，其中如果是下拉控件（type=2），还要拿到value对应的text
     // eslint-disable-next-line no-unused-expressions
-    faceKeyList && faceKeyList.length > 0 && faceKeyList.map(item => {
-      cl.push({
+    faceKeyList && faceKeyList.length > 0 && faceKeyList.map((item, index) => {
+      (index === 0) && cl.push({
         title: item.name,
         key: item.key,
         ellipsis: true,
@@ -170,24 +360,26 @@ class Face extends Component {
     });
 
     cl.push(
-      {
-        title: formatMessage({ id: 'oal.common.updateTime' }),
-        key: 'updateAt',
-        width: 150,
-        render: (text, record) => <span>{record.updateAt ? moment(record.updateAt).format('YYYY-MM-DD HH:mm') : ''}</span>,
-      },
+      // {
+      //   title: formatMessage({ id: 'oal.common.updateTime' }),
+      //   key: 'updateAt',
+      //   width: 150,
+      //   render: (text, record) => <span>{record.updateAt ? moment(record.updateAt).format('YYYY-MM-DD HH:mm') : ''}</span>,
+      // },
       {
         title: formatMessage({ id: 'oal.common.handle' }),
-        width: 150,
+        width: 200,
         render: (text, record) => (
           <Fragment>
-            <Popconfirm placement="topLeft" title={formatMessage({ id: 'oal.face.confirmDeleteFace' })} onConfirm={() => this.deleteFace(record)} okText={formatMessage({ id: 'oal.common.delete' })} cancelText={formatMessage({ id: 'oal.common.cancel' })}>
-              <a key="remove">
-                <FormattedMessage id="oal.common.delete" />
-            </a>
-            </Popconfirm>
+            <a key="edit"><FormattedMessage id="oal.common.edit" /></a>
             <Divider type="vertical" />
-            <MoreBtn item={record} />
+            <a key="move"><FormattedMessage id="oal.face.move" /></a>
+            <Divider type="vertical" />
+            {/* <Popconfirm placement="topLeft" title={formatMessage({ id: 'oal.face.confirmDeleteFace' })} onConfirm={() => this.deleteFace(record)} okText={formatMessage({ id: 'oal.common.delete' })} cancelText={formatMessage({ id: 'oal.common.cancel' })}> */}
+            <a key="remove"><FormattedMessage id="oal.common.delete" /></a>
+            {/* </Popconfirm> */}
+            <Divider type="vertical" />
+            {/* <MoreBtn item={record} /> */}
           </Fragment>
         ),
       });
@@ -213,7 +405,7 @@ class Face extends Component {
       return item
     })
     const resultArray = [];
-    for (let i = 0; i < tp.length; i++ ) {
+    for (let i = 0; i < tp.length; i++) {
       resultArray.push(tp[i])
       if (i !== nameArray.length - 1) {
         resultArray.push('_');
@@ -266,7 +458,7 @@ class Face extends Component {
                 uid: file.uid,
                 uploadRes: { res: -1, errorCode: 5007 },
               });
-              this.setState({ errorList })
+            this.setState({ errorList })
             flag = false
             break
           }
@@ -280,121 +472,121 @@ class Face extends Component {
     return flag
   }
 
-  onBeforeUploadbak = (file, fList, isDirectory, uniqueIndex) => {
-    // console.log('beforeUploadFile-------', fList);
-    // 这里只校验会影响数据的那种唯一性约束的字段，其他均无校验的必要，如果唯一性校验失败，终止上传
-    const { fileList, errorList } = this.state;
-    if (fileList.length === 0) {
-      this.setState({ fileList: fList })
-    }
+  // onBeforeUploadbak = (file, fList, isDirectory, uniqueIndex) => {
+  //   // console.log('beforeUploadFile-------', fList);
+  //   // 这里只校验会影响数据的那种唯一性约束的字段，其他均无校验的必要，如果唯一性校验失败，终止上传
+  //   const { fileList, errorList } = this.state;
+  //   if (fileList.length === 0) {
+  //     this.setState({ fileList: fList })
+  //   }
 
-    if (!isDirectory) {
-      return true;
-    }
-    // const { errorList } = this;
-    const isIn = findIndex(errorList,
-      item => (item.uid === file.uid || item.equalToUid === file.uid))
-    if (isIn !== -1) {
-      return false
-    }
-    let flag = true
-    // const { sysConfigs, faceKeyList } = this.props;
-    // console.log('fList---', fList)
-    const nameArray = this.getImgName(file.name).split('_')
-    for (let i = 0; i < fList.length; i++) {
-      if (fList[i].uid !== file.uid) {
-        // 只有不相同的做对比
-        const temp = this.getImgName(fList[i].name).split('_')
-        // 遍历取每条数据比较
-        for (let p = 0; p < uniqueIndex.length; p++) {
-          // 遍历唯一约束列
-          if (nameArray[uniqueIndex[p].index + 2] && (temp[uniqueIndex[p].index + 2] === nameArray[uniqueIndex[p].index + 2])) {
-            // 对比唯一约束列
-            // 唯一约束列结果一致，加入到错误列表
-            errorList.push({
-              uid: file.uid,
-              equalInfo: [file.name, fList[i].name],
-              equalToUid: fList[i].uid,
-              equalAt: p,
-            })
+  //   if (!isDirectory) {
+  //     return true;
+  //   }
+  //   // const { errorList } = this;
+  //   const isIn = findIndex(errorList,
+  //     item => (item.uid === file.uid || item.equalToUid === file.uid))
+  //   if (isIn !== -1) {
+  //     return false
+  //   }
+  //   let flag = true
+  //   // const { sysConfigs, faceKeyList } = this.props;
+  //   // console.log('fList---', fList)
+  //   const nameArray = this.getImgName(file.name).split('_')
+  //   for (let i = 0; i < fList.length; i++) {
+  //     if (fList[i].uid !== file.uid) {
+  //       // 只有不相同的做对比
+  //       const temp = this.getImgName(fList[i].name).split('_')
+  //       // 遍历取每条数据比较
+  //       for (let p = 0; p < uniqueIndex.length; p++) {
+  //         // 遍历唯一约束列
+  //         if (nameArray[uniqueIndex[p].index + 2] && (temp[uniqueIndex[p].index + 2] === nameArray[uniqueIndex[p].index + 2])) {
+  //           // 对比唯一约束列
+  //           // 唯一约束列结果一致，加入到错误列表
+  //           errorList.push({
+  //             uid: file.uid,
+  //             equalInfo: [file.name, fList[i].name],
+  //             equalToUid: fList[i].uid,
+  //             equalAt: p,
+  //           })
 
-            notification.error({
-              message: <div><span style={{ fontWeight: 700 }}>{uniqueIndex[p].name}</span><FormattedMessage id="oal.face.fieldRepeat" /></div>,
-              description: (<div>
-                <div style={{ marginTop: '1em' }}>{this.getErrorName(file.name, uniqueIndex[p].index + 2)}</div>
-                <div style={{ marginTop: '1em' }}>{this.getErrorName(fList[i].name, uniqueIndex[p].index + 2)}</div>
-              </div>),
-              duration: null,
-            });
-            flag = false
-          }
-        }
-      }
-    }
-    this.errorList = errorList
-    return flag;
-  };
+  //           notification.error({
+  //             message: <div><span style={{ fontWeight: 700 }}>{uniqueIndex[p].name}</span><FormattedMessage id="oal.face.fieldRepeat" /></div>,
+  //             description: (<div>
+  //               <div style={{ marginTop: '1em' }}>{this.getErrorName(file.name, uniqueIndex[p].index + 2)}</div>
+  //               <div style={{ marginTop: '1em' }}>{this.getErrorName(fList[i].name, uniqueIndex[p].index + 2)}</div>
+  //             </div>),
+  //             duration: null,
+  //           });
+  //           flag = false
+  //         }
+  //       }
+  //     }
+  //   }
+  //   this.errorList = errorList
+  //   return flag;
+  // };
 
-  renderUpload = (isDirectory, Btn, bean) => {
-    // eslint-disable-next-line no-underscore-dangle
-    const { fileList, errorList, successList } = this.state;
-    const { faceKeyList } = this.props;
+  // renderUpload = (isDirectory, Btn, bean) => {
+  //   // eslint-disable-next-line no-underscore-dangle
+  //   const { fileList, errorList, successList } = this.state;
+  //   const { faceKeyList } = this.props;
 
-    // 寻找出不可重复的字段
-    const uniqueIndex = []
-    if (faceKeyList && faceKeyList.length > 0) {
-      for (let i = 0; i < faceKeyList.length; i++) {
-        if (faceKeyList[i].isUnique) {
-          // 该字段不能重复
-          uniqueIndex.push({ index: i, name: faceKeyList[i].name })
-        }
-      }
-    }
+  //   // 寻找出不可重复的字段
+  //   const uniqueIndex = []
+  //   if (faceKeyList && faceKeyList.length > 0) {
+  //     for (let i = 0; i < faceKeyList.length; i++) {
+  //       if (faceKeyList[i].isUnique) {
+  //         // 该字段不能重复
+  //         uniqueIndex.push({ index: i, name: faceKeyList[i].name })
+  //       }
+  //     }
+  //   }
 
-    const isEdit = !!(bean && bean._id);
-    const authToken = sessionStorage.getItem(AUTH_TOKEN) || localStorage.getItem(AUTH_TOKEN);
-    const props = {
-      // eslint-disable-next-line no-underscore-dangle
-      accept: '.png, .jpg, .jpeg',
-      action: isEdit ? `/api/face/manage/${bean._id}/upload` : '/api/face/manage/upload',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
-      multiple: !isEdit,
-      directory: isDirectory,
-      // showUploadList: {
-      //   showPreviewIcon: true,
-      //   showRemoveIcon: false,
-      //   showDownloadIcon: false,
-      // },
-      fileList,
-      showUploadList: false,
-      beforeUpload: (file, fList) => this.onBeforeUpload(file, fList, isDirectory, uniqueIndex),
-      onError: (err, res, file) => {
-        // console.log('onError file:', typeof err)
-        // console.log('fList status:', res) // <h2>400 Bad Request</h2>
-        // console.log('event:', oc.event)
-        errorList.push({ name: file.name, size: file.size, uploadRes: 400, uid: file.uid })
-        this.setState({ errorList });
-      },
-      onSuccess: (result, file) => {
-        // console.log('onSuccess oc:', result, file)
-        const temp = { name: file.name, size: file.size, uploadRes: result, uid: file.uid }
-        if (result.res < 1) {
-          errorList.push(temp)
-          this.setState({ errorList });
-        } else {
-          successList.push(temp)
-          this.setState({ successList });
-        }
-      },
-    }
-    return (
-      <Upload {...props}>
-        {Btn}
-      </Upload>
-    )
-  }
+  //   const isEdit = !!(bean && bean._id);
+  //   const authToken = sessionStorage.getItem(AUTH_TOKEN) || localStorage.getItem(AUTH_TOKEN);
+  //   const props = {
+  //     // eslint-disable-next-line no-underscore-dangle
+  //     accept: '.png, .jpg, .jpeg',
+  //     action: isEdit ? `/api/face/manage/${bean._id}/upload` : '/api/face/manage/upload',
+  //     headers: {
+  //       Authorization: `Bearer ${authToken}`,
+  //     },
+  //     multiple: !isEdit,
+  //     directory: isDirectory,
+  //     // showUploadList: {
+  //     //   showPreviewIcon: true,
+  //     //   showRemoveIcon: false,
+  //     //   showDownloadIcon: false,
+  //     // },
+  //     fileList,
+  //     showUploadList: false,
+  //     beforeUpload: (file, fList) => this.onBeforeUpload(file, fList, isDirectory, uniqueIndex),
+  //     onError: (err, res, file) => {
+  //       // console.log('onError file:', typeof err)
+  //       // console.log('fList status:', res) // <h2>400 Bad Request</h2>
+  //       // console.log('event:', oc.event)
+  //       errorList.push({ name: file.name, size: file.size, uploadRes: 400, uid: file.uid })
+  //       this.setState({ errorList });
+  //     },
+  //     onSuccess: (result, file) => {
+  //       // console.log('onSuccess oc:', result, file)
+  //       const temp = { name: file.name, size: file.size, uploadRes: result, uid: file.uid }
+  //       if (result.res < 1) {
+  //         errorList.push(temp)
+  //         this.setState({ errorList });
+  //       } else {
+  //         successList.push(temp)
+  //         this.setState({ successList });
+  //       }
+  //     },
+  //   }
+  //   return (
+  //     <Upload {...props}>
+  //       {Btn}
+  //     </Upload>
+  //   )
+  // };
 
   showDrawer = () => {
     this.setState({
@@ -402,9 +594,23 @@ class Face extends Component {
     });
   };
 
+  showBatchDrawer = () => {
+    this.setState({
+      uploadBatchVisible: true,
+    });
+  };
+
   onCloseDrawer = () => {
     this.setState({
       uploadVisible: false,
+      selectedBean: {},
+    });
+    this.loadFaceList();
+  };
+
+  onCloseBatchDrawer = () => {
+    this.setState({
+      uploadBatchVisible: false,
       selectedBean: {},
     });
     this.loadFaceList();
@@ -427,126 +633,125 @@ class Face extends Component {
     })
   }
 
-  renderUploadPanel = () => {
-    const { uploadVisible, selectedBean, fileList } = this.state;
-    const { sysConfigs, faceKeyList } = this.props;
-    const isUploading = fileList.length > 0
-    // eslint-disable-next-line no-underscore-dangle
-    const isEdit = !!(selectedBean && selectedBean._id);
-    let title = formatMessage({ id: 'oal.face.uploadFacePhoto' });
-    if (isEdit) {
-      title = formatMessage({ id: 'oal.face.uploadFacePhoto' }, { name: selectedBean.name });
-    }
-    const faceSizeBean = sysConfigs.find(item => item.key === 'faceSize');
-    const maxFaceCountBean = sysConfigs.find(item => item.key === 'maxFaceCount');
-    let exampleStr = '';
-    // eslint-disable-next-line no-unused-expressions
-    faceKeyList && faceKeyList.length > 0 && faceKeyList.map(item => {
-      exampleStr += `_${item.name}`;
-    })
-    return (
-      <Drawer
-        title={title}
-        placement="right"
-        onClose={this.onCloseDrawer}
-        visible={uploadVisible}
-        width={580}
-      >
-        {
-          isUploading ? null : <Alert
-          message={
-            <div>
-              <div>
-                <FormattedMessage id="oal.face.uploadPanelTips1-1" /><span style={{ color: 'green', margin: '0 8px' }}><FormattedMessage id="oal.face.uploadPanelTips1-2" /></span><FormattedMessage id="oal.face.uploadPanelTips1-3" />
-              </div>
-              <div>
-                <FormattedMessage id="oal.face.uploadPanelTips2-1" />
-                <span style={{ color: 'green', margin: '0 8px' }}><FormattedMessage id="oal.face.uploadPanelTips2-2" /></span><FormattedMessage id="oal.face.uploadPanelTips2-3" />
-              </div>
-              <div>
-                <FormattedMessage id="oal.face.uploadPanelTips2-4" /><span style={{ color: 'red' }}><FormattedMessage id="oal.face.uploadPanelTips2-5" /><span>{exampleStr}</span>.jpeg</span>
-              </div>
-              <div>
-                <FormattedMessage id="oal.face.uploadPanelTips3" />(kb)
-                <div style={{ marginLeft: '22px' }}>
-                  <FormattedMessage id="oal.common.minVal" />：
-                  <span style={{ color: 'green' }}>
-                    {faceSizeBean && faceSizeBean.value && faceSizeBean.value.min ?
-                      `${faceSizeBean && faceSizeBean.value && faceSizeBean.value.min}kb`
-                      :
-                      formatMessage({ id: 'oal.common.unset' })
-                    }
-                  </span>
-                </div>
-                <div style={{ marginLeft: '22px' }}>
-                  <FormattedMessage id="oal.common.maxVal" />：
-                  <span style={{ color: 'green' }}>
-                    {faceSizeBean && faceSizeBean.value && faceSizeBean.value.max ?
-                      `${faceSizeBean && faceSizeBean.value && faceSizeBean.value.max}kb`
-                      :
-                      formatMessage({ id: 'oal.common.unset' })
-                    }
-                  </span>
-                </div>
-              </div>
-              <div>
-                <FormattedMessage id="oal.face.uploadPanelTips4-1" />
-                <span style={{ color: 'green' }}>
-                  {maxFaceCountBean && maxFaceCountBean.value ?
-                    `${maxFaceCountBean && maxFaceCountBean.value}${formatMessage({ id: 'oal.face.uploadPanelTips4-2' })}`
-                    :
-                    formatMessage({ id: 'oal.common.unset' })
-                  }
-                </span>
-              </div>
-              <div>
-                <FormattedMessage id="oal.face.uploadPanelTips5-1" />
-                <span style={{ color: 'green', margin: '0 8px' }}><FormattedMessage id="oal.face.uploadPanelTips5-2" /></span><FormattedMessage id="oal.face.uploadPanelTips5-3" />
-              </div>
-            </div>
-          }
-          type="warning"
-        />
-        }
+  // renderUploadPanel = () => {
+  //   const { uploadVisible, selectedBean, fileList } = this.state;
+  //   const { sysConfigs, faceKeyList } = this.props;
+  //   const isUploading = fileList.length > 0
+  //   // eslint-disable-next-line no-underscore-dangle
+  //   const isEdit = !!(selectedBean && selectedBean._id);
+  //   let title = formatMessage({ id: 'oal.face.uploadFacePhoto' });
+  //   if (isEdit) {
+  //     title = formatMessage({ id: 'oal.face.uploadFacePhoto' }, { name: selectedBean.name });
+  //   }
+  //   const faceSizeBean = sysConfigs.find(item => item.key === 'faceSize');
+  //   const maxFaceCountBean = sysConfigs.find(item => item.key === 'maxFaceCount');
+  //   let exampleStr = '';
+  //   // eslint-disable-next-line no-unused-expressions
+  //   faceKeyList && faceKeyList.length > 0 && faceKeyList.map(item => {
+  //     exampleStr += `_${item.name}`;
+  //   })
+  //   return (
+  //     <Drawer
+  //       title={title}
+  //       placement="right"
+  //       onClose={this.onCloseDrawer}
+  //       visible={uploadVisible}
+  //       width={580}
+  //     >
+  //       {
+  //         isUploading ? null : <Alert
+  //           message={
+  //             <div>
+  //               <div>
+  //                 <FormattedMessage id="oal.face.uploadPanelTips1-1" /><span style={{ color: 'green', margin: '0 8px' }}><FormattedMessage id="oal.face.uploadPanelTips1-2" /></span><FormattedMessage id="oal.face.uploadPanelTips1-3" />
+  //               </div>
+  //               <div>
+  //                 <FormattedMessage id="oal.face.uploadPanelTips2-1" />
+  //                 <span style={{ color: 'green', margin: '0 8px' }}><FormattedMessage id="oal.face.uploadPanelTips2-2" /></span><FormattedMessage id="oal.face.uploadPanelTips2-3" />
+  //               </div>
+  //               <div>
+  //                 <FormattedMessage id="oal.face.uploadPanelTips2-4" /><span style={{ color: 'red' }}><FormattedMessage id="oal.face.uploadPanelTips2-5" /><span>{exampleStr}</span>.jpeg</span>
+  //               </div>
+  //               <div>
+  //                 <FormattedMessage id="oal.face.uploadPanelTips3" />(kb)
+  //               <div style={{ marginLeft: '22px' }}>
+  //                   <FormattedMessage id="oal.common.minVal" />：
+  //                 <span style={{ color: 'green' }}>
+  //                     {faceSizeBean && faceSizeBean.value && faceSizeBean.value.min ?
+  //                       `${faceSizeBean && faceSizeBean.value && faceSizeBean.value.min}kb`
+  //                       :
+  //                       formatMessage({ id: 'oal.common.unset' })
+  //                     }
+  //                   </span>
+  //                 </div>
+  //                 <div style={{ marginLeft: '22px' }}>
+  //                   <FormattedMessage id="oal.common.maxVal" />：
+  //                 <span style={{ color: 'green' }}>
+  //                     {faceSizeBean && faceSizeBean.value && faceSizeBean.value.max ?
+  //                       `${faceSizeBean && faceSizeBean.value && faceSizeBean.value.max}kb`
+  //                       :
+  //                       formatMessage({ id: 'oal.common.unset' })
+  //                     }
+  //                   </span>
+  //                 </div>
+  //               </div>
+  //               <div>
+  //                 <FormattedMessage id="oal.face.uploadPanelTips4-1" />
+  //                 <span style={{ color: 'green' }}>
+  //                   {maxFaceCountBean && maxFaceCountBean.value ?
+  //                     `${maxFaceCountBean && maxFaceCountBean.value}${formatMessage({ id: 'oal.face.uploadPanelTips4-2' })}`
+  //                     :
+  //                     formatMessage({ id: 'oal.common.unset' })
+  //                   }
+  //                 </span>
+  //               </div>
+  //               <div>
+  //                 <FormattedMessage id="oal.face.uploadPanelTips5-1" />
+  //                 <span style={{ color: 'green', margin: '0 8px' }}><FormattedMessage id="oal.face.uploadPanelTips5-2" /></span><FormattedMessage id="oal.face.uploadPanelTips5-3" />
+  //               </div>
+  //             </div>
+  //           }
+  //           type="warning"
+  //         />
+  //       }
 
-        <div style={{ display: isUploading ? 'none' : 'flex', marginTop: '16px' }}>
-          {isEdit ? null : this.renderUpload(true, (
-            <Button>
-              <Icon type="upload" /> <FormattedMessage id="oal.face.uploadFolder" />
-            </Button>
-          ))}
-          {this.renderUpload(false, (
-            <Button style={{ marginLeft: 16 }}>
-              <Icon type="upload" /> <FormattedMessage id="oal.face.uploadPhoto" />
-            </Button>
-          ), selectedBean)}
-        </div>
+  //       <div style={{ display: isUploading ? 'none' : 'flex', marginTop: '16px' }}>
+  //         {isEdit ? null : this.renderUpload(true, (
+  //           <Button>
+  //             <Icon type="upload" /> <FormattedMessage id="oal.face.uploadFolder" />
+  //           </Button>
+  //         ))}
+  //         {this.renderUpload(false, (
+  //           <Button style={{ marginLeft: 16 }}>
+  //             <Icon type="upload" /> <FormattedMessage id="oal.face.uploadPhoto" />
+  //           </Button>
+  //         ), selectedBean)}
+  //       </div>
 
-        <UploadProgress fileList={this.state.fileList}
-            resetUpload={() => {
-              this.setState({
-                fileList: [],
-                errorList: [],
-                successList: [],
-              })
-              this.excludeNum = 0;
-            }}
-            openDetail ={tab => {
-              this.setState({ childrenDrawer: true, childrenTabIndex: tab })
-            }}
-            excludeNum = {this.excludeNum}
-            errorList={this.state.errorList}
-            successList={this.state.successList}/>
-          <UploadDetail childrenDrawer={this.state.childrenDrawer}
-              childrenTabIndex={this.state.childrenTabIndex}
-              changeTab = {tabType => this.setState({ childrenTabIndex: tabType })}
-              errorList={this.state.errorList}
-              successList={this.state.successList}
-              onChildrenDrawerClose={() => this.setState({ childrenDrawer: false })}/>
-      </Drawer>
-    )
-  }
-
+  //       <UploadProgress fileList={this.state.fileList}
+  //         resetUpload={() => {
+  //           this.setState({
+  //             fileList: [],
+  //             errorList: [],
+  //             successList: [],
+  //           })
+  //           this.excludeNum = 0;
+  //         }}
+  //         openDetail={tab => {
+  //           this.setState({ childrenDrawer: true, childrenTabIndex: tab })
+  //         }}
+  //         excludeNum={this.excludeNum}
+  //         errorList={this.state.errorList}
+  //         successList={this.state.successList} />
+  //       <UploadDetail childrenDrawer={this.state.childrenDrawer}
+  //         childrenTabIndex={this.state.childrenTabIndex}
+  //         changeTab={tabType => this.setState({ childrenTabIndex: tabType })}
+  //         errorList={this.state.errorList}
+  //         successList={this.state.successList}
+  //         onChildrenDrawerClose={() => this.setState({ childrenDrawer: false })} />
+  //     </Drawer>
+  //   )
+  // }
 
   deleteFace = bean => {
     const { dispatch } = this.props;
@@ -603,10 +808,14 @@ class Face extends Component {
     });
   };
 
-  handleStandardTableChange = pagination => {
+  handleStandardTableChange = (pagination, filters, sorter) => {
+    this.setState({
+      sortedInfo: sorter,
+    });
     this.loadFaceList({
       current: pagination.current,
       pageSize: pagination.pageSize,
+      sortedInfo: sorter,
     })
   };
 
@@ -631,113 +840,173 @@ class Face extends Component {
           }
         });
       },
-      onCancel() {},
+      onCancel() { },
     });
   }
 
   render() {
-    const extraContent = (
-      <div className={styles.extraContent}>
-        {/* <Popover content="授权成功的人脸才能被系统识别" title="什么是授权?">
-          <Button shape="circle" icon="question" size="small" style={{ marginRight: 16 }} />
-        </Popover>
-        <RadioGroup defaultValue="all" onChange={this.faceStateChange}>
-          <RadioButton value="all">全部</RadioButton>
-          <RadioButton value="1">已授权</RadioButton>
-          <RadioButton value="0">授权中</RadioButton>
-          <RadioButton value="-1">失败</RadioButton>
-        </RadioGroup> */}
-        <Search className={styles.extraContentSearch} placeholder={formatMessage({ id: 'oal.face.searchFullName' })} ref={ref => {
-          this.nameRef = ref
-        }} onSearch={() => {
-          this.onPageChange(1, 10)
-        }} />
-      </div>
-    );
-    const MoreBtn = ({ item }) => (
-      <Dropdown
-        overlay={
-          <Menu onClick={({ key }) => this.editAndDelete(key, item)}>
-            <Menu.Item key="modify"><FormattedMessage id="oal.common.modify" /></Menu.Item>
-            <Menu.Item key="editPhoto"><FormattedMessage id="oal.face.modifyPhoto" /></Menu.Item>
-          </Menu>
-        }
-      >
-        <a>
-          <FormattedMessage id="oal.common.edit" /> <Icon type="down" />
-        </a>
-      </Dropdown>
-    );
+    // const extraContent = (
+    //   <div className={styles.extraContent}>
+    //     {/* <Popover content="授权成功的人脸才能被系统识别" title="什么是授权?">
+    //       <Button shape="circle" icon="question" size="small" style={{ marginRight: 16 }} />
+    //     </Popover>
+    //     <RadioGroup defaultValue="all" onChange={this.faceStateChange}>
+    //       <RadioButton value="all">全部</RadioButton>
+    //       <RadioButton value="1">已授权</RadioButton>
+    //       <RadioButton value="0">授权中</RadioButton>
+    //       <RadioButton value="-1">失败</RadioButton>
+    //     </RadioGroup> */}
+    //     <Search className={styles.extraContentSearch} placeholder={formatMessage({ id: 'oal.face.searchFullName' })} ref={ref => {
+    //       this.nameRef = ref
+    //     }} onSearch={() => {
+    //       this.onPageChange(1, 10)
+    //     }} />
+    //   </div>
+    // );
+    // const MoreBtn = ({ item }) => (
+    //   <Dropdown
+    //     overlay={
+    //       <Menu onClick={({ key }) => this.editAndDelete(key, item)}>
+    //         <Menu.Item key="modify"><FormattedMessage id="oal.common.modify" /></Menu.Item>
+    //         <Menu.Item key="editPhoto"><FormattedMessage id="oal.face.modifyPhoto" /></Menu.Item>
+    //       </Menu>
+    //     }
+    //   >
+    //     <a>
+    //       <FormattedMessage id="oal.common.edit" /> <Icon type="down" />
+    //     </a>
+    //   </Dropdown>
+    // );
     const { modifyVisible, selectedBean, viewVisible, selectedRows, infoVisible } = this.state;
     const { face, loading, user, modifyLoading, faceKeyList } = this.props;
-    return (
-      <div className={styles.standardList}>
-        <Card
-          className={styles.listCard}
-          bordered={false}
-          title={formatMessage({ id: 'oal.face.faceList' })}
-          bodyStyle={{
-            padding: '0 32px 40px 32px',
-          }}
-          extra={extraContent}
-        >
-          <div style={{ marginBottom: 16 }}>
-            <Button
-              type="primary"
-              style={{ marginRight: 8 }}
-              icon="plus"
-              onClick={this.showDrawer}
-              ref={component => {
-                // eslint-disable-next-line  react/no-find-dom-node
-                this.addBtn = findDOMNode(component);
-              }}
-            >
-              <FormattedMessage id="oal.common.new" />
-            </Button>
-            <Button
-              style={{ marginRight: 8 }}
-              onClick={this.showConfirmRemoveAll}
-              ref={component => {
-                // eslint-disable-next-line  react/no-find-dom-node
-                this.addBtn = findDOMNode(component);
-              }}
-            >
-              <FormattedMessage id="oal.common.deleteAll" />
-            </Button>
-          </div>
 
-          {infoVisible ? (
-              <Alert showIcon message={ <div><FormattedMessage id="oal.face.moreConfigTips-1" /> <span style={{ color: 'red', marginLeft: 8 }}> <FormattedMessage id="oal.face.moreConfigTips-2" /></span></div>} type="info" closable afterClose={this.handleInfoClose} style={{ marginBottom: 8 }}/>
-            ) : null}
-          <StandardTable
-            rowKey={record => record._id}
-            needRowSelection={false}
-            selectedRows={selectedRows}
-            loading={loading}
-            data={face.faceList}
-            columns={this.columns()}
-            onSelectRow={this.handleSelectRows}
-            onChange={this.handleStandardTableChange}
+    face.faceList && face.faceList.pagination && (face.faceList.pagination.showTotal = (total, range) => (formatMessage({
+      id: 'oal.face.currentToTotal',
+    }, {
+      total,
+    })));
+
+    return (
+      <PageHeaderWrapper title=" " className={styles.myPageHeaderWrapper} >
+        <div className={styles.standardList}>
+          <Card
+            className={styles.listCard}
+            bordered={false}
+          >
+            <div className={styles.main} >
+              <div
+                className={styles.left}
+                ref={ref => { this.ref_leftDom = ref; }}
+                onClick={this.tree_clearMenu}
+              >
+                <Spin spinning={this.state.treeLoading} />
+                <Tree
+                  loadData={this.tree_onLoadData}
+                  // showLine={true}
+                  // blockNode={true}
+                  onMouseEnter={this.tree_onMouseEnter}
+                  onSelect={this.tree_onSelect}
+                >
+                  {this.tree_renderNodes(this.state.treeData)}
+                </Tree>
+                {this.state.nodeTreeItem ? this.tree_getNodeTreeMenu() : ''}
+              </div>
+
+              <div className={styles.right}>
+                <div className={styles.rightHeader}>
+                  <div style={{ flex: 1 }}>
+                    <FormattedMessage id="oal.face.search" />&nbsp;&nbsp;:&nbsp;&nbsp;
+                    <Input
+                      placeholder={formatMessage({ id: 'oal.face.enterFullName' })}
+                      style={{ marginRight: 20, width: 180, }}
+                      value={this.state.searchName}
+                      onChange={e => {
+                        this.setState({
+                          searchName: e.target.value,
+                        })
+                      }}
+                      onPressEnter={() => {
+                        this.onPageChange(1, 10)
+                      }}
+                    />
+                    <Button onClick={() => this.onPageChange(1, 10)} type="primary" loading={loading} style={{ marginRight: 10 }}>
+                      <FormattedMessage id="oal.common.query" />
+                    </Button>
+                    <Button onClick={() => {
+                      this.setState({
+                        searchName: '',
+                      }, () => {
+                        this.onPageChange(1, 10);
+                      });
+                    }} loading={loading}>
+                      <FormattedMessage id="oal.common.reset" />
+                    </Button>
+                  </div>
+
+                  <div>
+                    <Button
+                      type="primary"
+                      style={{ marginRight: 10 }}
+                      icon="plus"
+                      onClick={this.showDrawer}
+                    >
+                      <FormattedMessage id="oal.face.add" />
+                    </Button>
+                    <Button onClick={this.showBatchDrawer}><FormattedMessage id="oal.face.batchAdd" /></Button>
+                  </div>
+                </div>
+
+                <div className={styles.rightBatch}>
+                  <Button
+                    type="danger"
+                    disabled={!selectedRows || selectedRows.length === 0}
+                    style={{ marginRight: 10 }}
+                  >
+                    <FormattedMessage id="oal.common.delete" />
+                  </Button>
+                  <Button
+                    type="primary"
+                    disabled={!selectedRows || selectedRows.length === 0}
+                  >
+                    <FormattedMessage id="oal.face.move" />
+                  </Button>
+                </div>
+
+                {/* {infoVisible ? (
+                  <Alert showIcon message={<div><FormattedMessage id="oal.face.moreConfigTips-1" /> <span style={{ color: 'red', marginLeft: 8 }}> <FormattedMessage id="oal.face.moreConfigTips-2" /></span></div>} type="info" closable afterClose={this.handleInfoClose} style={{ marginBottom: 8 }} />
+                ) : null} */}
+                <StandardTable
+                  rowKey={record => record._id}
+                  needRowSelection
+                  selectedRows={selectedRows}
+                  loading={loading}
+                  data={face.faceList}
+                  columns={this.columns()}
+                  onSelectRow={this.handleSelectRows}
+                  onChange={this.handleStandardTableChange}
+                />
+              </div>
+            </div>
+          </Card>
+          {/* {this.renderUploadPanel()} */}
+          <ModifyModal
+            visible={modifyVisible}
+            bean={selectedBean}
+            faceKeyList={faceKeyList}
+            confirmLoading={modifyLoading}
+            handleCancel={this.closeModifyModal}
+            handleSubmit={this.submitModify}
           />
-        </Card>
-        {this.renderUploadPanel()}
-        <ModifyModal
-          visible={modifyVisible}
-          bean={selectedBean}
-          faceKeyList={faceKeyList}
-          confirmLoading={modifyLoading}
-          handleCancel={this.closeModifyModal}
-          handleSubmit={this.submitModify}
-        />
-        <Modal
-          title={selectedBean.name}
-          visible={viewVisible}
-          footer={null}
-          onCancel={this.closeViewModal}
-        >
-          <img src={selectedBean.imgPath} alt="" style={{ width: '100%', height: '100%' }} />
-        </Modal>
-      </div>
+          <Modal
+            title={selectedBean.name}
+            visible={viewVisible}
+            footer={null}
+            onCancel={this.closeViewModal}
+          >
+            <img src={selectedBean.imgPath} alt="" style={{ width: '100%', height: '100%' }} />
+          </Modal>
+        </div>
+      </PageHeaderWrapper >
     )
   }
 }

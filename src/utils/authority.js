@@ -60,7 +60,37 @@ export function getPermissionRoutes(userType, orgType) {
         name: 'settings',
         locale: 'menu.settings',
         icon: 'setting',
-      }
+      },
+      // 8126TODO 暂时允许admin组织查看设备
+      {
+        path: '/device',
+        name: 'device',
+        locale: 'menu.device',
+        icon: 'hdd',
+      },
+      {
+        path: '/face',
+        name: 'faceManger',
+        locale: 'menu.faceManger',
+        icon: 'smile',
+        routes: [
+          {
+            path: '/face/group',
+            name: 'faceGroup',
+            locale: 'menu.faceManger.faceGroup',
+          },
+          // {
+          //   path: '/face/blacklist',
+          //   name: 'faceBlacklist',
+          //   locale: 'menu.faceManger.faceBlacklist',
+          // },
+          {
+            path: '/face/visitor',
+            name: 'faceVisitor',
+            locale: 'menu.faceManger.faceVisitor',
+          },
+        ],
+      },
     ];
 
     // if (userType === 0) {
@@ -109,11 +139,11 @@ export function getPermissionRoutes(userType, orgType) {
             name: 'faceGroup',
             locale: 'menu.faceManger.faceGroup',
           },
-          {
-            path: '/face/blacklist',
-            name: 'faceBlacklist',
-            locale: 'menu.faceManger.faceBlacklist',
-          },
+          // {
+          //   path: '/face/blacklist',
+          //   name: 'faceBlacklist',
+          //   locale: 'menu.faceManger.faceBlacklist',
+          // },
           {
             path: '/face/visitor',
             name: 'faceVisitor',
@@ -167,7 +197,7 @@ export function getPermissionRoutes(userType, orgType) {
         name: 'settings',
         locale: 'menu.settings',
         icon: 'setting',
-      }
+      },
     ];
   }
 

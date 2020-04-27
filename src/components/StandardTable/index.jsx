@@ -84,7 +84,7 @@ class StandardTable extends Component {
 
   render() {
     const { selectedRowKeys, needTotalList } = this.state;
-    const { data, rowKey, needRowSelection, ...rest } = this.props;
+    const { data, rowKey, needRowSelection, needRowSelectionShowAlert, ...rest } = this.props;
     const { list = [], pagination = false } = data || {};
     const paginationProps = {
       showSizeChanger: true,
@@ -102,7 +102,7 @@ class StandardTable extends Component {
     };
     return (
       <div className={styles.standardTable}>
-        {needRowSelection &&
+        {needRowSelectionShowAlert &&
           <div className={styles.tableAlert}>
             <Alert
               message={

@@ -1,4 +1,4 @@
-import { fetchList, deleteFace, renameFace, modifyFaceInfo, removeAllFace } from './service';
+import { fetchList, deleteFace, renameFace, modifyFaceInfo, removeAllFace, fetchGroup } from './service';
 import { getSysConfig } from '@/services/sys';
 
 const Model = {
@@ -49,6 +49,10 @@ const Model = {
             payload: data,
           });
         }
+      },
+      *fetchGroupTree({ payload }, { call, put, select }) {
+        const response = yield call(fetchGroup);
+        return Promise.resolve(response);
       },
     },
     reducers: {

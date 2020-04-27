@@ -76,7 +76,7 @@ const ModifyModal = props => {
                     {},
                   ],
                   initialValue: bean.profile && bean.profile[item.key],
-                })(<Select placeholder={`${formatMessage({ id: 'oal.common.pleaseSelect' })}${item.name}`} disabled={item.readOnly && bean.profile && bean.profile[item.key]}>
+                })(<Select placeholder={`${formatMessage({ id: 'oal.common.pleaseSelect' })}${item.name}`} disabled={!!item.readOnly && !!bean.profile && !!bean.profile[item.key]}>
                     {data.map(option => (
                       <Option value={option.value} key={`option_${option.value}`}>{option.text}</Option>
                     ))}
@@ -97,7 +97,7 @@ const ModifyModal = props => {
                   {},
                 ],
                 initialValue: bean.profile && bean.profile[item.key],
-              })(<Input placeholder={`${formatMessage({ id: 'oal.common.pleaseEnter' })}${item.name}`} disabled={item.readOnly && bean.profile && bean.profile[item.key]}/>)}
+              })(<Input placeholder={`${formatMessage({ id: 'oal.common.pleaseEnter' })}${item.name}`} disabled={!!item.readOnly && !!bean.profile && !!bean.profile[item.key]}/>)}
             </Form.Item>
           )
         })}
