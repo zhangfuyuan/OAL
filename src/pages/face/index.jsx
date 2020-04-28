@@ -7,7 +7,11 @@ import { connect } from 'dva';
 import { findIndex, groupBy } from 'lodash';
 import { AUTH_TOKEN, SYSTEM_PATH } from '../../utils/constants';
 import styles from './style.less';
-import ModifyModal from './components/ModifyModal';
+import TreeAddModal from './components/TreeAddModal';
+import TreeModifyModal from './components/TreeModifyModal';
+import TreeDelModal from './components/TreeDelModal';
+import TableAddOrModifyModal from './components/TableAddOrModifyModal';
+import TableBatchAddModal from './components/TableBatchAddModal';
 // import UploadProgress from './components/UploadProgress';
 // import UploadDetail from './components/UploadDetail';
 import StandardTable from '@/components/StandardTable'
@@ -15,6 +19,7 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import router from 'umi/router';
 import Link from 'umi/link';
+import { toTree } from '@/utils/utils';
 
 const { Search } = Input;
 const { confirm } = Modal;
@@ -48,42 +53,50 @@ const listSubName = data => {
 @connect(({ user, face, faceKey, loading }) => ({
   face,
   user: user.currentUser,
-  loading: loading.effects['face/fetch'],
+  tableLoading: loading.effects['face/fetch'],
   modifyLoading: loading.effects['face/modify'],
   faceKeyList: faceKey.faceKeyList,
   sysConfigs: face.sysConfigs,
+  treeLoading: loading.effects['face/fetchGroupTree'],
 }))
 class Face extends Component {
   state = {
-    uploadVisible: false,
-    uploadBatchVisible: false,
+    treeAddVisible: false,
+    treeModifyVisible: false,
+    treeDelVisible: false,
+    // uploadVisible: false,
+    tableBatchAddVisible: false,
     featureState: 'all',
-    modifyVisible: false,
-    selectedBean: {},
+    tableAddOrModifyVisible: false,
+    tableSelectedBean: {},
     viewVisible: false,
-    selectedRows: [],
-    infoVisible: true,
-    fileList: [],
-    errorList: [],
-    successList: [],
-    childrenDrawer: false, // 上传的明细右侧栏
-    childrenTabIndex: 'success', // 明细中展示的tab类型
-    treeLoading: true,
+    tableSelectedRows: [],
+    // infoVisible: true,
+    // fileList: [],
+    // errorList: [],
+    // successList: [],
+    // childrenDrawer: false, // 上传的明细右侧栏
+    // childrenTabIndex: 'success', // 明细中展示的tab类型
     treeData: [],
     nodeTreeItem: null,
-    searchName: '',
-    sortedInfo: {},
+    tableSearchName: '',
+    sortedInfo: {
+      sortId: '',
+      sortOrder: '', // ascend（正序）、descend（倒序）
+    },
+    treeFocusKey: '',
+    tablePage: {
+      current: 1,
+      pageSize: 10,
+    },
   };
 
   ref_leftDom = null;
 
   componentDidMount() {
-    this.tree_loadData();
-    this.loadFaceList();
-    this.loadFaceKeyList();
-    this.loadSysConfig();
+    this.tree_loadData(true);
     // this.errorList = [];
-    this.excludeNum = 0;
+    // this.excludeNum = 0;
   }
 
   componentWillUnmount() {
@@ -92,19 +105,27 @@ class Face extends Component {
 
   /************************************************* Tree Start *************************************************/
 
-  tree_loadData = () => {
+  tree_loadData = (isRefreshTable) => {
     const { dispatch } = this.props;
+    const { treeFocusKey } = this.state;
+
+    this.tree_clearMenu();
+    this.setState({ treeData: [] });
     dispatch({
       type: 'face/fetchGroupTree',
     }).then(res => {
       if (res && res.res > 0) {
+        const treeData = toTree(res.data) || [];
         this.setState({
-          treeLoading: false,
-          treeData: [
-            { title: 'Expand to load', key: '0' },
-            { title: 'Expand to load', key: '1' },
-            { title: 'Tree Node', key: '2', isLeaf: true },
-          ],
+          treeData,
+          treeFocusKey: treeFocusKey || (treeData[0] && treeData[0].id) || '0',
+        }, () => {
+          if (isRefreshTable) {
+            // 8126TODO 一个请求搞定
+            this.table_loadFaceList();
+            this.loadFaceKeyList();
+            this.loadSysConfig();
+          }
         });
       }
     }).catch(err => {
@@ -112,51 +133,33 @@ class Face extends Component {
     })
   };
 
-  tree_onLoadData = treeNode =>
-    new Promise(resolve => {
-      if (treeNode.props.children) {
-        resolve();
-        return;
-      }
-      setTimeout(() => {
-        treeNode.props.dataRef.children = [
-          { title: 'Child Node', key: `${treeNode.props.eventKey}-0` },
-          { title: 'Child Node', key: `${treeNode.props.eventKey}-1` },
-        ];
-        this.setState({
-          treeData: [...this.state.treeData],
-        });
-        resolve();
-      }, 1000);
-    });
-
   tree_renderNodes = data =>
     data.map(item => {
-      if (item.children) {
+      if (item.children && item.children.length > 0) {
         return (
-          <TreeNode title={item.title} key={item.key} dataRef={item}>
+          <TreeNode key={item.id} title={`${item.name} (${item.num})`} dataRef={item}>
             {this.tree_renderNodes(item.children)}
           </TreeNode>
         );
       }
-      return <TreeNode key={item.key} {...item} dataRef={item} />;
+      return <TreeNode key={item.id} title={`${item.name} (${item.num})`} {...item} dataRef={item} />;
     });
 
   tree_onMouseEnter = (e) => {
-    if (this.ref_leftDom && (!this.state.nodeTreeItem || !this.state.nodeTreeItem.isEditing)) {
+    if (this.ref_leftDom) {
       const { left: pLeft, top: pTop } = this.ref_leftDom.getBoundingClientRect();
       const { left, width, top } = e.event.currentTarget.getBoundingClientRect();
       const x = left - pLeft + width + this.ref_leftDom.scrollLeft;
       const y = top - pTop;
-      const { eventKey, dataRef } = e.node.props;
+      const { eventKey, dataRef, pos } = e.node.props;
 
       this.setState({
         nodeTreeItem: {
-          nodeWidth: width,
           pageX: x,
           pageY: y,
           id: eventKey,
-          dataRef,
+          nodeData: dataRef,
+          level: pos && (pos.split('-').length - 1) || 1,
         }
       });
     }
@@ -164,12 +167,12 @@ class Face extends Component {
 
   tree_getNodeTreeMenu() {
     if (this.state.nodeTreeItem) {
-      const { pageX, pageY, isEditing, nodeWidth, dataRef } = { ...this.state.nodeTreeItem };
+      const { pageX, pageY, level } = this.state.nodeTreeItem;
       const tmpStyle = {
         position: 'absolute',
         maxHeight: 40,
         textAlign: 'center',
-        left: `${pageX + 10 - (isEditing ? nodeWidth + 10 : 0)}px`,
+        left: `${pageX + 10}px`,
         top: `${pageY}px`,
         display: 'flex',
         flexDirection: 'row',
@@ -180,31 +183,29 @@ class Face extends Component {
           onClick={e => e.stopPropagation()}
         >
           {
-            isEditing ?
-              <Input
-                size="small"
-                defaultValue={dataRef && dataRef.title || ''}
-                style={{ width: `${nodeWidth}px`, minWidth: `56px`, marginRight: '10px', }}
-                autoFocus={true}
-                onBlur={this.tree_handleEditSubInput}
-                onPressEnter={this.tree_handleEditSubInput}
-              /> : ''
+            level > 1 ?
+              (<div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_showTreeModifyModal}>
+                <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.modify' })}>
+                  <Icon type='edit' />
+                </Tooltip>
+              </div>) : ''
           }
-          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleEditSub}>
-            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.modify' })}>
-              <Icon type='edit' />
-            </Tooltip>
-          </div>
-          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleDeleteSub}>
-            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.delete' })}>
-              <Icon type='minus-circle-o' />
-            </Tooltip>
-          </div>
-          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleAddSub}>
-            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.addItems' })}>
-              <Icon type='plus-circle-o' />
-            </Tooltip>
-          </div>
+          {
+            level > 1 ?
+              (<div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_showTreeDelModal}>
+                <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.delete' })}>
+                  <Icon type='minus-circle-o' />
+                </Tooltip>
+              </div>) : ''
+          }
+          {
+            level < 5 ?
+              (<div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_showTreeAddModal}>
+                <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.addItems' })}>
+                  <Icon type='plus-circle-o' />
+                </Tooltip>
+              </div>) : ''
+          }
         </div>
       );
 
@@ -214,41 +215,6 @@ class Face extends Component {
     return '';
   }
 
-  tree_handleAddSub = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click add id :", this.state.nodeTreeItem.id);
-    }
-  };
-
-  tree_handleEditSub = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click edit id :", this.state.nodeTreeItem.id);
-      this.setState({
-        nodeTreeItem: {
-          ...this.state.nodeTreeItem,
-          isEditing: true,
-        },
-      });
-    }
-  };
-
-  tree_handleEditSubInput = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click edit value :", e.target.value);
-      this.state.nodeTreeItem.dataRef.title = e.target.value;
-      this.setState({
-        nodeTreeItem: null,
-        treeData: [...this.state.treeData],
-      });
-    }
-  };
-
-  tree_handleDeleteSub = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click delete id :", this.state.nodeTreeItem.id);
-    }
-  };
-
   tree_clearMenu = () => {
     this.setState({
       nodeTreeItem: null,
@@ -256,47 +222,58 @@ class Face extends Component {
   };
 
   tree_onSelect = (selectedKeys, e) => {
-    console.log('selectedKeys : ', selectedKeys, e);
+    console.log(8126, '点击分组刷新列表', selectedKeys[0]);
+    this.setState({
+      treeFocusKey: selectedKeys[0],
+    }, () => {
+      // 8126TODO 一个请求搞定
+      this.table_loadFaceList();
+    });
+  };
+
+  tree_onDrop = info => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'face/moveGroupNode',
+      payload: {
+        id: info.dragNode.props.eventKey,
+        parentId: info.node.props.eventKey,
+      },
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.common.moveSuccessfully' }));
+        this.tree_loadData();
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
   };
 
   /************************************************* Tree End *************************************************/
 
-  loadFaceList = (pagination, fs) => {
+  /************************************************ Table Start ************************************************/
+
+  table_loadFaceList = () => {
     const { dispatch } = this.props;
-    const { featureState, searchName } = this.state;
-    if (!pagination) {
-      // eslint-disable-next-line no-param-reassign
-      pagination = {
-        current: 1,
-        pageSize: 10,
-      }
-    }
-    const payload = {
-      ...pagination,
-      featureState: (fs || fs === '0') ? fs : featureState,
-    }
-    if (searchName) payload.name = searchName;
+    const { featureState, tableSearchName, treeFocusKey, tablePage, sortedInfo } = this.state;
+    const { sortId, sortOrder } = sortedInfo;
+    // 8126TODO 请求参数需对接
     dispatch({
       type: 'face/fetch',
-      payload,
+      payload: {
+        ...tablePage,
+        featureState,
+        groupId: treeFocusKey,
+        sortId,
+        sortOrder,
+        name: tableSearchName.trim(),
+      },
     });
   };
 
-  loadFaceKeyList = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'faceKey/getFaceKeyList',
-    });
-  };
-
-  loadSysConfig = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'face/toGetSysConfigs',
-    })
-  };
-
-  columns = () => {
+  table_columns = () => {
     const { user, faceKeyList } = this.props;
     // const MoreBtn = ({ item }) => (
     //   <Dropdown
@@ -317,7 +294,7 @@ class Face extends Component {
         title: formatMessage({ id: 'oal.common.photo' }),
         key: 'avatar',
         width: 100,
-        render: (text, record) => <Avatar src={`${record.imgPath}.jpg?height=64&width=64&mode=fit`} shape="square" size="large" onClick={() => this.openViewModal(record)} style={{ cursor: 'pointer' }} />,
+        render: (text, record) => <Avatar src={`${record.imgPath}.jpg?height=64&width=64&mode=fit`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
       },
       {
         title: formatMessage({ id: 'oal.common.fullName' }),
@@ -371,14 +348,14 @@ class Face extends Component {
         width: 200,
         render: (text, record) => (
           <Fragment>
-            <a key="edit"><FormattedMessage id="oal.common.edit" /></a>
+            <a key="edit" onClick={() => this.table_showTableAddOrModifyModal(record)}><FormattedMessage id="oal.common.edit" /></a>
             <Divider type="vertical" />
-            <a key="move"><FormattedMessage id="oal.face.move" /></a>
+            <a key="move" onClick={() => this.table_showTableMoveModal(record)}><FormattedMessage id="oal.common.move" /></a>
             <Divider type="vertical" />
             {/* <Popconfirm placement="topLeft" title={formatMessage({ id: 'oal.face.confirmDeleteFace' })} onConfirm={() => this.deleteFace(record)} okText={formatMessage({ id: 'oal.common.delete' })} cancelText={formatMessage({ id: 'oal.common.cancel' })}> */}
-            <a key="remove"><FormattedMessage id="oal.common.delete" /></a>
+            <a key="remove" onClick={() => this.table_showTableDelModal(record)}><FormattedMessage id="oal.common.delete" /></a>
             {/* </Popconfirm> */}
-            <Divider type="vertical" />
+            {/* <Divider type="vertical" /> */}
             {/* <MoreBtn item={record} /> */}
           </Fragment>
         ),
@@ -386,91 +363,399 @@ class Face extends Component {
     return cl;
   };
 
-  getImgName = str => {
-    const temp = str.split('.');
-    temp.pop();
-    return temp.join('.')
-  }
+  table_onPageChange = (page, pageSize) => {
+    this.setState({
+      tablePage: {
+        current: page,
+        pageSize,
+      },
+    }, () => {
+      this.table_loadFaceList();
+    });
+  };
 
-  getErrorName = (str, errorIndex) => {
-    const temp = str.split('.');
-    const pix = temp[temp.length - 1];
-    temp.pop();
-    const nameStr = temp.join('.')
-    const nameArray = nameStr.split('_')
-    const tp = nameArray.map((item, index) => {
-      if (errorIndex === index) {
-        return <span style={{ color: 'red', fontWeight: 700 }}>{item}</span>
+  table_handleSelectRows = rows => {
+    this.setState({
+      tableSelectedRows: rows,
+    });
+  };
+
+  table_handleStandardTableChange = (pagination, filters, sorter) => {
+    this.setState({
+      tablePage: pagination,
+      sortedInfo: sorter,
+    }, () => {
+      this.table_loadFaceList();
+    });
+  };
+
+  table_handelSearchChange = e => {
+    this.setState({
+      tableSearchName: e.target.value,
+    });
+  };
+
+  table_handelSearchPressEnter = () => {
+    this.table_onPageChange(1, 10);
+  };
+
+  table_handelSearchReset = () => {
+    this.setState({
+      tableSearchName: '',
+    }, () => {
+      this.table_onPageChange(1, 10);
+    });
+  };
+
+  /************************************************* Table End *************************************************/
+
+  /************************************************ Modal Start ************************************************/
+
+  // 树节点增 TreeAddModal
+  tree_showTreeAddModal = (e) => {
+    if (this.state.nodeTreeItem && this.state.nodeTreeItem.level < 5) {
+      this.setState({
+        treeAddVisible: true,
+      });
+    } else {
+      message.error(formatMessage({ id: 'oal.face.groupLevelLimit' }));
+    }
+  };
+
+  tree_closeTreeAddModal = () => {
+    this.setState({
+      treeAddVisible: false,
+    });
+  };
+
+  tree_submitTreeAddModal = (params, callback) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'face/addGroupNode',
+      payload: params,
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
+        this.tree_loadData();
+        this.tree_closeTreeAddModal();
+        callback && callback();
+      } else {
+        console.log(res);
       }
-      return item
+    }).catch(err => {
+      console.log(err);
+    });
+  };
+
+  // 树节点改 TreeModifyModal
+  tree_showTreeModifyModal = (e) => {
+    if (this.state.nodeTreeItem) {
+      this.setState({
+        treeModifyVisible: true,
+      });
+    }
+  };
+
+  tree_closeTreeModifyModal = () => {
+    this.setState({
+      treeModifyVisible: false,
+    });
+  };
+
+  tree_submitTreeModifyModal = (params, callback) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'face/modifyGroupNode',
+      payload: params,
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+        this.tree_loadData();
+        this.tree_closeTreeModifyModal();
+        callback && callback();
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
+  };
+
+  // 树节点删
+  tree_showTreeDelModal = (e) => {
+    if (this.state.nodeTreeItem) {
+      this.setState({
+        treeDelVisible: true,
+      });
+    }
+  };
+
+  tree_closeTreeDelModal = () => {
+    this.setState({
+      treeDelVisible: false,
+    });
+  };
+
+  tree_submitTreeDelModal = (params, callback) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'face/delGroupNode',
+      payload: params,
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+        this.setState({
+          treeFocusKey: '',
+        }, () => {
+          this.tree_loadData(true);
+        });
+        this.tree_closeTreeDelModal();
+        callback && callback();
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
+  };
+
+  // 添加/编辑（单个人脸信息）TableAddOrModifyModal
+  table_showTableAddOrModifyModal = bean => {
+    const _state = {
+      tableAddOrModifyVisible: true,
+    };
+
+    bean && bean._id && (_state.tableSelectedBean = bean);
+
+    this.setState(_state);
+  };
+
+  table_closeTableAddOrModifyModal = () => {
+    this.setState({
+      tableAddOrModifyVisible: false,
+      tableSelectedBean: {},
+    });
+  };
+
+  table_submitTableAddOrModifyModal = () => {
+    this.setState({
+      tableAddOrModifyVisible: false,
+      tableSelectedBean: {},
+    }, () => {
+      this.table_loadFaceList();
+    });
+  };
+
+  // 批量添加（上传人脸信息）TableBatchAddModal
+  table_showTableBatchAddModal = () => {
+    this.setState({
+      tableBatchAddVisible: true,
+    });
+  };
+
+  table_closeTableBatchAddModal = () => {
+    this.setState({
+      tableBatchAddVisible: false,
+    });
+  };
+
+  table_submitTableBatchAddModal = () => {
+    this.setState({
+      tableAddOrModifyVisible: false,
+    }, () => {
+      this.table_loadFaceList();
+    });
+  };
+
+  // 单个/批量移动（人脸分组）
+  table_showTableMoveModal = bean => {
+    console.log(8126, '单个/批量移动', bean || tableSelectedRows);
+    // this.setState({
+    //   tableAddOrModifyVisible: true,
+    //   tableSelectedBean: bean,
+    // });
+  };
+
+  table_closeTableMoveModal = () => {
+    // this.setState({
+    //   tableBatchAddVisible: false,
+    // });
+  };
+
+  table_submitTableMoveModal = () => {
+    // this.setState({
+    //   tableAddOrModifyVisible: false,
+    // }, () => {
+    //   this.table_loadFaceList();
+    // });
+  };
+
+  // 单个/批量删除（人脸信息）
+  table_showTableDelModal = bean => {
+    console.log(8126, '单个/批量移动', bean || tableSelectedRows);
+    // this.setState({
+    //   tableAddOrModifyVisible: true,
+    //   tableSelectedBean: bean,
+    // });
+  };
+
+  table_closeTableDelModal = () => {
+    // this.setState({
+    //   tableBatchAddVisible: false,
+    // });
+  };
+
+  table_submitTableDelModal = () => {
+    // this.setState({
+    //   tableBatchAddVisible: false,
+    // });
+  };
+
+  // 放大查看（人脸图片）
+  table_openViewModal = bean => {
+    this.setState({ viewVisible: true, tableSelectedBean: bean })
+  };
+
+  table_closeViewModal = () => {
+    this.setState({ viewVisible: false, tableSelectedBean: {} })
+  };
+
+  /************************************************* Modal End *************************************************/
+
+  // 8126TODO 待废弃
+  loadFaceKeyList = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'faceKey/getFaceKeyList',
+    });
+  };
+
+  // 8126TODO 待废弃
+  loadSysConfig = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'face/toGetSysConfigs',
     })
-    const resultArray = [];
-    for (let i = 0; i < tp.length; i++) {
-      resultArray.push(tp[i])
-      if (i !== nameArray.length - 1) {
-        resultArray.push('_');
-      }
-    }
-    return (
-      <div>
-        {
-          resultArray
-        }
-        .{pix}
-      </div>
-    )
-  }
+  };
 
-  addToList = (orgList, bean) => {
-    const tpIndex = findIndex(orgList, item => item.uid === bean.uid)
-    if (tpIndex === -1) {
-      orgList.push(bean)
-    }
-    return orgList;
-  }
+  // table_closeModifyModal = () => {
+  //   this.setState({ tableAddOrModifyVisible: false, tableSelectedBean: {} })
+  // };
 
-  onBeforeUpload = (file, fList, isDirectory, uniqueIndex) => {
-    let { fileList, errorList } = this.state;
-    if (fileList.length === 0) {
-      this.setState({ fileList: fList })
-    }
-    if (!isDirectory) {
-      return true;
-    }
+  // table_submitModify = (params, callback) => {
+  //   const { dispatch } = this.props;
+  //   dispatch({
+  //     type: 'face/modify',
+  //     payload: params,
+  //   }).then(res => {
+  //     if (res.res > 0) {
+  //       this.table_closeModifyModal();
+  //       this.table_loadFaceList();
+  //       message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+  //       callback();
+  //     }
+  //   });
+  // };
 
-    let flag = true
-    const nameArray = this.getImgName(file.name).split('_');
-    for (let i = 0; i < fList.length; i++) {
-      if (fList[i].uid !== file.uid) {
-        // 只有不相同的做对比
-        const temp = this.getImgName(fList[i].name).split('_')
-        // 遍历取每条数据比较
-        for (let p = 0; p < uniqueIndex.length; p++) {
-          // 遍历唯一约束列
-          if (nameArray[uniqueIndex[p].index + 2] && (temp[uniqueIndex[p].index + 2] === nameArray[uniqueIndex[p].index + 2])) {
-            // 对比唯一约束列
-            // 唯一约束列结果一致，加入到错误列表
-            this.excludeNum++;
-            errorList = this.addToList(errorList,
-              {
-                name: file.name,
-                size: file.size,
-                uid: file.uid,
-                uploadRes: { res: -1, errorCode: 5007 },
-              });
-            this.setState({ errorList })
-            flag = false
-            break
-          }
-        }
-        if (!flag) {
-          // 只需要找到一个违反唯一约束的，就退出
-          break;
-        }
-      }
-    }
-    return flag
-  }
+  // table_deleteFace = bean => {
+  //   const { dispatch } = this.props;
+  //   dispatch({
+  //     type: 'face/delete',
+  //     // eslint-disable-next-line no-underscore-dangle
+  //     payload: { faceId: bean._id },
+  //   }).then(res => {
+  //     if (res.res > 0) {
+  //       this.table_loadFaceList();
+  //       message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+  //     }
+  //   });
+  // };
+
+  // getImgName = str => {
+  //   const temp = str.split('.');
+  //   temp.pop();
+  //   return temp.join('.')
+  // };
+
+  // getErrorName = (str, errorIndex) => {
+  //   const temp = str.split('.');
+  //   const pix = temp[temp.length - 1];
+  //   temp.pop();
+  //   const nameStr = temp.join('.')
+  //   const nameArray = nameStr.split('_')
+  //   const tp = nameArray.map((item, index) => {
+  //     if (errorIndex === index) {
+  //       return <span style={{ color: 'red', fontWeight: 700 }}>{item}</span>
+  //     }
+  //     return item
+  //   })
+  //   const resultArray = [];
+  //   for (let i = 0; i < tp.length; i++) {
+  //     resultArray.push(tp[i])
+  //     if (i !== nameArray.length - 1) {
+  //       resultArray.push('_');
+  //     }
+  //   }
+  //   return (
+  //     <div>
+  //       {
+  //         resultArray
+  //       }
+  //       .{pix}
+  //     </div>
+  //   )
+  // };
+
+  // addToList = (orgList, bean) => {
+  //   const tpIndex = findIndex(orgList, item => item.uid === bean.uid)
+  //   if (tpIndex === -1) {
+  //     orgList.push(bean)
+  //   }
+  //   return orgList;
+  // };
+
+  // onBeforeUpload = (file, fList, isDirectory, uniqueIndex) => {
+  //   let { fileList, errorList } = this.state;
+  //   if (fileList.length === 0) {
+  //     this.setState({ fileList: fList })
+  //   }
+  //   if (!isDirectory) {
+  //     return true;
+  //   }
+
+  //   let flag = true
+  //   const nameArray = this.getImgName(file.name).split('_');
+  //   for (let i = 0; i < fList.length; i++) {
+  //     if (fList[i].uid !== file.uid) {
+  //       // 只有不相同的做对比
+  //       const temp = this.getImgName(fList[i].name).split('_')
+  //       // 遍历取每条数据比较
+  //       for (let p = 0; p < uniqueIndex.length; p++) {
+  //         // 遍历唯一约束列
+  //         if (nameArray[uniqueIndex[p].index + 2] && (temp[uniqueIndex[p].index + 2] === nameArray[uniqueIndex[p].index + 2])) {
+  //           // 对比唯一约束列
+  //           // 唯一约束列结果一致，加入到错误列表
+  //           this.excludeNum++;
+  //           errorList = this.addToList(errorList,
+  //             {
+  //               name: file.name,
+  //               size: file.size,
+  //               uid: file.uid,
+  //               uploadRes: { res: -1, errorCode: 5007 },
+  //             });
+  //           this.setState({ errorList })
+  //           flag = false
+  //           break
+  //         }
+  //       }
+  //       if (!flag) {
+  //         // 只需要找到一个违反唯一约束的，就退出
+  //         break;
+  //       }
+  //     }
+  //   }
+  //   return flag
+  // };
 
   // onBeforeUploadbak = (file, fList, isDirectory, uniqueIndex) => {
   //   // console.log('beforeUploadFile-------', fList);
@@ -588,50 +873,15 @@ class Face extends Component {
   //   )
   // };
 
-  showDrawer = () => {
-    this.setState({
-      uploadVisible: true,
-    });
-  };
-
-  showBatchDrawer = () => {
-    this.setState({
-      uploadBatchVisible: true,
-    });
-  };
-
-  onCloseDrawer = () => {
-    this.setState({
-      uploadVisible: false,
-      selectedBean: {},
-    });
-    this.loadFaceList();
-  };
-
-  onCloseBatchDrawer = () => {
-    this.setState({
-      uploadBatchVisible: false,
-      selectedBean: {},
-    });
-    this.loadFaceList();
-  };
-
-  onPageChange = (page, pageSize) => {
-    this.loadFaceList({
-      current: page,
-      pageSize,
-    })
-  }
-
-  faceStateChange = e => {
-    this.loadFaceList({
-      current: 1,
-      pageSize: 10,
-    }, e.target.value)
-    this.setState({
-      featureState: e.target.value,
-    })
-  }
+  // faceStateChange = e => {
+  //   this.table_loadFaceList({
+  //     current: 1,
+  //     pageSize: 10,
+  //   }, e.target.value)
+  //   this.setState({
+  //     featureState: e.target.value,
+  //   })
+  // };
 
   // renderUploadPanel = () => {
   //   const { uploadVisible, selectedBean, fileList } = this.state;
@@ -753,96 +1003,38 @@ class Face extends Component {
   //   )
   // }
 
-  deleteFace = bean => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'face/delete',
-      // eslint-disable-next-line no-underscore-dangle
-      payload: { faceId: bean._id },
-    }).then(res => {
-      if (res.res > 0) {
-        this.loadFaceList();
-        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
-      }
-    });
-  };
+  // editAndDelete = (key, bean) => {
+  //   if (key === 'modify') {
+  //     this.setState({ modifyVisible: true, selectedBean: bean })
+  //   } else {
+  //     this.setState({ uploadVisible: true, selectedBean: bean })
+  //   }
+  // };
 
-  editAndDelete = (key, bean) => {
-    if (key === 'modify') {
-      this.setState({ modifyVisible: true, selectedBean: bean })
-    } else {
-      this.setState({ uploadVisible: true, selectedBean: bean })
-    }
-  };
+  // handleInfoClose = () => {
+  //   this.setState({ infoVisible: false })
+  // };
 
-  closeModifyModal = () => {
-    this.setState({ modifyVisible: false, selectedBean: {} })
-  };
-
-  submitModify = (params, callback) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'face/modify',
-      payload: params,
-    }).then(res => {
-      if (res.res > 0) {
-        this.closeModifyModal();
-        this.loadFaceList();
-        message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
-        callback();
-      }
-    });
-  };
-
-  openViewModal = bean => {
-    this.setState({ viewVisible: true, selectedBean: bean })
-  };
-
-  closeViewModal = () => {
-    this.setState({ viewVisible: false, selectedBean: {} })
-  };
-
-  handleSelectRows = rows => {
-    this.setState({
-      selectedRows: rows,
-    });
-  };
-
-  handleStandardTableChange = (pagination, filters, sorter) => {
-    this.setState({
-      sortedInfo: sorter,
-    });
-    this.loadFaceList({
-      current: pagination.current,
-      pageSize: pagination.pageSize,
-      sortedInfo: sorter,
-    })
-  };
-
-  handleInfoClose = () => {
-    this.setState({ infoVisible: false })
-  }
-
-  showConfirmRemoveAll = () => {
-    const self = this;
-    confirm({
-      title: formatMessage({ id: 'oal.face.confirmDeleteAllFace' }),
-      icon: <ExclamationCircleOutlined />,
-      content: formatMessage({ id: 'oal.face.clearFaceLibraryTips' }),
-      onOk() {
-        const { dispatch } = self.props;
-        return dispatch({
-          type: 'face/removeAll',
-        }).then(res => {
-          if (res.res > 0) {
-            self.loadFaceList();
-            message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
-          }
-        });
-      },
-      onCancel() { },
-    });
-  }
+  // showConfirmRemoveAll = () => {
+  //   const self = this;
+  //   confirm({
+  //     title: formatMessage({ id: 'oal.face.confirmDeleteAllFace' }),
+  //     icon: <ExclamationCircleOutlined />,
+  //     content: formatMessage({ id: 'oal.face.clearFaceLibraryTips' }),
+  //     onOk() {
+  //       const { dispatch } = self.props;
+  //       return dispatch({
+  //         type: 'face/removeAll',
+  //       }).then(res => {
+  //         if (res.res > 0) {
+  //           self.table_loadFaceList();
+  //           message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+  //         }
+  //       });
+  //     },
+  //     onCancel() { },
+  //   });
+  // };
 
   render() {
     // const extraContent = (
@@ -877,8 +1069,29 @@ class Face extends Component {
     //     </a>
     //   </Dropdown>
     // );
-    const { modifyVisible, selectedBean, viewVisible, selectedRows, infoVisible } = this.state;
-    const { face, loading, user, modifyLoading, faceKeyList } = this.props;
+    const {
+      treeLoading,
+      face,
+      tableLoading,
+      user,
+      modifyLoading,
+      faceKeyList
+    } = this.props;
+    const {
+      treeData,
+      treeFocusKey,
+      nodeTreeItem,
+      treeAddVisible,
+      treeModifyVisible,
+      treeDelVisible,
+      // infoVisible,
+      tableSearchName,
+      tableAddOrModifyVisible,
+      tableBatchAddVisible,
+      tableSelectedBean,
+      viewVisible,
+      tableSelectedRows,
+    } = this.state;
 
     face.faceList && face.faceList.pagination && (face.faceList.pagination.showTotal = (total, range) => (formatMessage({
       id: 'oal.face.currentToTotal',
@@ -899,17 +1112,25 @@ class Face extends Component {
                 ref={ref => { this.ref_leftDom = ref; }}
                 onClick={this.tree_clearMenu}
               >
-                <Spin spinning={this.state.treeLoading} />
-                <Tree
-                  loadData={this.tree_onLoadData}
-                  // showLine={true}
-                  // blockNode={true}
-                  onMouseEnter={this.tree_onMouseEnter}
-                  onSelect={this.tree_onSelect}
-                >
-                  {this.tree_renderNodes(this.state.treeData)}
-                </Tree>
-                {this.state.nodeTreeItem ? this.tree_getNodeTreeMenu() : ''}
+                {
+                  !treeLoading && treeData && treeData.length > 0 ?
+                    (<Tree
+                      // showLine={true}
+                      // blockNode={true}
+                      draggable
+                      defaultExpandedKeys={[treeFocusKey]}
+                      defaultSelectedKeys={[treeFocusKey]}
+                      onMouseEnter={this.tree_onMouseEnter}
+                      onSelect={this.tree_onSelect}
+                      onDrop={this.tree_onDrop}
+                      onExpand={this.tree_clearMenu}
+                    >
+                      {this.tree_renderNodes(treeData)}
+                    </Tree>) :
+                    (<Spin spinning={treeLoading} />)
+
+                }
+                {nodeTreeItem ? this.tree_getNodeTreeMenu() : ''}
               </div>
 
               <div className={styles.right}>
@@ -919,26 +1140,21 @@ class Face extends Component {
                     <Input
                       placeholder={formatMessage({ id: 'oal.face.enterFullName' })}
                       style={{ marginRight: 20, width: 180, }}
-                      value={this.state.searchName}
-                      onChange={e => {
-                        this.setState({
-                          searchName: e.target.value,
-                        })
-                      }}
-                      onPressEnter={() => {
-                        this.onPageChange(1, 10)
-                      }}
+                      value={tableSearchName}
+                      onChange={this.table_handelSearchChange}
+                      onPressEnter={this.table_handelSearchPressEnter}
                     />
-                    <Button onClick={() => this.onPageChange(1, 10)} type="primary" loading={loading} style={{ marginRight: 10 }}>
+                    <Button
+                      type="primary"
+                      loading={tableLoading}
+                      style={{ marginRight: 10 }}
+                      onClick={this.table_handelSearchPressEnter}
+                    >
                       <FormattedMessage id="oal.common.query" />
                     </Button>
-                    <Button onClick={() => {
-                      this.setState({
-                        searchName: '',
-                      }, () => {
-                        this.onPageChange(1, 10);
-                      });
-                    }} loading={loading}>
+                    <Button
+                      loading={tableLoading}
+                      onClick={this.table_handelSearchReset} >
                       <FormattedMessage id="oal.common.reset" />
                     </Button>
                   </div>
@@ -948,27 +1164,33 @@ class Face extends Component {
                       type="primary"
                       style={{ marginRight: 10 }}
                       icon="plus"
-                      onClick={this.showDrawer}
+                      onClick={this.table_showTableAddOrModifyModal}
                     >
                       <FormattedMessage id="oal.face.add" />
                     </Button>
-                    <Button onClick={this.showBatchDrawer}><FormattedMessage id="oal.face.batchAdd" /></Button>
+                    <Button
+                      onClick={this.table_showTableBatchAddModal}
+                    >
+                      <FormattedMessage id="oal.face.batchAdd" />
+                    </Button>
                   </div>
                 </div>
 
                 <div className={styles.rightBatch}>
                   <Button
                     type="danger"
-                    disabled={!selectedRows || selectedRows.length === 0}
+                    disabled={!tableSelectedRows || tableSelectedRows.length === 0}
                     style={{ marginRight: 10 }}
+                    onClick={this.table_showTableDelModal}
                   >
                     <FormattedMessage id="oal.common.delete" />
                   </Button>
                   <Button
                     type="primary"
-                    disabled={!selectedRows || selectedRows.length === 0}
+                    disabled={!tableSelectedRows || tableSelectedRows.length === 0}
+                    onClick={this.table_showTableMoveModal}
                   >
-                    <FormattedMessage id="oal.face.move" />
+                    <FormattedMessage id="oal.common.move" />
                   </Button>
                 </div>
 
@@ -978,32 +1200,54 @@ class Face extends Component {
                 <StandardTable
                   rowKey={record => record._id}
                   needRowSelection
-                  selectedRows={selectedRows}
-                  loading={loading}
+                  selectedRows={tableSelectedRows}
+                  loading={tableLoading}
                   data={face.faceList}
-                  columns={this.columns()}
-                  onSelectRow={this.handleSelectRows}
-                  onChange={this.handleStandardTableChange}
+                  columns={this.table_columns()}
+                  onSelectRow={this.table_handleSelectRows}
+                  onChange={this.table_handleStandardTableChange}
                 />
               </div>
             </div>
           </Card>
           {/* {this.renderUploadPanel()} */}
-          <ModifyModal
-            visible={modifyVisible}
-            bean={selectedBean}
-            faceKeyList={faceKeyList}
-            confirmLoading={modifyLoading}
-            handleCancel={this.closeModifyModal}
-            handleSubmit={this.submitModify}
+          <TreeAddModal
+            visible={treeAddVisible}
+            bean={nodeTreeItem && nodeTreeItem.nodeData || {}}
+            handleCancel={this.tree_closeTreeAddModal}
+            handleSubmit={this.tree_submitTreeAddModal}
+          />
+          <TreeModifyModal
+            visible={treeModifyVisible}
+            bean={nodeTreeItem && nodeTreeItem.nodeData || {}}
+            handleCancel={this.tree_closeTreeModifyModal}
+            handleSubmit={this.tree_submitTreeModifyModal}
+          />
+          <TreeDelModal
+            visible={treeDelVisible}
+            bean={nodeTreeItem && nodeTreeItem.nodeData || {}}
+            handleCancel={this.tree_closeTreeDelModal}
+            handleSubmit={this.tree_submitTreeDelModal}
+          />
+          <TableAddOrModifyModal
+            visible={tableAddOrModifyVisible}
+            bean={tableSelectedBean}
+            faceKeyList={faceKeyList} // 8126TODO 待删
+            handleCancel={this.table_closeTableAddOrModifyModal}
+            handleSubmit={this.table_submitTableAddOrModifyModal}
+          />
+          <TableBatchAddModal
+            visible={tableBatchAddVisible}
+            handleCancel={this.table_closeTableBatchAddModal}
+            handleSubmit={this.table_submitTableBatchAddModal}
           />
           <Modal
-            title={selectedBean.name}
+            title={tableSelectedBean.name}
             visible={viewVisible}
             footer={null}
-            onCancel={this.closeViewModal}
+            onCancel={this.table_closeViewModal}
           >
-            <img src={selectedBean.imgPath} alt="" style={{ width: '100%', height: '100%' }} />
+            <img src={tableSelectedBean.imgPath} alt="" style={{ width: '100%', height: '100%' }} />
           </Modal>
         </div>
       </PageHeaderWrapper >

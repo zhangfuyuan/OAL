@@ -91,6 +91,47 @@ export function getPermissionRoutes(userType, orgType) {
           },
         ],
       },
+      {
+        path: '/log',
+        name: 'log',
+        locale: 'menu.log',
+        icon: 'global',
+        routes: [
+          {
+            path: '/log/authory',
+            name: 'logAuthory',
+            locale: 'menu.log.logAuthory',
+          },
+          {
+            path: '/log/query',
+            name: 'logQuery',
+            locale: 'menu.log.logQuery',
+          },
+        ],
+      },
+      {
+        path: '/workAttendance',
+        name: 'workAttendance',
+        locale: 'menu.workAttendance',
+        icon: 'table',
+        routes: [
+          {
+            path: '/workAttendance/rule',
+            name: 'workAttendanceRule',
+            locale: 'menu.workAttendance.workAttendanceRule',
+          },
+          {
+            path: '/workAttendance/statistics',
+            name: 'workAttendanceStatistics',
+            locale: 'menu.workAttendance.workAttendanceStatistics',
+          },
+          {
+            path: '/workAttendance/record',
+            name: 'workAttendanceRecord',
+            locale: 'menu.workAttendance.workAttendanceRecord',
+          },
+        ],
+      },
     ];
 
     // if (userType === 0) {
