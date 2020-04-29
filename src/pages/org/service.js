@@ -7,7 +7,7 @@ import { post, get, capture } from '@/utils/ajax';
  */
 export async function add(data) {
   const _promise = post('/api/org/add', data);
-  _promise.then(res => { if (res && res.res > 0) capture('9', data); });
+  _promise.then(res => { if (res && res.res > 0) capture('9', { ...data, oalid: res.data._id, }); });
   return _promise;
 }
 

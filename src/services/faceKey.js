@@ -12,7 +12,7 @@ export async function getFaceKeyList() {
 */
 export async function addFaceKey(params) {
   const _promise = post('/api/face/attribute/add', params);
-  _promise.then(res => { if (res && res.res > 0) capture('14', params); });
+  _promise.then(res => { if (res && res.res > 0) capture('14', { ...params, oalid: res.data._id, }); });
   return _promise;
 }
 

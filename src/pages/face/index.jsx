@@ -391,6 +391,7 @@ class Face extends Component {
             ...result.data,
             fName: file.name,
             oalhost: window.location.host,
+            oalid: result.data._id,
           });
         }
       },
