@@ -7,19 +7,20 @@ import {
   Icon,
   Button,
   notification,
-  Progress
+  Progress,
+  message
 } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import imgNull from '@/assets/img_null.png';
+import defaultSettings from '../../../../config/defaultSettings';
 
+const { publicPath } = defaultSettings;
+let uploader = null;
 // const { Option } = Select;
 
 const normFile = e => {
-  console.log('Upload event:', e);
-  if (Array.isArray(e)) {
-    return e;
-  }
+  if (Array.isArray(e)) return e;
   return e && e.fileList;
 };
 
@@ -39,13 +40,30 @@ const formItemLayout = {
     sm: { span: 16 },
   },
 };
-const TableAddOrModifyModal = props => {
-  const { form, bean, visible, handleSubmit, handleCancel, faceKeyList } = props;
-  const { getFieldDecorator, setFieldsValue } = form;
-  const [imageUrl, setImageUrl] = useState(null);
-  // const [uploadProgress, setUploadProgress] = useState(0);
 
-  const title = formatMessage({ id: (bean && bean._id ? 'oal.common.edit' : 'oal.face.add') });
+const TableAddOrModifyModal = props => {
+  const { form, bean, visible, handleSubmit, handleCancel, dispatch, groupId } = props;
+  const { getFieldDecorator, setFieldsValue, resetFields } = form;
+  const [imageUrl, setImageUrl] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadLoading, setUploadLoading] = useState(false);
+
+  const isEdit = !!bean && !!bean._id;
+  const title = formatMessage({ id: (isEdit ? 'oal.common.edit' : 'oal.face.add') });
+
+  const resetAllVar = () => {
+    // 重置 state
+    setUploadLoading(false);
+    setImageUrl(null);
+    setUploadProgress(0);
+
+    // 重置 表单数据
+    resetFields();
+    setFieldsValue({});
+
+    // 重置 全局变量
+    if (uploader) wuDestroy();
+  };
 
   const checkStaffid = (rule, value, callback) => {
     const reg = /^[0-9A-Za-z]+$/;
@@ -59,11 +77,11 @@ const TableAddOrModifyModal = props => {
     const len = value && value.length || 0;
     if (value && len > 0) {
       const curFile = value[len - 1].originFileObj;
-      console.log('文件信息：', curFile.type, curFile.size);
+      console.log('图片信息：', curFile.type, curFile.size);
 
       const fileType = curFile.type;
       const isJpgOrPng = fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/jpg';
-      const isLt500KB = curFile.size / 1024 < 500;
+      const isGt500KB = curFile.size / 1024 > 500;
 
       if (!isJpgOrPng) {
         notification.error({
@@ -76,7 +94,7 @@ const TableAddOrModifyModal = props => {
         setImageUrl(null);
         callback(formatMessage({ id: 'oal.face.uploadImageFormatLimit' }));
       }
-      if (!isLt500KB) {
+      if (isGt500KB) {
         notification.error({
           message: formatMessage({ id: 'oal.face.failToUpload' }),
           description: formatMessage({ id: 'oal.face.uploadImageSizeLimit' }),
@@ -87,7 +105,7 @@ const TableAddOrModifyModal = props => {
         setImageUrl(null);
         callback(formatMessage({ id: 'oal.face.uploadImageSizeLimit' }));
       }
-      if (isJpgOrPng && isLt500KB) {
+      if (isJpgOrPng && !isGt500KB) {
         getBase64(curFile, imageUrl => {
           setImageUrl(imageUrl);
         });
@@ -97,36 +115,62 @@ const TableAddOrModifyModal = props => {
   };
 
   const beforeUpload = () => {
-    // console.log('文件信息：', file.type, file.size);
-    // const isLt500KB = file.size / 1024 < 500;
-    // const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg';
-    // if (!isJpgOrPng) {
-    //   notification.error({
-    //     message: formatMessage({ id: 'oal.face.failToUpload' }),
-    //     description: formatMessage({ id: 'oal.face.uploadImageFormatLimit' }),
-    //   });
-    // }
-    // if (!isLt500KB) {
-    //   notification.error({
-    //     message: formatMessage({ id: 'oal.face.failToUpload' }),
-    //     description: formatMessage({ id: 'oal.face.uploadImageSizeLimit' }),
-    //   });
-    // }
-    // if (isJpgOrPng && isLt500KB) {
-    //   const newFileList = [file];
-
-    //   getBase64(file, imageUrl => {
-    //     setImageUrl(imageUrl);
-    //   });
-    // }
     return false;
   };
 
   const handleOk = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
+      const { name, staffid, userPhotos } = fieldsValue;
+      const params = {
+        name,
+        staffid,
+        groupId,
+      }
 
-      console.log(8126, '添加/编辑人脸信息', fieldsValue);
+      isEdit && (params._id = bean._id);
+      setUploadLoading(true);
+      dispatch({
+        type: 'face/addOrEditFace',
+        payload: params,
+      }).then(res => {
+        if (res && res.res > 0) {
+          const len = userPhotos && userPhotos.length || 0;
+
+          if (window.WebUploader && len > 0) {
+            console.log(8126, '添加/更新人脸图片', userPhotos);
+            wuInit([userPhotos[len - 1].originFileObj]);
+          } else if (isEdit) {
+            // 编辑，可不修改图片直接结束
+            handleSubmit();
+            resetAllVar();
+          } else {
+            console.log(userPhotos);
+            setUploadLoading(false);
+          }
+        } else if (res && res.res === 10001) {
+          // 8126TODO 异常情况1：工号重复
+          notification.error({
+            message: formatMessage({ id: 'oal.face.staffidRepeat' }),
+            description: formatMessage({ id: 'oal.face.staffidRepeatTips' }),
+          });
+          setUploadLoading(false);
+        } else if (res && res.res === 10002) {
+          // 8126TODO 异常情况2：用户数已超出
+          notification.error({
+            message: formatMessage({ id: 'oal.face.addFailed' }),
+            description: formatMessage({ id: 'oal.face.userNumLimit' }),
+          });
+          setUploadLoading(false);
+        } else {
+          console.log(res);
+          setUploadLoading(false);
+        }
+      }).catch(err => {
+        console.log(err);
+        setUploadLoading(false);
+      });
+
 
       // const params = {};
       // params.faceId = bean._id;
@@ -142,6 +186,105 @@ const TableAddOrModifyModal = props => {
     });
   };
 
+  /********************************************** WebUploader API Start **********************************************/
+
+  // 初始化 WebUploader 实例对象
+  const wuInit = newFileList => {
+    if (uploader) wuDestroy();
+
+    uploader = window.WebUploader.create({
+      swf: (process.env === 'production' ? publicPath : '/') + 'lib/webuploader/Uploader.swf', // 请根据实际项目部署路径配置swf文件路径
+      server: 'https://www.mocky.io/v2/5cc8019d300000980a055e76', // 8126TODO 文件接收服务端
+      thumb: false, // 不生成缩略图
+      compress: false, // 如果此选项为false, 则图片在上传前不进行压缩
+      prepareNextFile: true, // 是否允许在文件传输时提前把下一个文件准备好
+      chunked: true // 分片上传
+    });
+
+    newFileList.forEach((item, index) => {
+      let wuFile = new window.WebUploader.Lib.File(window.WebUploader.guid('rt_'), item);
+      let newfile = new window.WebUploader.File(wuFile);
+
+      newfile.index = index;
+      isEdit && (newfile._id = bean._id);
+      newfile.groupId = groupId;
+      uploader.addFiles(newfile);
+      wuFile = null;
+      newfile = null;
+    });
+
+    wuUpload();
+  };
+
+  // 触发 WebUploader 上传图片/视频资源
+  const wuUpload = () => {
+    if (!uploader) return false;
+
+    // uploader.on('uploadStart', file => {});
+
+    uploader.on('uploadBeforeSend', (block, data) => {
+      data.md5 = block.file.md5;
+      isEdit && (data._id = block.file._id);
+      data.groupId = block.file.groupId;
+    });
+
+    uploader.on('uploadProgress', (file, percentage) => {
+      setUploadProgress(parseInt(percentage * 100));
+    });
+
+    uploader.on('uploadError', (file, reason) => {
+      console.log(`${file.name} : ${reason}`);
+
+      message.error('uploadError');
+      setUploadLoading(false);
+    });
+
+    uploader.on('uploadSuccess', (file, response) => {
+      // const { errcode, data, msg } = response;
+      // 8126TODO 上传成功返回数据
+
+      if (response.status === 'done' && response.url) {
+        handleSubmit(isEdit);
+        resetAllVar();
+      } else {
+        message.error('false');
+      }
+
+      setUploadLoading(false);
+
+      // if (errcode === 0 && data && data.fileLink) {
+      //   message.success('uploadSuccess');
+      //   setUploadLoading(false);
+      // } else if (errcode === 0 && data === 'upload_chunk') {
+      //   // 分片文件上传成功时返回，啥也不做
+      // } else if (msg && /false/i.test(msg)) {
+      //   message.error('false');
+      //   setUploadLoading(false);
+      // }
+    });
+
+    // uploader.on('uploadComplete', file => {});
+
+    uploader.on('error', type => {
+      console.log(`errorType：`, type);
+
+      message.error('error');
+      setUploadLoading(false);
+    });
+
+    uploader.upload();
+  };
+
+  // 销毁 WebUploader 实例对象
+  const wuDestroy = () => {
+    if (!uploader) return false;
+
+    uploader.destroy();
+    uploader = null;
+  };
+
+  /********************************************** WebUploader API End **********************************************/
+
   return (
     <Modal
       destroyOnClose
@@ -150,6 +293,7 @@ const TableAddOrModifyModal = props => {
       onOk={handleOk}
       onCancel={handleCancel}
       maskClosable={false}
+      confirmLoading={uploadLoading}
     >
       <Form {...formItemLayout}>
         <Form.Item label={formatMessage({ id: 'oal.common.fullName' })}>
@@ -186,16 +330,19 @@ const TableAddOrModifyModal = props => {
           })(<Input placeholder={formatMessage({ id: 'oal.face.enterStaffid' })} disabled={!!bean && !!bean.profile && !!bean.profile.jobNumber} />)}
         </Form.Item>
         <div style={{ position: 'relative', width: 155, height: 155, margin: '0 0 24px 25%', }}>
-          <img src={imageUrl || imgNull} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: 5, objectFit: 'contain', }} />
-          <div className="oal-progress" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 5, }}>
-            <Progress percent={50} showInfo={false} />
-          </div>
+          <img src={imageUrl || (isEdit ? bean.imgPath : imgNull)} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: 5, objectFit: 'contain', }} />
+          {
+            uploadProgress > 0 ?
+              (<div className="oal-progress" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 5, }}>
+                <Progress percent={uploadProgress} showInfo={false} />
+              </div>) : ''
+          }
         </div>
         <Form.Item label={formatMessage({ id: 'oal.face.userPhotos' })}>
           {getFieldDecorator('userPhotos', {
             rules: [
               {
-                required: true,
+                required: !isEdit,
                 message: formatMessage({ id: 'oal.face.enterUserPhotosTips' }),
               },
               {

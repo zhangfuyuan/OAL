@@ -1,107 +1,125 @@
-import { Modal, Upload, Icon, message, Progress } from 'antd';
+import { Modal, Upload, Icon, message, Progress, notification, Result, Button } from 'antd';
 import React, { useState, useEffect } from 'react';
-import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import { FormattedMessage, formatMessage, getLocale } from 'umi-plugin-react/locale';
 import defaultSettings from '../../../../config/defaultSettings';
 
 const { publicPath } = defaultSettings;
+const { Dragger } = Upload;
 let uploader = null;
-let okUrl = '';
+let myFileList = [];
+let myFileListLen = 0
+let uploadSuccessNum = 0;
 
-const getBase64 = (img, callback) => {
-  const reader = new FileReader();
-  reader.addEventListener('load', () => callback(reader.result));
-  reader.readAsDataURL(img);
+const userImportTemplateLinkMap = {
+  'zh-CN': 'http://lango-tech.com/XBH/lango19/data/users.zip',
+  'zh-TW': 'http://lango-tech.com/XBH/lango19/data/zh-TW/users.zip',
+  'en-US': 'http://lango-tech.com/XBH/lango19/data/en/users.zip',
 };
 
 const TableBatchAddModal = props => {
-  const { visible, currentUser, handleSubmit, confirmLoading, handleCancel } = props;
-  const [imgLoading, setImgLoading] = useState(false);
+  const { visible, groupId, handleSubmit, handleCancel } = props;
   const [uploadLoading, setUploadLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
-  // const [fileList, setFileList] = useState([]);
+  const [folderName, setFolderName] = useState('');
+  const [isUploadSuccess, setIsUploadSuccess] = useState(false);
 
-  // useEffect(() => {
-  //   console.log(imageUrl);
-  //   return () => {
-  //     setImageUrl[null];
-  //     console.log(imageUrl);
-  //   }
-  // }, [imageUrl]);
+  const selectedLang = getLocale();
 
   const resetAllVar = () => {
     // 重置 state
-    setImgLoading(false);
     setUploadLoading(false);
-    setImageUrl(null);
     setUploadProgress(0);
+    setFolderName('');
+    setIsUploadSuccess(false);
 
     // 重置 全局变量
     if (uploader) wuDestroy();
-    okUrl = '';
+    myFileList = [];
+    myFileListLen = 0;
+    uploadSuccessNum = 0;
   };
 
-  // const handleChange = info => {
-  //   if (info.file.status === 'uploading') {
-  //     setUploadLoading(true);
-  //     return;
-  //   }
-  //   if (info.file.status === 'done') {
-  //     // Get this url from response in real world.
-  //     getBase64(info.file.originFileObj, imageUrl => {
-  //       setImageUrl(imageUrl);
-  //       setUploadLoading(false);
-  //     });
-  //   }
-  // };
-
   const beforeUpload = file => {
-    setImgLoading(true);
-    setUploadLoading(true);
-    console.log('文件信息：', file.type, file.size);
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg';
-    if (!isJpgOrPng) {
-      message.error('You can only upload JPG/PNG file!');
-      setImgLoading(false);
-      setUploadLoading(false);
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('Image must smaller than 2MB!');
-      setImgLoading(false);
-      setUploadLoading(false);
-    }
-    if (isJpgOrPng && isLt2M) {
-      // const newFileList = [...fileList, file];
-      // 8126TODO 不显示上传列表可不用
-      // setFileList(newFileList);
-      const newFileList = [file];
+    myFileList.push(file);
 
-      getBase64(file, imageUrl => {
-        setImageUrl(imageUrl);
-        setImgLoading(false);
-
-        if (window.WebUploader && newFileList.length > 0) wuInit(newFileList);
-      });
+    if (myFileList && myFileList.length === 1) {
+      const { webkitRelativePath } = file;
+      const webkitRelativePathSplit = webkitRelativePath && webkitRelativePath.split('/') || [''];
+      setFolderName(webkitRelativePathSplit[0]);
     }
+
     return false;
   };
 
-  const uploadButton = (
-    <div>
-      <Icon type={imgLoading ? 'loading' : 'plus'} />
-      <div className="ant-upload-text">Upload</div>
-    </div>
-  );
+  const beforeUploadCheck = callback => {
+    const len = myFileList && myFileList.length || 0;
+    let isError = 0;
+    let hasXls = false;
 
-  const uploadingBox = (
-    <div style={{ position: 'relative', width: '100%' }}>
-      <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
-      <div className="oal-progress" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.3)', }}>
-        <Progress percent={uploadProgress} showInfo={false} />
-      </div>
-    </div>
-  );
+    for (let i = 0; i < len; i++) {
+      const { name, size, type } = myFileList[i];
+      const isJpgOrPng = type === 'image/jpeg' || type === 'image/png' || type === 'image/jpg';
+      const isXls = /(\.xls)|(\.xlsx)|(\.csv)/i.test(name);
+
+      if (isJpgOrPng) {
+        const isGt500KB = size / 1024 > 500;
+
+        if (isGt500KB) {
+          isError = 1;
+          break;
+        }
+      } else if (isXls) {
+        hasXls = true;
+      } else {
+        isError = 1;
+        break;
+      }
+    }
+
+    if (!hasXls) isError = 1;
+
+    callback(isError);
+  };
+
+  const uploadSuccessCheck = () => {
+    if (uploadSuccessNum >= myFileListLen) {
+      setIsUploadSuccess(true);
+      setUploadLoading(false);
+    }
+  };
+
+  const handleModalOk = () => {
+    if (isUploadSuccess) {
+      handleSubmit();
+      resetAllVar();
+    } else {
+      setUploadLoading(true);
+      beforeUploadCheck(isError => {
+        if (isError === 1) {
+          notification.error({
+            message: formatMessage({ id: 'oal.face.failToUpload' }),
+            description: formatMessage({ id: 'oal.face.batchAddErrorTips' }),
+          });
+          resetAllVar();
+        } else {
+          const len = myFileList && myFileList.length || 0;
+
+          if (window.WebUploader && len > 0) {
+            myFileListLen = len;
+            wuInit(myFileList);
+          } else {
+            resetAllVar();
+          }
+          console.log(8126, '批量添加', myFileList);
+        }
+      });
+    }
+  };
+
+  const handleModalCancel = () => {
+    handleCancel();
+    resetAllVar();
+  };
 
   /********************************************** WebUploader API Start **********************************************/
 
@@ -123,6 +141,7 @@ const TableBatchAddModal = props => {
       let newfile = new window.WebUploader.File(wuFile);
 
       newfile.index = index;
+      newfile.groupId = groupId;
       uploader.addFiles(newfile);
       wuFile = null;
       newfile = null;
@@ -138,32 +157,43 @@ const TableBatchAddModal = props => {
     // uploader.on('uploadStart', file => {});
 
     uploader.on('uploadBeforeSend', (block, data) => {
+      if (!visible) return;
       data.md5 = block.file.md5;
+      data.groupId = block.file.groupId;
     });
 
-    uploader.on('uploadProgress', (file, percentage) => {
-      setUploadProgress(parseInt(percentage * 100));
-    });
+    // uploader.on('uploadProgress', (file, percentage) => {
+    //   if (!visible) return;
+    // });
 
     uploader.on('uploadError', (file, reason) => {
+      if (!visible) return;
       console.log(`${file.name} : ${reason}`);
 
-      message.error('uploadError');
-      setUploadLoading(false);
+      message.error(formatMessage({ id: 'oal.face.failToUpload' }));
+      resetAllVar();
     });
 
     uploader.on('uploadSuccess', (file, response) => {
+      if (!visible) return;
       // const { errcode, data, msg } = response;
       // 8126TODO 上传成功返回数据
 
       if (response.status === 'done' && response.url) {
-        message.success('uploadSuccess');
-        okUrl = response.url;
+        uploadSuccessNum++;
+        setUploadProgress(parseInt(uploadSuccessNum / myFileListLen * 100));
+        uploadSuccessCheck();
+      } else if (response && response.res === 10002) {
+        // 8126TODO 异常情况：用户数已超出
+        notification.error({
+          message: formatMessage({ id: 'oal.face.failToUpload' }),
+          description: formatMessage({ id: 'oal.face.userNumLimit' }),
+        });
+        resetAllVar();
       } else {
-        message.error('false');
+        message.error(formatMessage({ id: 'oal.face.failToUpload' }));
+        resetAllVar();
       }
-
-      setUploadLoading(false);
 
       // if (errcode === 0 && data && data.fileLink) {
       //   message.success('uploadSuccess');
@@ -179,10 +209,11 @@ const TableBatchAddModal = props => {
     // uploader.on('uploadComplete', file => {});
 
     uploader.on('error', type => {
+      if (!visible) return;
       console.log(`errorType：`, type);
 
-      message.error('error');
-      setUploadLoading(false);
+      message.error(formatMessage({ id: 'oal.face.failToUpload' }));
+      resetAllVar();
     });
 
     uploader.upload();
@@ -198,39 +229,102 @@ const TableBatchAddModal = props => {
 
   /********************************************** WebUploader API End **********************************************/
 
-  const handleModalOk = () => {
-    handleSubmit(okUrl);
-    resetAllVar();
-  };
-
-  const handleModalCancel = () => {
-    handleCancel();
-    resetAllVar();
-  };
-
   return (
     <Modal
       destroyOnClose
-      title={formatMessage({ id: 'oal.settings.modifySysIcons' })}
+      title={formatMessage({ id: 'oal.face.batchAdd' })}
       visible={visible}
       confirmLoading={uploadLoading}
       maskClosable={false}
       onOk={handleModalOk}
       onCancel={handleModalCancel}
     >
-      <Upload
-        accept="image/*"
-        listType="picture-card"
-        className="avatar-uploader oal-avatar-uploader-alone"
-        showUploadList={false}
-        // fileList={fileList}
-        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-        withCredentials
-        beforeUpload={beforeUpload}
-      // onChange={handleChange}
-      >
-        {imageUrl ? uploadingBox : uploadButton}
-      </Upload>
+      {
+        isUploadSuccess ?
+          (<Result
+            status="success"
+            title={formatMessage({ id: 'oal.face.addSuccessfully' })}
+            subTitle={formatMessage({ id: 'oal.face.batchAddSuccessTips' }, { num: myFileListLen })}
+          />) :
+          (<div>
+            <Dragger
+              accept=".png, .jpg, .jpeg, .xls, .xlsx, .csv"
+              multiple
+              directory
+              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+              withCredentials
+              showUploadList={false}
+              beforeUpload={beforeUpload}
+            >
+              <p className="ant-upload-drag-icon">
+                <Icon type="inbox" />
+              </p>
+              <p className="ant-upload-text" style={{ fontSize: '14px' }}>
+                <FormattedMessage id="oal.face.draggerTips" />
+              </p>
+            </Dragger>
+
+            <div>
+              {
+                folderName ?
+                  (<div>
+                    <span>
+                      <div className="ant-upload-list-item ant-upload-list-item-undefined ant-upload-list-item-list-type-text">
+                        <div className="ant-upload-list-item-info">
+                          <span>
+                            <Icon type="paper-clip" />
+                            <span className="ant-upload-list-item-name ant-upload-list-item-name-icon-count-1" title={folderName}>{folderName}</span>
+                            <span className="ant-upload-list-item-card-actions ">
+                              <a
+                                title={formatMessage({ id: 'oal.face.batchAdd' })}
+                                onClick={resetAllVar}
+                              >
+                                <Icon type="close" />
+                              </a>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </span>
+                  </div>) : ''
+              }
+              {
+                uploadProgress > 0 ?
+                  (<Progress percent={uploadProgress} showInfo={false} strokeWidth={5} />) : ''
+              }
+            </div>
+
+            <div style={{ marginTop: '30px', color: '#999', }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#999', }}>
+                <FormattedMessage id="oal.face.uploadExplain" />
+              </h3>
+
+              <div>
+                <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#999', }}>
+                  <FormattedMessage id="oal.face.importTemplate" />
+                </h3>
+                <p>
+                  <FormattedMessage id="oal.face.importTemplateTips1" />
+                &nbsp;
+                <a href={userImportTemplateLinkMap[selectedLang] || 'http://lango-tech.com/XBH/lango19/data/users.zip'}>
+                    <FormattedMessage id="oal.face.importTemplateTips2" />
+                  </a>
+                &nbsp;
+                <FormattedMessage id="oal.face.importTemplateTips3" />
+                </p>
+              </div>
+
+              <div>
+                <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#999', }}>
+                  <FormattedMessage id="oal.face.fileUpload" />
+                </h3>
+                <p>
+                  <FormattedMessage id="oal.face.fileUploadTips" />
+                </p>
+              </div>
+            </div>
+          </div>)
+      }
     </Modal>
   );
 };

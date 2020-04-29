@@ -100,6 +100,24 @@ const Model = {
       const response = yield call(fetchGroup, payload);
       return Promise.resolve(response);
     },
+    // （单个）添加/编辑人脸信息（不包括图片）
+    *addOrEditFace({ payload }, { call, put, select }) {
+      console.log(8126, '添加/编辑人脸信息', payload);
+      const response = yield call(fetchGroup, payload);
+      return Promise.resolve(response);
+    },
+    // 移动人脸
+    *moveFace({ payload }, { call, put, select }) {
+      console.log(8126, '移动人脸', payload);
+      const response = yield call(fetchGroup, payload);
+      return Promise.resolve(response);
+    },
+    // 删除人脸
+    *delFace({ payload }, { call, put, select }) {
+      console.log(8126, '删除人脸', payload);
+      const response = yield call(fetchGroup, payload);
+      return Promise.resolve(response);
+    },
   },
   reducers: {
     save(state, action) {

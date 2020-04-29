@@ -12,6 +12,8 @@ import TreeModifyModal from './components/TreeModifyModal';
 import TreeDelModal from './components/TreeDelModal';
 import TableAddOrModifyModal from './components/TableAddOrModifyModal';
 import TableBatchAddModal from './components/TableBatchAddModal';
+import TableMoveModal from './components/TableMoveModal';
+import TableDelModal from './components/TableDelModal';
 // import UploadProgress from './components/UploadProgress';
 // import UploadDetail from './components/UploadDetail';
 import StandardTable from '@/components/StandardTable'
@@ -66,6 +68,8 @@ class Face extends Component {
     treeDelVisible: false,
     // uploadVisible: false,
     tableBatchAddVisible: false,
+    tableMoveVisible: false,
+    tableDelVisible: false,
     featureState: 'all',
     tableAddOrModifyVisible: false,
     tableSelectedBean: {},
@@ -81,8 +85,8 @@ class Face extends Component {
     nodeTreeItem: null,
     tableSearchName: '',
     sortedInfo: {
-      sortId: '',
-      sortOrder: '', // ascend（正序）、descend（倒序）
+      columnKey: '',
+      order: '', // ascend（正序）、descend（倒序）
     },
     treeFocusKey: '',
     tablePage: {
@@ -130,7 +134,7 @@ class Face extends Component {
       }
     }).catch(err => {
       console.log(err);
-    })
+    });
   };
 
   tree_renderNodes = data =>
@@ -258,7 +262,7 @@ class Face extends Component {
   table_loadFaceList = () => {
     const { dispatch } = this.props;
     const { featureState, tableSearchName, treeFocusKey, tablePage, sortedInfo } = this.state;
-    const { sortId, sortOrder } = sortedInfo;
+    const { columnKey, order } = sortedInfo;
     // 8126TODO 请求参数需对接
     dispatch({
       type: 'face/fetch',
@@ -266,8 +270,8 @@ class Face extends Component {
         ...tablePage,
         featureState,
         groupId: treeFocusKey,
-        sortId,
-        sortOrder,
+        columnKey,
+        order,
         name: tableSearchName.trim(),
       },
     });
@@ -350,10 +354,10 @@ class Face extends Component {
           <Fragment>
             <a key="edit" onClick={() => this.table_showTableAddOrModifyModal(record)}><FormattedMessage id="oal.common.edit" /></a>
             <Divider type="vertical" />
-            <a key="move" onClick={() => this.table_showTableMoveModal(record)}><FormattedMessage id="oal.common.move" /></a>
+            <a key="move" onClick={(e) => this.table_showTableMoveModal(e, record)}><FormattedMessage id="oal.common.move" /></a>
             <Divider type="vertical" />
             {/* <Popconfirm placement="topLeft" title={formatMessage({ id: 'oal.face.confirmDeleteFace' })} onConfirm={() => this.deleteFace(record)} okText={formatMessage({ id: 'oal.common.delete' })} cancelText={formatMessage({ id: 'oal.common.cancel' })}> */}
-            <a key="remove" onClick={() => this.table_showTableDelModal(record)}><FormattedMessage id="oal.common.delete" /></a>
+            <a key="remove" onClick={(e) => this.table_showTableDelModal(e, record)}><FormattedMessage id="oal.common.delete" /></a>
             {/* </Popconfirm> */}
             {/* <Divider type="vertical" /> */}
             {/* <MoreBtn item={record} /> */}
@@ -381,9 +385,16 @@ class Face extends Component {
   };
 
   table_handleStandardTableChange = (pagination, filters, sorter) => {
+    console.log(8126, pagination, sorter);
     this.setState({
-      tablePage: pagination,
-      sortedInfo: sorter,
+      tablePage: {
+        current: pagination.current,
+        pageSize: pagination.pageSize,
+      },
+      sortedInfo: {
+        columnKey: sorter.columnKey,
+        order: sorter.order,
+      }
     }, () => {
       this.table_loadFaceList();
     });
@@ -537,7 +548,8 @@ class Face extends Component {
     });
   };
 
-  table_submitTableAddOrModifyModal = () => {
+  table_submitTableAddOrModifyModal = isEdit => {
+    message.success(formatMessage({ id: (isEdit ? 'oal.common.saveSuccessfully' : 'oal.face.addSuccessfully') }));
     this.setState({
       tableAddOrModifyVisible: false,
       tableSelectedBean: {},
@@ -561,54 +573,97 @@ class Face extends Component {
 
   table_submitTableBatchAddModal = () => {
     this.setState({
-      tableAddOrModifyVisible: false,
+      tableBatchAddVisible: false,
     }, () => {
       this.table_loadFaceList();
     });
   };
 
   // 单个/批量移动（人脸分组）
-  table_showTableMoveModal = bean => {
-    console.log(8126, '单个/批量移动', bean || tableSelectedRows);
-    // this.setState({
-    //   tableAddOrModifyVisible: true,
-    //   tableSelectedBean: bean,
-    // });
+  table_showTableMoveModal = (e, bean) => {
+    console.log(8126, '单个/批量移动', bean || this.state.tableSelectedRows);
+    this.setState({
+      tableMoveVisible: true,
+      tableSelectedBean: bean || {},
+    });
   };
 
   table_closeTableMoveModal = () => {
-    // this.setState({
-    //   tableBatchAddVisible: false,
-    // });
+    this.setState({
+      tableMoveVisible: false,
+      tableSelectedBean: {},
+    });
   };
 
-  table_submitTableMoveModal = () => {
-    // this.setState({
-    //   tableAddOrModifyVisible: false,
-    // }, () => {
-    //   this.table_loadFaceList();
-    // });
+  table_submitTableMoveModal = (param, callback) => {
+    const { dispatch } = this.props;
+    const { tableSelectedBean, tableSelectedRows } = this.state;
+    dispatch({
+      type: 'face/moveFace',
+      payload: {
+        groupId: param,
+        faceId: tableSelectedBean && tableSelectedBean._id || tableSelectedRows.map(item => item._id).join(','),
+      },
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.common.moveSuccessfully' }));
+        this.setState({
+          tableMoveVisible: false,
+          tableSelectedBean: {},
+        }, () => {
+          this.table_loadFaceList();
+        });
+        this.table_closeTableMoveModal();
+        callback && callback();
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
   };
 
   // 单个/批量删除（人脸信息）
-  table_showTableDelModal = bean => {
-    console.log(8126, '单个/批量移动', bean || tableSelectedRows);
-    // this.setState({
-    //   tableAddOrModifyVisible: true,
-    //   tableSelectedBean: bean,
-    // });
+  table_showTableDelModal = (e, bean) => {
+    console.log(8126, '单个/批量删除', bean || this.state.tableSelectedRows);
+    this.setState({
+      tableDelVisible: true,
+      tableSelectedBean: bean || {},
+    });
   };
 
   table_closeTableDelModal = () => {
-    // this.setState({
-    //   tableBatchAddVisible: false,
-    // });
+    this.setState({
+      tableDelVisible: false,
+      tableSelectedBean: {},
+    });
   };
 
-  table_submitTableDelModal = () => {
-    // this.setState({
-    //   tableBatchAddVisible: false,
-    // });
+  table_submitTableDelModal = (params, callback) => {
+    const { dispatch } = this.props;
+    const { tableSelectedBean, tableSelectedRows } = this.state;
+    dispatch({
+      type: 'face/delFace',
+      payload: {
+        faceId: tableSelectedBean && tableSelectedBean._id || tableSelectedRows.map(item => item._id).join(','),
+      },
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+        this.setState({
+          tableDelVisible: false,
+          tableSelectedBean: {},
+        }, () => {
+          this.table_loadFaceList();
+        });
+        this.table_closeTableDelModal();
+        callback && callback();
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
   };
 
   // 放大查看（人脸图片）
@@ -1075,7 +1130,8 @@ class Face extends Component {
       tableLoading,
       user,
       modifyLoading,
-      faceKeyList
+      faceKeyList,
+      dispatch
     } = this.props;
     const {
       treeData,
@@ -1091,6 +1147,8 @@ class Face extends Component {
       tableSelectedBean,
       viewVisible,
       tableSelectedRows,
+      tableMoveVisible,
+      tableDelVisible,
     } = this.state;
 
     face.faceList && face.faceList.pagination && (face.faceList.pagination.showTotal = (total, range) => (formatMessage({
@@ -1232,14 +1290,28 @@ class Face extends Component {
           <TableAddOrModifyModal
             visible={tableAddOrModifyVisible}
             bean={tableSelectedBean}
-            faceKeyList={faceKeyList} // 8126TODO 待删
+            dispatch={dispatch}
+            groupId={treeFocusKey}
             handleCancel={this.table_closeTableAddOrModifyModal}
             handleSubmit={this.table_submitTableAddOrModifyModal}
           />
           <TableBatchAddModal
             visible={tableBatchAddVisible}
+            groupId={treeFocusKey}
             handleCancel={this.table_closeTableBatchAddModal}
             handleSubmit={this.table_submitTableBatchAddModal}
+          />
+          <TableMoveModal
+            visible={tableMoveVisible}
+            treeData={treeData}
+            handleCancel={this.table_closeTableMoveModal}
+            handleSubmit={this.table_submitTableMoveModal}
+          />
+          <TableDelModal
+            visible={tableDelVisible}
+            bean={tableSelectedBean && tableSelectedBean._id ? [tableSelectedBean] : tableSelectedRows}
+            handleCancel={this.table_closeTableDelModal}
+            handleSubmit={this.table_submitTableDelModal}
           />
           <Modal
             title={tableSelectedBean.name}
