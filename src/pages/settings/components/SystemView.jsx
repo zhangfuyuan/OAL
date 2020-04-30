@@ -57,6 +57,7 @@ class SystemView extends Component {
         ),
         description: '',
         actions: [],
+        style: 'hide',
       })
     }
     items.push({
@@ -80,6 +81,7 @@ class SystemView extends Component {
           renderItem={item => (
             <List.Item
               actions={item.actions}
+              style={item.style === 'hide' ? { display: 'none' } : {}}
             >
               <List.Item.Meta
                 title={item.title}
