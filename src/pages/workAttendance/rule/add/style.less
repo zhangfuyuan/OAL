@@ -41,6 +41,52 @@
   }
 }
 
+.main {
+  width: 50%;
+  margin: 0 auto;
+}
+
+.info h2,
+.times h2 {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+.info {
+  :global {
+    .ant-row.ant-form-item {
+      padding: 0 5%;
+    }
+  }
+}
+
+.timeItem {
+  padding: 0 5%;
+}
+
+.timeItemLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h3.timeItemLine {
+  margin-bottom: 24px;
+}
+
+.timeItemLineLeft {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.timeItemLineRight {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
 // Media queries breakpoints
 // Extra small screen / phone
 // @screen-xs: 480px;
