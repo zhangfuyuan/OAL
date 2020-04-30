@@ -61,6 +61,9 @@ export default {
   'menu.log.logQuery': '记录查询',
   'menu.workAttendance': '考勤管理',
   'menu.workAttendance.workAttendanceRule': '考勤规则',
+  'menu.workAttendance.workAttendanceRule.workAttendanceRuleIndex': '规则列表',
+  'menu.workAttendance.workAttendanceRule.workAttendanceRuleAdd': '添加规则',
+  'menu.workAttendance.workAttendanceRule.workAttendanceRuleEdit': '编辑规则',
   'menu.workAttendance.workAttendanceStatistics': '考勤统计',
   'menu.workAttendance.workAttendanceRecord': '考勤记录',
 };

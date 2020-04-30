@@ -1,5 +1,5 @@
 export default {
-  publicPath: '/OAL/',
+  publicPath: '/',
   navTheme: 'dark',
   primaryColor: '#1890FF',
   layout: 'sidemenu',

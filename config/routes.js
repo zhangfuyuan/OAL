@@ -117,7 +117,31 @@ const routers = [
               {
                 path: '/workAttendance/rule',
                 name: 'workAttendanceRule',
-                component: './workAttendance',
+                hideChildrenInMenu: true,
+                routes: [
+                  {
+                    path: '/workAttendance/rule',
+                    redirect: '/workAttendance/rule/index',
+                  },
+                  {
+                    path: '/workAttendance/rule/index',
+                    name: 'workAttendanceRuleIndex',
+                    component: './workAttendance',
+                  },
+                  {
+                    path: '/workAttendance/rule/add',
+                    name: 'workAttendanceRuleAdd',
+                    component: './workAttendance/rule/add',
+                  },
+                  {
+                    path: '/workAttendance/rule/edit',
+                    name: 'workAttendanceRuleEdit',
+                    component: './workAttendance/rule/edit',
+                  },
+                  {
+                    component: './404',
+                  },
+                ],
               },
               {
                 path: '/workAttendance/statistics',

@@ -22,3 +22,12 @@ export async function getPerAttendList(data) {
 export async function getDeviceList(data) {
     return get(`/api/device/list/${data.verity}`);
 }
+
+/**
+ * ...
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function fetchTest(data) {
+  return get('/api/user/authByToken');
+}

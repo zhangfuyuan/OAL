@@ -409,4 +409,13 @@ export default {
   'oal.face.moveUserTo': 'Move user to',
   'oal.face.pleaseSelectTargetGroup': 'Please select the target group',
   'oal.face.deleteFaceConfirm': 'The user can not be recovered after deleting, and the device side user information will be deleted synchronously. Do you want to delete?',
+  'oal.work-rule.addRule': 'Add rules',
+  'oal.work-rule.workRule': 'Attendance rules',
+  'oal.work-rule.timeFrame': 'TimeFrame',
+  'oal.work-rule.record': 'Record',
+  'oal.work-rule.relateDevice': 'Relate device',
+  'oal.work-rule.currentToTotal': 'There are {total} attendance rules',
+  'oal.work-rule.deleteRuleConfirm': 'Are attendance records deleted synchronously?',
+  'oal.work-rule.relateSuccessfully': 'Relate successfully',
+  'oal.work-rule.pleaseSelectAssociatedDevice': 'Please select the associated device',
 };

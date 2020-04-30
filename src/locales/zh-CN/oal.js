@@ -409,4 +409,13 @@ export default {
   'oal.face.moveUserTo': '移动用户到',
   'oal.face.pleaseSelectTargetGroup': '请选择目标分组',
   'oal.face.deleteFaceConfirm': '用户删除后不可恢复，同时将同步删除设备端用户信息，是否删除？',
+  'oal.work-rule.addRule': '添加规则',
+  'oal.work-rule.workRule': '考勤规则',
+  'oal.work-rule.timeFrame': '时段',
+  'oal.work-rule.record': '记录',
+  'oal.work-rule.relateDevice': '关联设备',
+  'oal.work-rule.currentToTotal': '总共 {total} 条考勤规则',
+  'oal.work-rule.deleteRuleConfirm': '是否同步删除考勤记录？',
+  'oal.work-rule.relateSuccessfully': '关联成功',
+  'oal.work-rule.pleaseSelectAssociatedDevice': '请选择关联设备',
 };

@@ -27,6 +27,7 @@ import moment from 'moment';
 import StandardTable from '@/components/StandardTable';
 import { SYSTEM_PATH } from '@/utils/constants';
 import styles from './style.less';
+import { getPageQuery } from '@/utils/utils';
 
 const { TreeNode } = Tree;
 const FormItem = Form.Item;
@@ -35,10 +36,10 @@ const { Option } = Select;
 const statusMap = ['error', 'success'];
 const status = ['oal.common.disable', 'oal.common.enable'];
 
-@connect(({ setting, log, loading }) => ({
+@connect(({ setting, workAttendanceRuleEdit, loading }) => ({
   setting,
-  log,
-  demoListLoading: loading.effects['log/fetchList'],
+  workAttendanceRuleEdit,
+  demoListLoading: loading.effects['workAttendanceRuleEdit/fetchList'],
 }))
 class Demo extends Component {
 
@@ -56,6 +57,7 @@ class Demo extends Component {
       pageSize: 10,
     },
     nodeTreeItem: null,
+    ruleId: getPageQuery().ruleId, // 8126TODO
   };
 
   ref_leftDom = null;
@@ -74,7 +76,7 @@ class Demo extends Component {
   tree_loadData = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'log/fetch',
+      type: 'workAttendanceRuleEdit/fetch',
     }).then(res => {
       if (res && res.res > 0) {
         this.setState({
@@ -244,7 +246,7 @@ class Demo extends Component {
     const { dispatch } = this.props;
     const { page } = this.state;
     dispatch({
-      type: 'log/fetchList',
+      type: 'workAttendanceRuleEdit/fetchList',
       payload: {
         ...page,
       },
@@ -424,7 +426,7 @@ class Demo extends Component {
 
   render() {
     const {
-      log: { demoList },
+      workAttendanceRuleEdit: { demoList },
       demoListLoading,
     } = this.props;
 

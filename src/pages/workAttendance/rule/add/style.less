@@ -1,5 +1,5 @@
 @import '~antd/es/style/themes/default.less';
-@import './utils/utils.less';
+// @import '../../utils/utils.less';
 
 .myPageHeaderWrapper {
   :global {
@@ -23,41 +23,6 @@
   }
 }
 
-.tableList {
-  .tableListOperator {
-    margin-bottom: 16px;
-    button {
-      margin-right: 8px;
-    }
-  }
-}
-
-.tableListForm {
-  :global {
-    .ant-form-item {
-      display: flex;
-      margin-right: 0;
-      margin-bottom: 24px;
-      > .ant-form-item-label {
-        width: auto;
-        padding-right: 8px;
-        line-height: 32px;
-      }
-      .ant-form-item-control {
-        line-height: 32px;
-      }
-    }
-    .ant-form-item-control-wrapper {
-      flex: 1;
-    }
-  }
-  .submitButtons {
-    display: block;
-    margin-bottom: 24px;
-    white-space: nowrap;
-  }
-}
-
 .card {
   :global {
     .ant-card-meta-title {
@@ -76,14 +41,27 @@
   }
 }
 
+// Media queries breakpoints
+// Extra small screen / phone
+// @screen-xs: 480px;
+
+// Small screen / tablet
+// @screen-sm: 576px;
+
+// Medium screen / desktop
+// @screen-md: 768px;
+
+// Large screen / wide desktop
+// @screen-lg: 992px;
+
+// Extra large screen / full hd
+// @screen-xl: 1200px;
+
+// Extra extra large screen / large desktop
+// @screen-xxl: 1600px;
+
 @media screen and (max-width: @screen-lg) {
-  .tableListForm :global(.ant-form-item) {
-    margin-right: 24px;
-  }
 }
 
 @media screen and (max-width: @screen-md) {
-  .tableListForm :global(.ant-form-item) {
-    margin-right: 8px;
-  }
 }

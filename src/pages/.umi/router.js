@@ -172,8 +172,44 @@ const routes = [
               {
                 path: '/workAttendance/rule',
                 name: 'workAttendanceRule',
-                component: require('../workAttendance').default,
-                exact: true,
+                hideChildrenInMenu: true,
+                routes: [
+                  {
+                    path: '/workAttendance/rule',
+                    redirect: '/workAttendance/rule/index',
+                    exact: true,
+                  },
+                  {
+                    path: '/workAttendance/rule/index',
+                    name: 'workAttendanceRuleIndex',
+                    component: require('../workAttendance').default,
+                    exact: true,
+                  },
+                  {
+                    path: '/workAttendance/rule/add',
+                    name: 'workAttendanceRuleAdd',
+                    component: require('../workAttendance/rule/add').default,
+                    exact: true,
+                  },
+                  {
+                    path: '/workAttendance/rule/edit',
+                    name: 'workAttendanceRuleEdit',
+                    component: require('../workAttendance/rule/edit').default,
+                    exact: true,
+                  },
+                  {
+                    component: require('../404').default,
+                    exact: true,
+                  },
+                  {
+                    component: () =>
+                      React.createElement(
+                        require('E:/web/guarderClient/guarderClient/node_modules/umi-build-dev/lib/plugins/404/NotFound.js')
+                          .default,
+                        { pagesPath: 'src/pages', hasRoutesInConfig: true },
+                      ),
+                  },
+                ],
               },
               {
                 path: '/workAttendance/statistics',

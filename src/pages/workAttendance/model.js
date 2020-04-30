@@ -1,4 +1,4 @@
-import { getAttendList, getPerAttendList, getDeviceList } from './service';
+import { getAttendList, getPerAttendList, getDeviceList, fetchTest } from './service';
 
 const Model = {
   namespace: 'report',
@@ -40,6 +40,18 @@ const Model = {
           payload: response.data,
         });
       }
+      return Promise.resolve(response);
+    },
+    // 关联设备
+    *ruleRelateDevice({ payload }, { call, put, select }) {
+      console.log(8126, '关联设备', payload);
+      const response = yield call(fetchTest, payload);
+      return Promise.resolve(response);
+    },
+    // 删除考勤规则
+    *deleteRule({ payload }, { call, put, select }) {
+      console.log(8126, '删除考勤规则', payload);
+      const response = yield call(fetchTest, payload);
       return Promise.resolve(response);
     },
   },

@@ -550,12 +550,8 @@ class Face extends Component {
 
   table_submitTableAddOrModifyModal = isEdit => {
     message.success(formatMessage({ id: (isEdit ? 'oal.common.saveSuccessfully' : 'oal.face.addSuccessfully') }));
-    this.setState({
-      tableAddOrModifyVisible: false,
-      tableSelectedBean: {},
-    }, () => {
-      this.table_loadFaceList();
-    });
+    this.table_closeTableAddOrModifyModal();
+    this.table_loadFaceList();
   };
 
   // 批量添加（上传人脸信息）TableBatchAddModal
@@ -572,11 +568,8 @@ class Face extends Component {
   };
 
   table_submitTableBatchAddModal = () => {
-    this.setState({
-      tableBatchAddVisible: false,
-    }, () => {
-      this.table_loadFaceList();
-    });
+    this.table_closeTableBatchAddModal();
+    this.table_loadFaceList();
   };
 
   // 单个/批量移动（人脸分组）
@@ -607,13 +600,8 @@ class Face extends Component {
     }).then(res => {
       if (res && res.res > 0) {
         message.success(formatMessage({ id: 'oal.common.moveSuccessfully' }));
-        this.setState({
-          tableMoveVisible: false,
-          tableSelectedBean: {},
-        }, () => {
-          this.table_loadFaceList();
-        });
         this.table_closeTableMoveModal();
+        this.table_loadFaceList();
         callback && callback();
       } else {
         console.log(res);
@@ -650,13 +638,8 @@ class Face extends Component {
     }).then(res => {
       if (res && res.res > 0) {
         message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
-        this.setState({
-          tableDelVisible: false,
-          tableSelectedBean: {},
-        }, () => {
-          this.table_loadFaceList();
-        });
         this.table_closeTableDelModal();
+        this.table_loadFaceList();
         callback && callback();
       } else {
         console.log(res);

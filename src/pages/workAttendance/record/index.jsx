@@ -27,6 +27,7 @@ import moment from 'moment';
 import StandardTable from '@/components/StandardTable';
 import { SYSTEM_PATH } from '@/utils/constants';
 import styles from './style.less';
+import { getPageQuery } from '@/utils/utils';
 
 const { TreeNode } = Tree;
 const FormItem = Form.Item;
@@ -56,6 +57,7 @@ class Demo extends Component {
       pageSize: 10,
     },
     nodeTreeItem: null,
+    ruleId: getPageQuery().ruleId, // 8126TODO
   };
 
   ref_leftDom = null;

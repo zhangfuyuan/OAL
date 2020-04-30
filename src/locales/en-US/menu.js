@@ -61,6 +61,9 @@ export default {
   'menu.log.logQuery': 'recordsQuery',
   'menu.workAttendance': 'attendanceManagement',
   'menu.workAttendance.workAttendanceRule': 'attendanceRules',
+  'menu.workAttendance.workAttendanceRule.workAttendanceRuleIndex': 'List of rules',
+  'menu.workAttendance.workAttendanceRule.workAttendanceRuleAdd': 'Add rules',
+  'menu.workAttendance.workAttendanceRule.workAttendanceRuleEdit': 'Edit rules',
   'menu.workAttendance.workAttendanceStatistics': 'attendanceStatistics',
   'menu.workAttendance.workAttendanceRecord': 'attendanceRecord',
 };

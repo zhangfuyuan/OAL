@@ -1,5 +1,5 @@
 @import '~antd/es/style/themes/default.less';
-@import './utils/utils.less';
+// @import '../../utils/utils.less';
 
 .myPageHeaderWrapper {
   :global {
@@ -20,15 +20,42 @@
       font-weight: normal;
       font-size: 14px;
     }
+
+    .ant-card-body {
+      padding: 0;
+    }
+
+    .ant-tree li .ant-tree-node-content-wrapper {
+      margin-right: 100px;
+    }
   }
 }
 
-.tableList {
-  .tableListOperator {
-    margin-bottom: 16px;
-    button {
-      margin-right: 8px;
-    }
+.main {
+  display: flex;
+  width: 100%;
+  overflow: auto;
+  background-color: @menu-bg;
+
+  .left {
+    width: 27.7%;
+    padding: 24px;
+    border-right: @border-width-base @border-style-base @border-color-split;
+    overflow: auto;
+    position: relative;
+  }
+
+  .right {
+    flex: 1;
+    padding: 24px;
+    position: relative;
+  }
+}
+
+.tableListOperator {
+  margin-bottom: 16px;
+  button {
+    margin-right: 8px;
   }
 }
 
@@ -76,6 +103,25 @@
   }
 }
 
+// Media queries breakpoints
+// Extra small screen / phone
+// @screen-xs: 480px;
+
+// Small screen / tablet
+// @screen-sm: 576px;
+
+// Medium screen / desktop
+// @screen-md: 768px;
+
+// Large screen / wide desktop
+// @screen-lg: 992px;
+
+// Extra large screen / full hd
+// @screen-xl: 1200px;
+
+// Extra extra large screen / large desktop
+// @screen-xxl: 1600px;
+
 @media screen and (max-width: @screen-lg) {
   .tableListForm :global(.ant-form-item) {
     margin-right: 24px;
@@ -83,6 +129,15 @@
 }
 
 @media screen and (max-width: @screen-md) {
+  .main {
+    flex-direction: column;
+
+    .left {
+      width: 100%;
+      border: none;
+    }
+  }
+
   .tableListForm :global(.ant-form-item) {
     margin-right: 8px;
   }

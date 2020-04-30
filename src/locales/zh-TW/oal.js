@@ -409,4 +409,13 @@ export default {
   'oal.face.moveUserTo': '移動用戶到',
   'oal.face.pleaseSelectTargetGroup': '請選擇目標分組',
   'oal.face.deleteFaceConfirm': '用戶刪除後不可恢復，同時將同步刪除設備端用戶信息，是否刪除？',
+  'oal.work-rule.addRule': '添加規則',
+  'oal.work-rule.workRule': '考勤規則',
+  'oal.work-rule.timeFrame': '時段',
+  'oal.work-rule.record': '記錄',
+  'oal.work-rule.relateDevice': '關聯設備',
+  'oal.work-rule.currentToTotal': '總共 {total} 條考勤規則',
+  'oal.work-rule.deleteRuleConfirm': '是否同步刪除考勤記錄？',
+  'oal.work-rule.relateSuccessfully': '關聯成功',
+  'oal.work-rule.pleaseSelectAssociatedDevice': '請選擇關聯的設備',
 };

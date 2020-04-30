@@ -119,6 +119,24 @@ export function getPermissionRoutes(userType, orgType) {
             path: '/workAttendance/rule',
             name: 'workAttendanceRule',
             locale: 'menu.workAttendance.workAttendanceRule',
+            hideChildrenInMenu: true,
+            routes: [
+              {
+                path: '/workAttendance/rule/index',
+                name: 'workAttendanceRuleIndex',
+                locale: 'menu.workAttendance.workAttendanceRule.workAttendanceRuleIndex',
+              },
+              {
+                path: '/workAttendance/rule/add',
+                name: 'workAttendanceRuleAdd',
+                locale: 'menu.workAttendance.workAttendanceRule.workAttendanceRuleAdd',
+              },
+              {
+                path: '/workAttendance/rule/edit',
+                name: 'workAttendanceRuleEdit',
+                locale: 'menu.workAttendance.workAttendanceRule.workAttendanceRuleEdit',
+              },
+            ],
           },
           {
             path: '/workAttendance/statistics',
@@ -220,6 +238,24 @@ export function getPermissionRoutes(userType, orgType) {
             path: '/workAttendance/rule',
             name: 'workAttendanceRule',
             locale: 'menu.workAttendance.workAttendanceRule',
+            hideChildrenInMenu: true,
+            routes: [
+              {
+                path: '/workAttendance/rule/index',
+                name: 'workAttendanceRuleIndex',
+                locale: 'menu.workAttendance.workAttendanceRule.workAttendanceRuleIndex',
+              },
+              {
+                path: '/workAttendance/rule/add',
+                name: 'workAttendanceRuleAdd',
+                locale: 'menu.workAttendance.workAttendanceRule.workAttendanceRuleAdd',
+              },
+              {
+                path: '/workAttendance/rule/edit',
+                name: 'workAttendanceRuleEdit',
+                locale: 'menu.workAttendance.workAttendanceRule.workAttendanceRuleEdit',
+              },
+            ],
           },
           {
             path: '/workAttendance/statistics',

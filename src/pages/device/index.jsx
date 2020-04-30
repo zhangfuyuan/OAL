@@ -51,7 +51,7 @@ class Device extends Component {
 
   componentDidMount() {
     this.loadData();
-    this.initSocket();
+    // this.initSocket();
   }
 
   componentWillUnmount() {
