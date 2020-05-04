@@ -5,15 +5,33 @@ import { post, get } from '@/utils/ajax';
  * @param data
  * @returns {Promise<*>}
  */
-export async function demoAjax1(data) {
+export async function ajaxTest(data) {
   return get('/api/user/authByToken');
 }
 
 /**
- * demo2
+ * 查询记录
  * @param data
  * @returns {Promise<*>}
  */
-export async function demoAjax2(data) {
-  return post('/api/org/fetchList', data);
+export async function ajaxLog(data) {
+  return post('/api/face/manage/fetchList', data);
+}
+
+/**
+ * 查询设备
+ * @param query
+ * @returns {Promise<*>}
+ */
+export async function getDeviceList(data) {
+  return get(`/api/device/list/${data.verity}`);
+}
+
+/**
+ * 查询用户
+ * @param query
+ * @returns {Promise<*>}
+ */
+export async function ajaxUser(query) {
+  return post('/api/face/manage/fetchList', query);
 }

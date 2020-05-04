@@ -16,6 +16,7 @@ import {
   Spin,
   Tooltip,
   Avatar,
+  Modal,
 } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import router from 'umi/router';
@@ -27,17 +28,18 @@ import moment from 'moment';
 import StandardTable from '@/components/StandardTable';
 import { SYSTEM_PATH } from '@/utils/constants';
 import styles from './style.less';
+import TableAddOrModifyModal from './components/TableAddOrModifyModal';
+import TableDelModal from './components/TableDelModal';
+import TableRelateDeviceModal from './components/TableRelateDeviceModal';
 
 const FormItem = Form.Item;
 const { Option } = Select;
-
-const statusMap = ['error', 'success'];
-const status = ['oal.common.disable', 'oal.common.enable'];
 
 @connect(({ setting, faceVisitor, loading }) => ({
   setting,
   faceVisitor,
   listLoading: loading.effects['faceVisitor/fetchList'],
+  deviceList: faceVisitor.deviceList,
 }))
 class Visitor extends Component {
 
@@ -56,10 +58,16 @@ class Visitor extends Component {
       columnKey: '',
       order: '', // ascend（正序）、descend（倒序）
     },
+    tableSelectedBean: {},
+    viewVisible: false,
+    tableAddOrModifyVisible: false,
+    tableDelVisible: false,
+    relateVisible: false,
   };
 
   componentDidMount() {
     this.table_loadData();
+    this.loadDeviceList();
   }
 
   componentWillUnmount() {
@@ -69,13 +77,24 @@ class Visitor extends Component {
 
   table_loadData = () => {
     const { dispatch } = this.props;
-    const { tablePage, sortedInfo } = this.state;
+    const { tablePage, sortedInfo, formValues } = this.state;
     dispatch({
       type: 'faceVisitor/fetchList',
       payload: {
         ...tablePage,
         ...sortedInfo,
+        ...formValues,
         featureState: 'all',
+      },
+    });
+  };
+
+  loadDeviceList = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'faceVisitor/getDeviceList',
+      payload: {
+        verity: 1,
       },
     });
   };
@@ -120,12 +139,12 @@ class Visitor extends Component {
         width: 200,
         render: (text, record) => (
           <Fragment>
-            <a key="edit"><FormattedMessage id="oal.common.edit" /></a>
+            <a key="edit" onClick={() => this.table_showTableAddOrModifyModal(record)}><FormattedMessage id="oal.common.edit" /></a>
             <Divider type="vertical" />
-            <a key="relate"><FormattedMessage id="oal.work-rule.relateDevice" /></a>
+            <a key="relate" onClick={(e) => this.table_showRelateModal(e, record)}><FormattedMessage id="oal.work-rule.relateDevice" /></a>
             <Divider type="vertical" />
             {/* <Popconfirm placement="topLeft" title={formatMessage({ id: 'oal.face.confirmDeleteFace' })} onConfirm={() => this.deleteFace(record)} okText={formatMessage({ id: 'oal.common.delete' })} cancelText={formatMessage({ id: 'oal.common.cancel' })}> */}
-            <a key="remove"><FormattedMessage id="oal.common.delete" /></a>
+            <a key="remove" onClick={(e) => this.table_showTableDelModal(e, record)}><FormattedMessage id="oal.common.delete" /></a>
           </Fragment>
         ),
       },
@@ -134,13 +153,6 @@ class Visitor extends Component {
   };
 
   table_handleChange = (pagination, filters, sorter) => {
-    const { dispatch } = this.props;
-    const { formValues } = this.state;
-    const params = {
-      current: pagination.current,
-      pageSize: pagination.pageSize,
-      ...formValues,
-    };
     this.setState({
       tablePage: {
         current: pagination.current,
@@ -156,38 +168,29 @@ class Visitor extends Component {
   };
 
   table_handleSearch = () => {
-    const { form, dispatch } = this.props;
-    const { tablePage, sortedInfo } = this.state;
+    const { form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       this.setState({
         formValues: fieldsValue,
         tableSelectedRows: [],
+      }, () => {
+        this.table_loadData();
       });
-      const params = {
-        ...tablePage,
-        ...sortedInfo,
-        ...fieldsValue,
-      };
-      console.log('table_handleSearch', params);
     });
   };
 
   table_handleFormReset = () => {
-    const { form, dispatch } = this.props;
+    const { form } = this.props;
     form.resetFields();
     form.setFieldsValue({});
-    const { tablePage, sortedInfo } = this.state;
     this.setState({
       formValues: {},
+      tableSelectedRows: [],
+    }, () => {
+      this.table_loadData();
     });
-    const params = {
-      ...tablePage,
-      pageNo: 1,
-      ...sortedInfo,
-    };
-    console.log('table_handleFormReset', params);
   };
 
   table_renderSimpleForm = () => {
@@ -238,25 +241,104 @@ class Visitor extends Component {
     );
   };
 
+  // 添加/编辑（单个人脸信息）TableAddOrModifyModal
   table_showTableAddOrModifyModal = bean => {
-    console.log(812666)
+    const _state = {
+      tableAddOrModifyVisible: true,
+    };
+
+    bean && bean._id && (_state.tableSelectedBean = bean);
+
+    this.setState(_state);
   };
 
-  table_showTableDelModal = bean => {
-    console.log(812666)
+  table_closeTableAddOrModifyModal = () => {
+    this.setState({
+      tableAddOrModifyVisible: false,
+      tableSelectedBean: {},
+    });
   };
 
-  table_showTableMoveModal = bean => {
-    console.log(812666)
+  table_submitTableAddOrModifyModal = isEdit => {
+    message.success(formatMessage({ id: (isEdit ? 'oal.common.saveSuccessfully' : 'oal.face.addSuccessfully') }));
+    this.table_closeTableAddOrModifyModal();
+    this.table_loadData();
   };
 
-  table_showTableRelateModal = bean => {
-    console.log(812666)
+  // 单个/批量删除（人脸信息）
+  table_showTableDelModal = (e, bean) => {
+    console.log(8126, '单个/批量删除', bean || this.state.tableSelectedRows);
+    this.setState({
+      tableDelVisible: true,
+      tableSelectedBean: bean || {},
+    });
   };
 
-  /************************************************* Other *************************************************/
+  table_closeTableDelModal = () => {
+    this.setState({
+      tableDelVisible: false,
+      tableSelectedBean: {},
+    });
+  };
 
+  table_submitTableDelModal = (params, callback) => {
+    const { dispatch } = this.props;
+    const { tableSelectedBean, tableSelectedRows } = this.state;
+    dispatch({
+      type: 'faceVisitor/delVisitor',
+      payload: {
+        visitorId: tableSelectedBean && tableSelectedBean._id || tableSelectedRows.map(item => item._id).join(','),
+      },
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+        this.table_closeTableDelModal();
+        this.table_loadData();
+        callback && callback();
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
+  };
 
+  // 单个/批量关联设备
+  table_showRelateModal = (e, bean) => {
+    this.setState({ relateVisible: true, tableSelectedBean: bean || {} });
+  };
+
+  table_closeRelateModal = () => {
+    this.setState({ relateVisible: false, tableSelectedBean: {} });
+  };
+
+  table_submitRelateModal = (visitorId, deviceId) => {
+    const { dispatch } = this.props;
+    // 8126TODO 需对接
+    dispatch({
+      type: 'faceVisitor/relateDevice',
+      payload: {
+        // eslint-disable-next-line no-underscore-dangle
+        visitorId,
+        deviceId,
+      },
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.work-rule.relateSuccessfully' }));
+        this.table_closeRelateModal();
+        this.table_loadData();
+      }
+    });
+  };
+
+  // 放大查看（人脸图片）
+  table_openViewModal = bean => {
+    this.setState({ viewVisible: true, tableSelectedBean: bean })
+  };
+
+  table_closeViewModal = () => {
+    this.setState({ viewVisible: false, tableSelectedBean: {} })
+  };
 
   /************************************************ Render ************************************************/
 
@@ -264,10 +346,23 @@ class Visitor extends Component {
     const {
       faceVisitor: { visitorList },
       listLoading,
+      dispatch,
+      deviceList,
     } = this.props;
     const {
       tableSelectedRows,
+      tableSelectedBean,
+      viewVisible,
+      tableAddOrModifyVisible,
+      tableDelVisible,
+      relateVisible,
     } = this.state;
+
+    visitorList && visitorList.pagination && (visitorList.pagination.showTotal = (total, range) => (formatMessage({
+      id: 'oal.face-visitor.currentToTotal',
+    }, {
+      total,
+    })));
 
     return (
       <PageHeaderWrapper title=" " className={styles.myPageHeaderWrapper} >
@@ -287,7 +382,7 @@ class Visitor extends Component {
                 <Button
                   type="primary"
                   disabled={!tableSelectedRows || tableSelectedRows.length === 0}
-                  onClick={this.table_showTableRelateModal}
+                  onClick={this.table_showRelateModal}
                 >
                   <FormattedMessage id="oal.work-rule.relateDevice" />
                 </Button>
@@ -306,6 +401,34 @@ class Visitor extends Component {
             </div>
           </div>
         </Card>
+
+        <Modal
+          title={tableSelectedBean.name}
+          visible={viewVisible}
+          footer={null}
+          onCancel={this.table_closeViewModal}
+        >
+          <img src={tableSelectedBean.imgPath} alt="" style={{ width: '100%', height: '100%' }} />
+        </Modal>
+        <TableAddOrModifyModal
+          visible={tableAddOrModifyVisible}
+          bean={tableSelectedBean}
+          dispatch={dispatch}
+          handleCancel={this.table_closeTableAddOrModifyModal}
+          handleSubmit={this.table_submitTableAddOrModifyModal}
+        />
+        <TableDelModal
+          visible={tableDelVisible}
+          bean={tableSelectedBean && tableSelectedBean._id ? [tableSelectedBean] : tableSelectedRows}
+          handleCancel={this.table_closeTableDelModal}
+          handleSubmit={this.table_submitTableDelModal}
+        />
+        <TableRelateDeviceModal
+          visible={relateVisible}
+          bean={{ selectedBean: (tableSelectedBean && tableSelectedBean._id ? [tableSelectedBean] : tableSelectedRows), deviceList }}
+          handleCancel={this.table_closeRelateModal}
+          handleSubmit={this.table_submitRelateModal}
+        />
       </PageHeaderWrapper>
     );
   }

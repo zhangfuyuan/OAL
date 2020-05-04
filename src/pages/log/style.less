@@ -103,6 +103,44 @@
   }
 }
 
+.left {
+  :global {
+    .ant-list-item {
+      padding: 0;
+    }
+    .ant-list-item-meta {
+      align-items: center;
+    }
+    .ant-list-item-meta-avatar {
+      margin-right: 5px;
+    }
+    .ant-list-item-meta-title {
+      margin: 0;
+    }
+    .oal-list-content {
+      display: block;
+      padding: 5px 0 5px 5px;
+      cursor: pointer;
+      color: rgba(0, 0, 0, 0.65);
+      font-weight: normal;
+    }
+    .oal-list-content:hover,
+    .oal-list-content.active {
+      color: @primary-color;
+      background-color: #E6F7FF;
+    }
+  }
+}
+
+
+:global {
+  .oal-user-list {
+    .ant-list-item:hover {
+      background-color: #E6F7FF;
+    }
+  }
+}
+
 // Media queries breakpoints
 // Extra small screen / phone
 // @screen-xs: 480px;
