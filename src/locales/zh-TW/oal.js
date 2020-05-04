@@ -435,4 +435,6 @@ export default {
   'oal.work-rule.enterAttendanceEndTimeTips': '結束考勤時間爲必填',
   'oal.work-rule.attendanceShouldEarlier': '開始考勤時間應早於上班時間',
   'oal.work-rule.attendanceShouldLater': '結束考勤時間應晚於下班時間',
+  'oal.work-rule.workShouldLater': '下班時間應晚於上班時間',
+  'oal.face-visitor.validity': '有效期',
 };

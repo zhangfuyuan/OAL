@@ -1,50 +1,24 @@
-import { demoAjax1, demoAjax2 } from './service';
+import { editRule } from './service';
 
 const Model = {
   namespace: 'workAttendanceRuleEdit',
   state: {
-    demoState: {},
-    demoList: {},
   },
   effects: {
-    *fetch({ payload }, { call, put, select }) {
-      const response = yield call(demoAjax1);
-
-      if (response.res > 0) {
-        yield put({
-          type: 'save',
-          payload: response.data,
-        });
-      }
-
+    // 获取规则详情
+    *getDetails({ payload }, { call, put, select }) {
+      console.log(8126, '获取规则详情', payload);
+      const response = yield call(editRule, payload);
       return Promise.resolve(response);
     },
-    *fetchList({ payload }, { call, put, select }) {
-      const response = yield call(demoAjax2, payload);
-
-      if (response.res > 0) {
-        yield put({
-          type: 'saveList',
-          payload: response.data,
-        });
-      }
-
+    // 编辑规则
+    *edit({ payload }, { call, put, select }) {
+      console.log(8126, '编辑规则', payload);
+      const response = yield call(editRule, payload);
       return Promise.resolve(response);
     },
   },
   reducers: {
-    save(state, action) {
-      return {
-        ...state,
-        demoState: action.payload,
-      };
-    },
-    saveList(state, action) {
-      return {
-        ...state,
-        demoList: action.payload,
-      };
-    },
   },
 };
 

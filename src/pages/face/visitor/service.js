@@ -5,7 +5,7 @@ import { post, get } from '@/utils/ajax';
  * @param data
  * @returns {Promise<*>}
  */
-export async function demoAjax1(data) {
+export async function ajaxTest(data) {
   return get('/api/user/authByToken');
 }
 
@@ -14,6 +14,6 @@ export async function demoAjax1(data) {
  * @param data
  * @returns {Promise<*>}
  */
-export async function demoAjax2(data) {
-  return post('/api/org/fetchList', data);
+export async function ajaxList(data) {
+  return post('/api/face/manage/fetchList', data);
 }

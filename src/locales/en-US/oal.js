@@ -435,4 +435,6 @@ export default {
   'oal.work-rule.enterAttendanceEndTimeTips': 'Attendance end time is required',
   'oal.work-rule.attendanceShouldEarlier': 'Attendance start time should be earlier than work start time',
   'oal.work-rule.attendanceShouldLater': 'Attendance end time should be later than work end time',
+  'oal.work-rule.workShouldLater': 'Work end time should be later than work start time',
+  'oal.face-visitor.validity': 'Validity',
 };

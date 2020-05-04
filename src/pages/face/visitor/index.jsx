@@ -14,8 +14,8 @@ import {
   Menu,
   Icon,
   Spin,
-  Tree,
   Tooltip,
+  Avatar,
 } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import router from 'umi/router';
@@ -28,7 +28,6 @@ import StandardTable from '@/components/StandardTable';
 import { SYSTEM_PATH } from '@/utils/constants';
 import styles from './style.less';
 
-const { TreeNode } = Tree;
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -38,275 +37,95 @@ const status = ['oal.common.disable', 'oal.common.enable'];
 @connect(({ setting, faceVisitor, loading }) => ({
   setting,
   faceVisitor,
-  demoListLoading: loading.effects['faceVisitor/fetchList'],
+  listLoading: loading.effects['faceVisitor/fetchList'],
 }))
-class Demo extends Component {
+class Visitor extends Component {
 
   // constructor(props) {
   //   super(props);
   // }
 
   state = {
-    demoLoading: true,
-    treeData: [],
-    selectedRows: [],
+    tableSelectedRows: [],
     formValues: {},
-    page: {
+    tablePage: {
       current: 1,
       pageSize: 10,
     },
-    nodeTreeItem: null,
+    sortedInfo: {
+      columnKey: '',
+      order: '', // ascend（正序）、descend（倒序）
+    },
   };
 
-  ref_leftDom = null;
-
   componentDidMount() {
-    this.tree_loadData();
     this.table_loadData();
   }
 
   componentWillUnmount() {
-    this.tree_clearMenu();
   }
-
-  /************************************************* Tree *************************************************/
-
-  tree_loadData = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'faceVisitor/fetch',
-    }).then(res => {
-      if (res && res.res > 0) {
-        this.setState({
-          demoLoading: false,
-          treeData: [
-            { title: 'Expand to load', key: '0' },
-            { title: 'Expand to load', key: '1' },
-            { title: 'Tree Node', key: '2', isLeaf: true },
-          ],
-        });
-      }
-    }).catch(err => {
-      console.log(err);
-    })
-  };
-
-  tree_onLoadData = treeNode =>
-    new Promise(resolve => {
-      if (treeNode.props.children) {
-        resolve();
-        return;
-      }
-      setTimeout(() => {
-        treeNode.props.dataRef.children = [
-          { title: 'Child Node', key: `${treeNode.props.eventKey}-0` },
-          { title: 'Child Node', key: `${treeNode.props.eventKey}-1` },
-        ];
-        this.setState({
-          treeData: [...this.state.treeData],
-        });
-        resolve();
-      }, 1000);
-    });
-
-  tree_renderNodes = data =>
-    data.map(item => {
-      if (item.children) {
-        return (
-          <TreeNode title={item.title} key={item.key} dataRef={item}>
-            {this.tree_renderNodes(item.children)}
-          </TreeNode>
-        );
-      }
-      return <TreeNode key={item.key} {...item} dataRef={item} />;
-    });
-
-  tree_onMouseEnter = (e) => {
-    if (this.ref_leftDom && (!this.state.nodeTreeItem || !this.state.nodeTreeItem.isEditing)) {
-      const { left: pLeft, top: pTop } = this.ref_leftDom.getBoundingClientRect();
-      const { left, width, top } = e.event.currentTarget.getBoundingClientRect();
-      const x = left - pLeft + width + this.ref_leftDom.scrollLeft;
-      const y = top - pTop;
-      const { eventKey, dataRef } = e.node.props;
-
-      this.setState({
-        nodeTreeItem: {
-          nodeWidth: width,
-          pageX: x,
-          pageY: y,
-          id: eventKey,
-          dataRef,
-        }
-      });
-    }
-  };
-
-  tree_getNodeTreeMenu() {
-    if (this.state.nodeTreeItem) {
-      const { pageX, pageY, isEditing, nodeWidth, dataRef } = { ...this.state.nodeTreeItem };
-      const tmpStyle = {
-        position: 'absolute',
-        maxHeight: 40,
-        textAlign: 'center',
-        left: `${pageX + 10 - (isEditing ? nodeWidth + 10 : 0)}px`,
-        top: `${pageY}px`,
-        display: 'flex',
-        flexDirection: 'row',
-      };
-      const menu = (
-        <div
-          style={tmpStyle}
-          onClick={e => e.stopPropagation()}
-        >
-          {
-            isEditing ?
-              <Input
-                size="small"
-                defaultValue={dataRef && dataRef.title || ''}
-                style={{ width: `${nodeWidth}px`, minWidth: `56px`, marginRight: '10px', }}
-                autoFocus={true}
-                onBlur={this.tree_handleEditSubInput}
-                onPressEnter={this.tree_handleEditSubInput}
-              /> : ''
-          }
-          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleEditSub}>
-            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.modify' })}>
-              <Icon type='edit' />
-            </Tooltip>
-          </div>
-          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleDeleteSub}>
-            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.delete' })}>
-              <Icon type='minus-circle-o' />
-            </Tooltip>
-          </div>
-          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleAddSub}>
-            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.addItems' })}>
-              <Icon type='plus-circle-o' />
-            </Tooltip>
-          </div>
-        </div>
-      );
-
-      return menu;
-    }
-
-    return '';
-  }
-
-  tree_handleAddSub = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click add id :", this.state.nodeTreeItem.id);
-    }
-  };
-
-  tree_handleEditSub = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click edit id :", this.state.nodeTreeItem.id);
-      this.setState({
-        nodeTreeItem: {
-          ...this.state.nodeTreeItem,
-          isEditing: true,
-        },
-      });
-    }
-  };
-
-  tree_handleEditSubInput = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click edit value :", e.target.value);
-      this.state.nodeTreeItem.dataRef.title = e.target.value;
-      this.setState({
-        nodeTreeItem: null,
-        treeData: [...this.state.treeData],
-      });
-    }
-  };
-
-  tree_handleDeleteSub = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click delete id :", this.state.nodeTreeItem.id);
-    }
-  };
-
-  tree_clearMenu = () => {
-    this.setState({
-      nodeTreeItem: null,
-    });
-  };
-
-  tree_onSelect = (selectedKeys, e) => {
-    console.log('selectedKeys : ', selectedKeys, e);
-  };
 
   /************************************************* Table *************************************************/
 
   table_loadData = () => {
     const { dispatch } = this.props;
-    const { page } = this.state;
+    const { tablePage, sortedInfo } = this.state;
     dispatch({
       type: 'faceVisitor/fetchList',
       payload: {
-        ...page,
+        ...tablePage,
+        ...sortedInfo,
+        featureState: 'all',
       },
     });
   };
 
   table_handleSelectRows = rows => {
     this.setState({
-      selectedRows: rows,
+      tableSelectedRows: rows,
     });
   };
 
   table_columns = () => {
-    const MoreBtn = ({ item }) => (
-      <Dropdown
-        overlay={
-          <Menu onClick={({ key }) => console.log('Dropdown', key, item)}>
-            <Menu.Item key="modify" disabled={item.state === 0}><FormattedMessage id="oal.common.modify" /></Menu.Item>
-            <Menu.Item key="open" disabled={item.state === 1}><FormattedMessage id="oal.common.enable" /></Menu.Item>
-            <Menu.Item key="close" disabled={item.state === 0}><FormattedMessage id="oal.common.disable" /></Menu.Item>
-          </Menu>
-        }
-      >
-        <a>
-          <FormattedMessage id="oal.common.more" /><Icon type="down" />
-        </a>
-      </Dropdown>
-    );
     const cl = [
       {
-        title: formatMessage({ id: 'oal.org.orgName' }),
+        title: formatMessage({ id: 'oal.common.photo' }),
+        key: 'avatar',
+        width: 100,
+        render: (text, record) => <Avatar src={`${record.imgPath}.jpg?height=64&width=64&mode=fit`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
+      },
+      {
+        title: formatMessage({ id: 'oal.common.fullName' }),
+        key: 'name',
         dataIndex: 'name',
+        ellipsis: true,
+        key: 'name',
+        sorter: (a, b) => a.name - b.name,
+        sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
       },
       {
-        title: formatMessage({ id: 'oal.common.status' }),
-        dataIndex: 'state',
-        render(val) {
-          return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
-        },
+        title: formatMessage({ id: 'oal.common.phoneNumber' }),
+        key: 'mobile',
+        dataIndex: 'mobile',
       },
       {
-        title: formatMessage({ id: 'oal.org.path' }),
-        dataIndex: 'path',
-        render: (_text, record) => (
-          <Fragment>
-            <a onClick={() => console.log('path', record.path)}>{record.path}</a>
-          </Fragment>
-        ),
-      },
-      {
-        title: formatMessage({ id: 'oal.org.contacts' }),
-        dataIndex: 'contactName',
-        render: (text, record) => <span>{(record && record.contact && record.contact.nickName) || formatMessage({ id: 'oal.org.notFill' })}</span>,
+        title: formatMessage({ id: 'oal.face-visitor.validity' }),
+        key: 'validity',
+        dataIndex: 'validity',
+        sorter: (a, b) => a.validity - b.validity,
+        sortOrder: this.state.sortedInfo.columnKey === 'validity' && this.state.sortedInfo.order,
       },
       {
         title: formatMessage({ id: 'oal.common.handle' }),
-        width: 150,
+        width: 200,
         render: (text, record) => (
           <Fragment>
-            <a onClick={() => console.log('handle', record)}><FormattedMessage id="oal.common.view" /></a>
+            <a key="edit"><FormattedMessage id="oal.common.edit" /></a>
             <Divider type="vertical" />
-            <MoreBtn item={record} />
+            <a key="relate"><FormattedMessage id="oal.work-rule.relateDevice" /></a>
+            <Divider type="vertical" />
+            {/* <Popconfirm placement="topLeft" title={formatMessage({ id: 'oal.face.confirmDeleteFace' })} onConfirm={() => this.deleteFace(record)} okText={formatMessage({ id: 'oal.common.delete' })} cancelText={formatMessage({ id: 'oal.common.cancel' })}> */}
+            <a key="remove"><FormattedMessage id="oal.common.delete" /></a>
           </Fragment>
         ),
       },
@@ -314,7 +133,7 @@ class Demo extends Component {
     return cl;
   };
 
-  table_handleChange = pagination => {
+  table_handleChange = (pagination, filters, sorter) => {
     const { dispatch } = this.props;
     const { formValues } = this.state;
     const params = {
@@ -322,21 +141,33 @@ class Demo extends Component {
       pageSize: pagination.pageSize,
       ...formValues,
     };
-    console.log('table_handleChange', params);
+    this.setState({
+      tablePage: {
+        current: pagination.current,
+        pageSize: pagination.pageSize,
+      },
+      sortedInfo: {
+        columnKey: sorter.columnKey,
+        order: sorter.order,
+      }
+    }, () => {
+      this.table_loadData();
+    });
   };
 
   table_handleSearch = () => {
     const { form, dispatch } = this.props;
-    const { page } = this.state;
+    const { tablePage, sortedInfo } = this.state;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       this.setState({
         formValues: fieldsValue,
-        selectedRows: [],
+        tableSelectedRows: [],
       });
       const params = {
-        ...page,
+        ...tablePage,
+        ...sortedInfo,
         ...fieldsValue,
       };
       console.log('table_handleSearch', params);
@@ -347,13 +178,14 @@ class Demo extends Component {
     const { form, dispatch } = this.props;
     form.resetFields();
     form.setFieldsValue({});
-    const { page } = this.state;
+    const { tablePage, sortedInfo } = this.state;
     this.setState({
       formValues: {},
     });
     const params = {
-      ...page,
+      ...tablePage,
       pageNo: 1,
+      ...sortedInfo,
     };
     console.log('table_handleFormReset', params);
   };
@@ -371,32 +203,11 @@ class Demo extends Component {
           }}
         >
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label={formatMessage({ id: 'oal.org.orgName' })}>
-              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.org.enterOrgName' })} />)}
+            <FormItem label={formatMessage({ id: 'oal.face.search' })}>
+              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
             </FormItem>
           </Col>
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label={formatMessage({ id: 'oal.org.path' })}>
-              {getFieldDecorator('path')(<Input placeholder={formatMessage({ id: 'oal.org.enterPath' })} />)}
-            </FormItem>
-          </Col>
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label={formatMessage({ id: 'oal.common.status' })}>
-              {getFieldDecorator('state')(
-                <Select
-                  placeholder={formatMessage({ id: 'oal.common.pleaseSelect' })}
-                  style={{
-                    width: '100%',
-                  }}
-                >
-                  <Option value=""><FormattedMessage id="oal.common.all" /></Option>
-                  <Option value="0"><FormattedMessage id="oal.common.disable" /></Option>
-                  <Option value="1"><FormattedMessage id="oal.common.enable" /></Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={4} lg={4} md={4} sm={24}>
+          <Col xxl={4} lg={4} md={4} sm={12}>
             <span className={styles.submitButtons}>
               <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={loading}>
                 <FormattedMessage id="oal.common.query" />
@@ -411,9 +222,36 @@ class Demo extends Component {
               </Button>
             </span>
           </Col>
+          <Col xxl={15} xl={14} lg={12} md={12} sm={12}>
+            <div style={{ textAlign: 'right', }}>
+              <Button
+                type="primary"
+                icon="plus"
+                onClick={this.table_showTableAddOrModifyModal}
+              >
+                <FormattedMessage id="oal.face.add" />
+              </Button>
+            </div>
+          </Col>
         </Row>
       </Form>
     );
+  };
+
+  table_showTableAddOrModifyModal = bean => {
+    console.log(812666)
+  };
+
+  table_showTableDelModal = bean => {
+    console.log(812666)
+  };
+
+  table_showTableMoveModal = bean => {
+    console.log(812666)
+  };
+
+  table_showTableRelateModal = bean => {
+    console.log(812666)
   };
 
   /************************************************* Other *************************************************/
@@ -424,46 +262,43 @@ class Demo extends Component {
 
   render() {
     const {
-      faceVisitor: { demoList },
-      demoListLoading,
+      faceVisitor: { visitorList },
+      listLoading,
     } = this.props;
+    const {
+      tableSelectedRows,
+    } = this.state;
 
     return (
       <PageHeaderWrapper title=" " className={styles.myPageHeaderWrapper} >
         <Card bordered={false}>
           <div className={styles.main} >
-            <div
-              className={styles.left}
-              ref={ref => { this.ref_leftDom = ref; }}
-              onClick={this.tree_clearMenu}
-            >
-              <Spin spinning={this.state.demoLoading} />
-              <Tree
-                loadData={this.tree_onLoadData}
-                showLine={true}
-                // blockNode={true}
-                onMouseEnter={this.tree_onMouseEnter}
-                onSelect={this.tree_onSelect}
-              >
-                {this.tree_renderNodes(this.state.treeData)}
-              </Tree>
-              {this.state.nodeTreeItem ? this.tree_getNodeTreeMenu() : ''}
-            </div>
-
             <div className={styles.right}>
               <div className={styles.tableListForm}>{this.table_renderSimpleForm()}</div>
               <div className={styles.tableListOperator}>
-                <Button icon="plus" type="primary" onClick={() => console.log('plus')}>
-                  <FormattedMessage id="oal.common.new" />
+                <Button
+                  type="danger"
+                  disabled={!tableSelectedRows || tableSelectedRows.length === 0}
+                  style={{ marginRight: 10 }}
+                  onClick={this.table_showTableDelModal}
+                >
+                  <FormattedMessage id="oal.common.delete" />
+                </Button>
+                <Button
+                  type="primary"
+                  disabled={!tableSelectedRows || tableSelectedRows.length === 0}
+                  onClick={this.table_showTableRelateModal}
+                >
+                  <FormattedMessage id="oal.work-rule.relateDevice" />
                 </Button>
               </div>
               <StandardTable
                 // eslint-disable-next-line no-underscore-dangle
                 rowKey={record => record._id}
-                needRowSelection={false}
-                selectedRows={this.state.selectedRows}
-                loading={demoListLoading}
-                data={demoList}
+                needRowSelection
+                selectedRows={tableSelectedRows}
+                loading={listLoading}
+                data={visitorList}
                 columns={this.table_columns()}
                 onSelectRow={this.table_handleSelectRows}
                 onChange={this.table_handleChange}
@@ -476,4 +311,4 @@ class Demo extends Component {
   }
 }
 
-export default Form.create()(Demo);
+export default Form.create()(Visitor);

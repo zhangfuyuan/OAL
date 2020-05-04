@@ -20,68 +20,6 @@
       font-weight: normal;
       font-size: 14px;
     }
-
-    .ant-card-body {
-      padding: 0;
-    }
-
-    .ant-tree li .ant-tree-node-content-wrapper {
-      margin-right: 100px;
-    }
-  }
-}
-
-.main {
-  display: flex;
-  width: 100%;
-  overflow: auto;
-  background-color: @menu-bg;
-
-  .left {
-    width: 27.7%;
-    padding: 24px;
-    border-right: @border-width-base @border-style-base @border-color-split;
-    overflow: auto;
-    position: relative;
-  }
-
-  .right {
-    flex: 1;
-    padding: 24px;
-    position: relative;
-  }
-}
-
-.tableListOperator {
-  margin-bottom: 16px;
-  button {
-    margin-right: 8px;
-  }
-}
-
-.tableListForm {
-  :global {
-    .ant-form-item {
-      display: flex;
-      margin-right: 0;
-      margin-bottom: 24px;
-      > .ant-form-item-label {
-        width: auto;
-        padding-right: 8px;
-        line-height: 32px;
-      }
-      .ant-form-item-control {
-        line-height: 32px;
-      }
-    }
-    .ant-form-item-control-wrapper {
-      flex: 1;
-    }
-  }
-  .submitButtons {
-    display: block;
-    margin-bottom: 24px;
-    white-space: nowrap;
   }
 }
 
@@ -101,6 +39,52 @@
       }
     }
   }
+}
+
+.main {
+  width: 50%;
+  margin: 0 auto;
+}
+
+.info h2,
+.times h2 {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+.info {
+  :global {
+    .ant-row.ant-form-item {
+      padding: 0 5%;
+    }
+  }
+}
+
+.timeItem {
+  padding: 0 5%;
+}
+
+.timeItemLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h3.timeItemLine {
+  margin-bottom: 24px;
+}
+
+.timeItemLineLeft {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.timeItemLineRight {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 // Media queries breakpoints
@@ -123,22 +107,7 @@
 // @screen-xxl: 1600px;
 
 @media screen and (max-width: @screen-lg) {
-  .tableListForm :global(.ant-form-item) {
-    margin-right: 24px;
-  }
 }
 
 @media screen and (max-width: @screen-md) {
-  .main {
-    flex-direction: column;
-
-    .left {
-      width: 100%;
-      border: none;
-    }
-  }
-
-  .tableListForm :global(.ant-form-item) {
-    margin-right: 8px;
-  }
 }

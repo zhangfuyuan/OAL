@@ -7,6 +7,7 @@ import {
   Input,
   Icon,
   TimePicker,
+  message,
 } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import router from 'umi/router';
@@ -41,7 +42,7 @@ class Demo extends Component {
   // }
 
   state = {
-    formValues: {},
+    // formValues: {},
   };
 
   componentDidMount() {
@@ -83,11 +84,111 @@ class Demo extends Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        // const { keys, ruleName, time } = values;
-        console.log(8126, values);
+        const { keys, ruleName, times } = values;
+        let hasError = false;
+        let workAttendanceTimes = [];
+
+        workAttendanceTimes = keys.map((k, index) => {
+          const workStartTime = times[`${k}-0`].format('HH:mm');
+          const attendanceStartTime = times[`${k}-1`].format('HH:mm');
+          const workEndTime = times[`${k}-2`].format('HH:mm');
+          const attendanceEndTime = times[`${k}-3`].format('HH:mm');
+
+          if (workStartTime > workEndTime) {
+            message.error(formatMessage({ id: 'oal.work-rule.workShouldLater' }));
+            hasError = true;
+          } else if (workStartTime < attendanceStartTime) {
+            message.error(formatMessage({ id: 'oal.work-rule.attendanceShouldEarlier' }));
+            hasError = true;
+          } else if (workEndTime > attendanceEndTime) {
+            message.error(formatMessage({ id: 'oal.work-rule.attendanceShouldLater' }));
+            hasError = true;
+          }
+
+          return {
+            workStartTime,
+            workEndTime,
+            workAttendanceStartTime: attendanceStartTime,
+            workAttendanceEndTime: attendanceEndTime,
+          };
+        });
+
+        if (!hasError) {
+          const { dispatch } = this.props;
+          // 8126TODO 需对接
+          dispatch({
+            type: 'workAttendanceRuleAdd/add',
+            payload: {
+              // eslint-disable-next-line no-underscore-dangle
+              ruleName,
+              workAttendanceTimes,
+            },
+          }).then(res => {
+            if (res && res.res > 0) {
+              message.success(formatMessage({ id: 'oal.common.saveSuccessfully' }));
+              router.push('/workAttendance/rule');
+            }
+          });
+        }
       }
     });
   };
+
+  // checkWorkStartTime = (rule, value, callback) => {
+  //   const { form } = this.props;
+  //   const ruleField = rule.field;
+  //   const keysIndex = ruleField.substring(ruleField.indexOf('[') + 1, ruleField.indexOf('-'));
+  //   const workStartTime = value.format('HH:mm');
+  //   const times = form.getFieldValue('times');
+  //   const attendanceStartTime = times[`${keysIndex}-1`].format('HH:mm');
+
+  //   if (workStartTime < attendanceStartTime) {
+  //     callback(formatMessage({ id: 'oal.work-rule.attendanceShouldEarlier' }));
+  //   }
+  //   callback();
+  // };
+
+  // checkAttendanceStartTime = (rule, value, callback) => {
+  //   const { form } = this.props;
+  //   const ruleField = rule.field;
+  //   const keysIndex = ruleField.substring(ruleField.indexOf('[') + 1, ruleField.indexOf('-'));
+  //   const attendanceStartTime = value.format('HH:mm');
+  //   const times = form.getFieldValue('times');
+  //   const workStartTime = times[`${keysIndex}-0`].format('HH:mm');
+
+  //   if (workStartTime < attendanceStartTime) {
+  //     callback(formatMessage({ id: 'oal.work-rule.attendanceShouldEarlier' }));
+  //   }
+  //   callback();
+  // };
+
+  // checkWorkEndTime = (rule, value, callback) => {
+  //   const { form } = this.props;
+  //   const ruleField = rule.field;
+  //   const keysIndex = ruleField.substring(ruleField.indexOf('[') + 1, ruleField.indexOf('-'));
+  //   const workEndTime = value.format('HH:mm');
+  //   const times = form.getFieldValue('times');
+  //   const attendanceEndTime = times[`${keysIndex}-3`].format('HH:mm');
+
+  //   if (workEndTime > attendanceEndTime) {
+  //     callback(formatMessage({ id: 'oal.work-rule.attendanceShouldLater' }));
+  //   }
+  //   callback();
+  // };
+
+  // checkAttendanceEndTime = (rule, value, callback) => {
+  //   const { form } = this.props;
+  //   const ruleField = rule.field;
+  //   const keysIndex = ruleField.substring(ruleField.indexOf('[') + 1, ruleField.indexOf('-'));
+  //   const attendanceEndTime = value.format('HH:mm');
+  //   const times = form.getFieldValue('times');
+  //   const workEndTime = times[`${keysIndex}-2`].format('HH:mm');
+
+  //   if (workEndTime > attendanceEndTime) {
+  //     callback(formatMessage({ id: 'oal.work-rule.attendanceShouldLater' }));
+  //   }
+  //   callback();
+  // };
 
   render() {
     const {
@@ -107,11 +208,12 @@ class Demo extends Component {
       >
         <h3 className={styles.timeItemLine}>
           <FormattedMessage id="oal.work-rule.workTime" />
-          {
+          {/* 暂时隐藏 "新增工作时段" */}
+          {/* {
             index === 0 ?
               (keysLen < 3 ? <a onClick={this.add} style={{ fontWeight: 'bold', fontSize: '14px', }}><FormattedMessage id="oal.work-rule.newWorkTime" /></a> : '') :
-              <Icon className="dynamic-delete-button" type="minus-circle-o" onClick={() => this.remove(k)} />
-          }
+              <Icon className="dynamic-delete-button" type="minus-circle-o"  style={{ fontSize: '18px', color: '#FF4D4F' }} onClick={() => this.remove(k)} />
+          } */}
         </h3>
 
         <div className={styles.timeItemLine}>
@@ -120,12 +222,15 @@ class Demo extends Component {
             label={formatMessage({ id: 'oal.work-rule.workStartTime' })}
             key={`${k + '-0'}`}
           >
-            {getFieldDecorator(`time[${k + '-0'}]`, {
+            {getFieldDecorator(`times[${k + '-0'}]`, {
               rules: [
                 {
                   required: true,
                   message: formatMessage({ id: 'oal.work-rule.enterWorkStartTimeTips' })
-                }
+                },
+                // {
+                //   validator: this.checkWorkStartTime,
+                // },
               ],
               // initialValue: moment('12:08', 'HH:mm'), // 8126TODO edit
             })(<TimePicker format={'HH:mm'} />)}
@@ -136,12 +241,15 @@ class Demo extends Component {
             label={formatMessage({ id: 'oal.work-rule.attendanceStartTime' })}
             key={`${k + '-1'}`}
           >
-            {getFieldDecorator(`time[${k + '-1'}]`, {
+            {getFieldDecorator(`times[${k + '-1'}]`, {
               rules: [
                 {
                   required: true,
                   message: formatMessage({ id: 'oal.work-rule.enterWorkStartTimeTips' })
-                }
+                },
+                // {
+                //   validator: this.checkAttendanceStartTime,
+                // },
               ],
             })(<TimePicker format={'HH:mm'} />)}
           </Form.Item>
@@ -153,12 +261,15 @@ class Demo extends Component {
             label={formatMessage({ id: 'oal.work-rule.workEndTime' })}
             key={`${k + '-2'}`}
           >
-            {getFieldDecorator(`time[${k + '-2'}]`, {
+            {getFieldDecorator(`times[${k + '-2'}]`, {
               rules: [
                 {
                   required: true,
                   message: formatMessage({ id: 'oal.work-rule.enterAttendanceStartTimeTips' })
-                }
+                },
+                // {
+                //   validator: this.checkWorkEndTime,
+                // },
               ],
             })(<TimePicker format={'HH:mm'} />)}
           </Form.Item>
@@ -168,12 +279,15 @@ class Demo extends Component {
             label={formatMessage({ id: 'oal.work-rule.attendanceEndTime' })}
             key={`${k + '-3'}`}
           >
-            {getFieldDecorator(`time[${k + '-3'}]`, {
+            {getFieldDecorator(`times[${k + '-3'}]`, {
               rules: [
                 {
                   required: true,
                   message: formatMessage({ id: 'oal.work-rule.enterAttendanceEndTimeTips' })
-                }
+                },
+                // {
+                //   validator: this.checkAttendanceEndTime,
+                // },
               ],
             })(<TimePicker format={'HH:mm'} />)}
           </Form.Item>
