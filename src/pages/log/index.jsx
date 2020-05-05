@@ -156,7 +156,6 @@ class Log extends Component {
         key: 'name',
         dataIndex: 'name',
         ellipsis: true,
-        key: 'name',
         sorter: (a, b) => a.name - b.name,
         sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
       },
@@ -330,9 +329,9 @@ class Log extends Component {
     });
   };
 
-  // 单个/批量删除（人脸信息）
+  // 移除授权
   table_showTableDelModal = (e, bean) => {
-    console.log(8126, '单个/批量删除', bean || this.state.tableSelectedRows);
+    console.log(8126, '移除授权', bean || this.state.tableSelectedRows);
     this.setState({
       tableDelVisible: true,
       tableSelectedBean: bean || {},
@@ -356,7 +355,7 @@ class Log extends Component {
       },
     }).then(res => {
       if (res && res.res > 0) {
-        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+        message.success(formatMessage({ id: 'oal.log.removeSuccessfully' }));
         this.table_closeTableDelModal();
         this.table_loadData();
         callback && callback();
@@ -385,7 +384,6 @@ class Log extends Component {
       deviceListLoading,
       logList,
       logListLoading,
-      treeLoading,
     } = this.props;
     const {
       tableSelectedRows,

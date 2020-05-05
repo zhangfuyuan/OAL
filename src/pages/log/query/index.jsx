@@ -9,13 +9,12 @@ import {
   Row,
   Select,
   message,
-  Badge,
-  Dropdown,
-  Menu,
   Icon,
   Spin,
-  Tree,
-  Tooltip,
+  List,
+  Avatar,
+  Modal,
+  DatePicker,
 } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import router from 'umi/router';
@@ -28,377 +27,264 @@ import StandardTable from '@/components/StandardTable';
 import { SYSTEM_PATH } from '@/utils/constants';
 import styles from './style.less';
 
-const { TreeNode } = Tree;
 const FormItem = Form.Item;
 const { Option } = Select;
+const { RangePicker } = DatePicker;
+const initFormValues = {
+  type: '',
+  date: [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
+};
 
-const statusMap = ['error', 'success'];
-const status = ['oal.common.disable', 'oal.common.enable'];
-
-@connect(({ setting, logQuery, loading }) => ({
-  setting,
+@connect(({ logQuery, loading }) => ({
   logQuery,
-  demoListLoading: loading.effects['logQuery/fetchList'],
+  deviceList: logQuery.deviceList,
+  deviceListLoading: loading.effects['logQuery/getDeviceList'],
+  logQueryList: logQuery.logQueryList,
+  logQueryListLoading: loading.effects['logQuery/fetchLogQuery'],
 }))
-class Demo extends Component {
+class logQuery extends Component {
 
   // constructor(props) {
   //   super(props);
   // }
 
   state = {
-    demoLoading: true,
-    treeData: [],
-    selectedRows: [],
-    formValues: {},
-    page: {
+    listSelectedBean: {},
+    tableSelectedRows: [],
+    formValues: {
+      ...initFormValues,
+    },
+    tablePage: {
       current: 1,
       pageSize: 10,
     },
-    nodeTreeItem: null,
+    sortedInfo: {
+      columnKey: '',
+      order: '', // ascend（正序）、descend（倒序）
+    },
+    tableSelectedBean: {},
+    viewVisible: false,
   };
 
-  ref_leftDom = null;
+  ref_download = null;
 
   componentDidMount() {
-    this.tree_loadData();
-    this.table_loadData();
+    this.list_loadData();
   }
 
   componentWillUnmount() {
-    this.tree_clearMenu();
   }
 
-  /************************************************* Tree *************************************************/
+  /************************************************* List *************************************************/
 
-  tree_loadData = () => {
+  list_loadData = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'logQuery/fetch',
+      type: 'logQuery/getDeviceList',
+      payload: {
+        verity: 1,
+      },
     }).then(res => {
-      if (res && res.res > 0) {
-        this.setState({
-          demoLoading: false,
-          treeData: [
-            { title: 'Expand to load', key: '0' },
-            { title: 'Expand to load', key: '1' },
-            { title: 'Tree Node', key: '2', isLeaf: true },
-          ],
-        });
+      if (res && res.res > 0 && res.data.length > 0) {
+        this.list_handleClickItem(null, res.data[0]);
+      } else {
+        console.log(res);
       }
     }).catch(err => {
       console.log(err);
-    })
-  };
-
-  tree_onLoadData = treeNode =>
-    new Promise(resolve => {
-      if (treeNode.props.children) {
-        resolve();
-        return;
-      }
-      setTimeout(() => {
-        treeNode.props.dataRef.children = [
-          { title: 'Child Node', key: `${treeNode.props.eventKey}-0` },
-          { title: 'Child Node', key: `${treeNode.props.eventKey}-1` },
-        ];
-        this.setState({
-          treeData: [...this.state.treeData],
-        });
-        resolve();
-      }, 1000);
     });
-
-  tree_renderNodes = data =>
-    data.map(item => {
-      if (item.children) {
-        return (
-          <TreeNode title={item.title} key={item.key} dataRef={item}>
-            {this.tree_renderNodes(item.children)}
-          </TreeNode>
-        );
-      }
-      return <TreeNode key={item.key} {...item} dataRef={item} />;
-    });
-
-  tree_onMouseEnter = (e) => {
-    if (this.ref_leftDom && (!this.state.nodeTreeItem || !this.state.nodeTreeItem.isEditing)) {
-      const { left: pLeft, top: pTop } = this.ref_leftDom.getBoundingClientRect();
-      const { left, width, top } = e.event.currentTarget.getBoundingClientRect();
-      const x = left - pLeft + width + this.ref_leftDom.scrollLeft;
-      const y = top - pTop;
-      const { eventKey, dataRef } = e.node.props;
-
-      this.setState({
-        nodeTreeItem: {
-          nodeWidth: width,
-          pageX: x,
-          pageY: y,
-          id: eventKey,
-          dataRef,
-        }
-      });
-    }
   };
 
-  tree_getNodeTreeMenu() {
-    if (this.state.nodeTreeItem) {
-      const { pageX, pageY, isEditing, nodeWidth, dataRef } = { ...this.state.nodeTreeItem };
-      const tmpStyle = {
-        position: 'absolute',
-        maxHeight: 40,
-        textAlign: 'center',
-        left: `${pageX + 10 - (isEditing ? nodeWidth + 10 : 0)}px`,
-        top: `${pageY}px`,
-        display: 'flex',
-        flexDirection: 'row',
-      };
-      const menu = (
-        <div
-          style={tmpStyle}
-          onClick={e => e.stopPropagation()}
-        >
-          {
-            isEditing ?
-              <Input
-                size="small"
-                defaultValue={dataRef && dataRef.title || ''}
-                style={{ width: `${nodeWidth}px`, minWidth: `56px`, marginRight: '10px', }}
-                autoFocus={true}
-                onBlur={this.tree_handleEditSubInput}
-                onPressEnter={this.tree_handleEditSubInput}
-              /> : ''
-          }
-          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleEditSub}>
-            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.modify' })}>
-              <Icon type='edit' />
-            </Tooltip>
-          </div>
-          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleDeleteSub}>
-            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.delete' })}>
-              <Icon type='minus-circle-o' />
-            </Tooltip>
-          </div>
-          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleAddSub}>
-            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.addItems' })}>
-              <Icon type='plus-circle-o' />
-            </Tooltip>
-          </div>
-        </div>
-      );
-
-      return menu;
-    }
-
-    return '';
-  }
-
-  tree_handleAddSub = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click add id :", this.state.nodeTreeItem.id);
-    }
-  };
-
-  tree_handleEditSub = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click edit id :", this.state.nodeTreeItem.id);
-      this.setState({
-        nodeTreeItem: {
-          ...this.state.nodeTreeItem,
-          isEditing: true,
-        },
-      });
-    }
-  };
-
-  tree_handleEditSubInput = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click edit value :", e.target.value);
-      this.state.nodeTreeItem.dataRef.title = e.target.value;
-      this.setState({
-        nodeTreeItem: null,
-        treeData: [...this.state.treeData],
-      });
-    }
-  };
-
-  tree_handleDeleteSub = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click delete id :", this.state.nodeTreeItem.id);
-    }
-  };
-
-  tree_clearMenu = () => {
+  list_handleClickItem = (e, bean) => {
+    console.log(8126, '点击设备', bean);
     this.setState({
-      nodeTreeItem: null,
+      listSelectedBean: bean,
+    }, () => {
+      this.table_loadData();
     });
-  };
-
-  tree_onSelect = (selectedKeys, e) => {
-    console.log('selectedKeys : ', selectedKeys, e);
   };
 
   /************************************************* Table *************************************************/
 
   table_loadData = () => {
     const { dispatch } = this.props;
-    const { page } = this.state;
+    const { tablePage, sortedInfo, formValues, listSelectedBean } = this.state;
     dispatch({
-      type: 'logQuery/fetchList',
+      type: 'logQuery/fetchLogQuery',
       payload: {
-        ...page,
+        ...tablePage,
+        ...sortedInfo,
+        ...formValues,
+        featureState: 'all',
+        deviceId: listSelectedBean._id,
       },
     });
   };
 
   table_handleSelectRows = rows => {
     this.setState({
-      selectedRows: rows,
+      tableSelectedRows: rows,
     });
   };
 
   table_columns = () => {
-    const MoreBtn = ({ item }) => (
-      <Dropdown
-        overlay={
-          <Menu onClick={({ key }) => console.log('Dropdown', key, item)}>
-            <Menu.Item key="modify" disabled={item.state === 0}><FormattedMessage id="oal.common.modify" /></Menu.Item>
-            <Menu.Item key="open" disabled={item.state === 1}><FormattedMessage id="oal.common.enable" /></Menu.Item>
-            <Menu.Item key="close" disabled={item.state === 0}><FormattedMessage id="oal.common.disable" /></Menu.Item>
-          </Menu>
-        }
-      >
-        <a>
-          <FormattedMessage id="oal.common.more" /><Icon type="down" />
-        </a>
-      </Dropdown>
-    );
     const cl = [
       {
-        title: formatMessage({ id: 'oal.org.orgName' }),
+        title: formatMessage({ id: 'oal.common.photo' }),
+        key: 'avatar',
+        width: 100,
+        render: (text, record) => <Avatar src={`${record.imgPath}.jpg?height=64&width=64&mode=fit`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
+      },
+      {
+        title: formatMessage({ id: 'oal.common.fullName' }),
+        key: 'name',
         dataIndex: 'name',
+        ellipsis: true,
+        sorter: (a, b) => a.name - b.name,
+        sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
       },
       {
-        title: formatMessage({ id: 'oal.common.status' }),
-        dataIndex: 'state',
-        render(val) {
-          return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
-        },
+        title: formatMessage({ id: 'oal.log-query.group' }),
+        key: 'group',
+        dataIndex: 'group',
+        render: (text, record) => <span>{record.group && record.group.name || '-'}</span>,
       },
       {
-        title: formatMessage({ id: 'oal.org.path' }),
-        dataIndex: 'path',
-        render: (_text, record) => (
-          <Fragment>
-            <a onClick={() => console.log('path', record.path)}>{record.path}</a>
-          </Fragment>
-        ),
+        title: formatMessage({ id: 'oal.log-query.device' }),
+        key: 'device',
+        dataIndex: 'device',
+        render: (text, record) => <span>{record.device && record.device.name || '-'}</span>,
       },
       {
-        title: formatMessage({ id: 'oal.org.contacts' }),
-        dataIndex: 'contactName',
-        render: (text, record) => <span>{(record && record.contact && record.contact.nickName) || formatMessage({ id: 'oal.org.notFill' })}</span>,
+        title: formatMessage({ id: 'oal.log-query.animalHeat' }),
+        key: 'animalHeat',
+        dataIndex: 'animalHeat',
+        sorter: (a, b) => a.animalHeat - b.animalHeat,
+        sortOrder: this.state.sortedInfo.columnKey === 'animalHeat' && this.state.sortedInfo.order,
       },
       {
-        title: formatMessage({ id: 'oal.common.handle' }),
+        title: formatMessage({ id: 'oal.common.time' }),
+        key: 'time',
+        dataIndex: 'time',
+        sorter: (a, b) => a.time - b.time,
+        sortOrder: this.state.sortedInfo.columnKey === 'time' && this.state.sortedInfo.order,
         width: 150,
-        render: (text, record) => (
-          <Fragment>
-            <a onClick={() => console.log('handle', record)}><FormattedMessage id="oal.common.view" /></a>
-            <Divider type="vertical" />
-            <MoreBtn item={record} />
-          </Fragment>
-        ),
+        render: (text, record) => <span>{record.time || '2020-04-12 15:16'}</span>,
       },
     ];
     return cl;
   };
 
-  table_handleChange = pagination => {
-    const { dispatch } = this.props;
-    const { formValues } = this.state;
-    const params = {
-      current: pagination.current,
-      pageSize: pagination.pageSize,
-      ...formValues,
-    };
-    console.log('table_handleChange', params);
+  table_handleChange = (pagination, filters, sorter) => {
+    this.setState({
+      tablePage: {
+        current: pagination.current,
+        pageSize: pagination.pageSize,
+      },
+      sortedInfo: {
+        columnKey: sorter.columnKey,
+        order: sorter.order,
+      }
+    }, () => {
+      this.table_loadData();
+    });
   };
 
   table_handleSearch = () => {
-    const { form, dispatch } = this.props;
-    const { page } = this.state;
+    const { form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
+      const { date } = fieldsValue;
       this.setState({
-        formValues: fieldsValue,
-        selectedRows: [],
+        formValues: {
+          ...fieldsValue,
+          date: [date[0].format('YYYY-MM-DD'), date[1].format('YYYY-MM-DD')],
+        },
+        tableSelectedRows: [],
+      }, () => {
+        this.table_loadData();
       });
-      const params = {
-        ...page,
-        ...fieldsValue,
-      };
-      console.log('table_handleSearch', params);
     });
   };
 
   table_handleFormReset = () => {
-    const { form, dispatch } = this.props;
+    const { form } = this.props;
     form.resetFields();
-    form.setFieldsValue({});
-    const { page } = this.state;
     this.setState({
-      formValues: {},
+      formValues: {
+        ...initFormValues,
+      },
+      tableSelectedRows: [],
+    }, () => {
+      this.table_loadData();
     });
-    const params = {
-      ...page,
-      pageNo: 1,
-    };
-    console.log('table_handleFormReset', params);
   };
 
   table_renderSimpleForm = () => {
-    const { form, loading } = this.props;
+    const { form, logQueryListLoading } = this.props;
     const { getFieldDecorator } = form;
+    const { formValues } = this.state;
+    const { type, date } = formValues;
     return (
       <Form layout="inline">
         <Row
           gutter={{
             md: 4,
-            lg: 24,
-            xl: 48,
+            lg: 12,
+            xl: 24,
           }}
         >
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label={formatMessage({ id: 'oal.org.orgName' })}>
-              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.org.enterOrgName' })} />)}
-            </FormItem>
-          </Col>
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label={formatMessage({ id: 'oal.org.path' })}>
-              {getFieldDecorator('path')(<Input placeholder={formatMessage({ id: 'oal.org.enterPath' })} />)}
-            </FormItem>
-          </Col>
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label={formatMessage({ id: 'oal.common.status' })}>
-              {getFieldDecorator('state')(
+          <Col xxl={6} xl={6} lg={8} md={8} sm={24}>
+            <FormItem label={formatMessage({ id: 'oal.common.type' })}>
+              {getFieldDecorator('type', {
+                initialValue: type,
+              })(
                 <Select
                   placeholder={formatMessage({ id: 'oal.common.pleaseSelect' })}
                   style={{
                     width: '100%',
                   }}
+                  onChange={this.handleTypeChange}
                 >
                   <Option value=""><FormattedMessage id="oal.common.all" /></Option>
-                  <Option value="0"><FormattedMessage id="oal.common.disable" /></Option>
-                  <Option value="1"><FormattedMessage id="oal.common.enable" /></Option>
+                  <Option value="0"><FormattedMessage id="menu.faceManger.faceGroup" /></Option>
+                  {/* <Option value="1"><FormattedMessage id="menu.faceManger.faceBlacklist" /></Option> */}
+                  <Option value="2"><FormattedMessage id="menu.faceManger.faceVisitor" /></Option>
+                  <Option value="3"><FormattedMessage id="oal.log-query.stranger" /></Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
-          <Col xxl={4} lg={4} md={4} sm={24}>
+          {
+            formValues && formValues.type === '0' ?
+              (<Col xxl={6} xl={6} lg={8} md={8} sm={24}>
+                <FormItem label={formatMessage({ id: 'oal.log-query.selectGroup' })}>
+                  {getFieldDecorator('group')(<Input placeholder={formatMessage({ id: 'oal.log-query.pleaseSelectGroup' })} />)}
+                </FormItem>
+              </Col>) : ''
+          }
+          <Col xxl={6} xl={6} lg={8} md={8} sm={24}>
+            <FormItem label={formatMessage({ id: 'oal.face.search' })}>
+              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
+            </FormItem>
+          </Col>
+          <Col xxl={8} xl={8} lg={12} md={12} sm={24}>
+            <FormItem label="">
+              {getFieldDecorator('date', {
+                initialValue: [moment(date[0], 'YYYY-MM-DD'), moment(date[1], 'YYYY-MM-DD')],
+              })(<RangePicker
+                ranges={{
+                  [formatMessage({ id: 'oal.log-query.today' })]: [moment(), moment()],
+                  [formatMessage({ id: 'oal.log-query.latestWeek' })]: [moment().subtract(1, 'weeks'), moment()],
+                  [formatMessage({ id: 'oal.log-query.latestMonth' })]: [moment().subtract(1, 'months'), moment()],
+                }}
+              />)}
+            </FormItem>
+          </Col>
+          <Col xxl={4} lg={6} md={6} sm={24}>
             <span className={styles.submitButtons}>
-              <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={loading}>
+              <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={logQueryListLoading}>
                 <FormattedMessage id="oal.common.query" />
               </Button>
               <Button
@@ -416,54 +302,118 @@ class Demo extends Component {
     );
   };
 
-  /************************************************* Other *************************************************/
+  handleTypeChange = value => {
+    const { formValues } = this.state;
 
+    this.setState({
+      formValues: {
+        ...formValues,
+        type: value,
+      }
+    })
+  };
 
+  handleExport = () => {
+    const { dispatch } = this.props;
+    const { sortedInfo, formValues, listSelectedBean } = this.state;
+
+    // 8126TODO 需对接
+    dispatch({
+      type: 'logQuery/export',
+      payload: {
+        ...sortedInfo,
+        ...formValues,
+        featureState: 'all',
+        deviceId: listSelectedBean._id,
+      },
+    }).then(res => {
+      if (res && res.res > 0) {
+        if (this.ref_download) {
+          this.ref_download.href = res.data.length > 0 ? res.data : `http://lango-tech.com/XBH/lango19/data/users.zip`;
+          this.ref_download.click();
+        }
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
+  };
+
+  // 放大查看（人脸图片）
+  table_openViewModal = bean => {
+    this.setState({ viewVisible: true, tableSelectedBean: bean })
+  };
+
+  table_closeViewModal = () => {
+    this.setState({ viewVisible: false, tableSelectedBean: {} })
+  };
 
   /************************************************ Render ************************************************/
 
   render() {
     const {
-      logQuery: { demoList },
-      demoListLoading,
+      deviceList,
+      deviceListLoading,
+      logQueryList,
+      logQueryListLoading,
     } = this.props;
+    const {
+      tableSelectedRows,
+      listSelectedBean,
+      tableSelectedBean,
+      viewVisible,
+    } = this.state;
+
+    logQueryList && logQueryList.pagination && (logQueryList.pagination.showTotal = (total, range) => (formatMessage({
+      id: 'oal.log.currentToTotal',
+    }, {
+      total,
+    })));
 
     return (
       <PageHeaderWrapper title=" " className={styles.myPageHeaderWrapper} >
         <Card bordered={false}>
           <div className={styles.main} >
-            <div
-              className={styles.left}
-              ref={ref => { this.ref_leftDom = ref; }}
-              onClick={this.tree_clearMenu}
-            >
-              <Spin spinning={this.state.demoLoading} />
-              <Tree
-                loadData={this.tree_onLoadData}
-                showLine={true}
-                // blockNode={true}
-                onMouseEnter={this.tree_onMouseEnter}
-                onSelect={this.tree_onSelect}
-              >
-                {this.tree_renderNodes(this.state.treeData)}
-              </Tree>
-              {this.state.nodeTreeItem ? this.tree_getNodeTreeMenu() : ''}
+            <div className={styles.left}>
+              {
+                deviceListLoading ?
+                  <Spin spinning={deviceListLoading} /> :
+                  (<List
+                    itemLayout="horizontal"
+                    split={false}
+                    dataSource={[...deviceList, ...deviceList, ...deviceList]}
+                    renderItem={(item, index) => (
+                      <List.Item>
+                        <List.Item.Meta
+                          avatar={<Icon type="tablet" theme={listSelectedBean._id === item._id ? "twoTone" : "outlined"} style={{ fontSize: '16px', }} />}
+                          title={<a className={`oal-list-content ${listSelectedBean._id === item._id ? "active" : ""}`}>{item.name}</a>}
+                          onClick={(e) => this.list_handleClickItem(e, item)}
+                        />
+                      </List.Item>
+                    )}
+                  />)
+              }
             </div>
 
             <div className={styles.right}>
               <div className={styles.tableListForm}>{this.table_renderSimpleForm()}</div>
               <div className={styles.tableListOperator}>
-                <Button icon="plus" type="primary" onClick={() => console.log('plus')}>
-                  <FormattedMessage id="oal.common.new" />
+                <Button
+                  type="primary"
+                  onClick={this.handleExport}
+                >
+                  <FormattedMessage id="oal.common.export" />
                 </Button>
+                <a ref={el => { this.ref_download = el }} href="" />
               </div>
               <StandardTable
                 // eslint-disable-next-line no-underscore-dangle
                 rowKey={record => record._id}
                 needRowSelection={false}
-                selectedRows={this.state.selectedRows}
-                loading={demoListLoading}
-                data={demoList}
+                selectedRows={tableSelectedRows}
+                loading={logQueryListLoading}
+                data={logQueryList}
                 columns={this.table_columns()}
                 onSelectRow={this.table_handleSelectRows}
                 onChange={this.table_handleChange}
@@ -471,9 +421,18 @@ class Demo extends Component {
             </div>
           </div>
         </Card>
+
+        <Modal
+          title={tableSelectedBean.name}
+          visible={viewVisible}
+          footer={null}
+          onCancel={this.table_closeViewModal}
+        >
+          <img src={tableSelectedBean.imgPath} alt="" style={{ width: '100%', height: '100%' }} />
+        </Modal>
       </PageHeaderWrapper>
     );
   }
 }
 
-export default Form.create()(Demo);
+export default Form.create()(logQuery);

@@ -5,12 +5,12 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 const TableDelModal = props => {
   const { bean, visible, handleSubmit, handleCancel } = props;
 
-  let title = formatMessage({ id: 'oal.common.delete' });
+  let title = formatMessage({ id: 'oal.log.remove' });
   if (bean && bean.length > 0) {
     if (bean.length === 1) {
-      title = `${formatMessage({ id: 'oal.common.delete' })}(${bean && bean[0] && bean[0].name || '--'})`;
+      title = `${formatMessage({ id: 'oal.log.remove' })}(${bean && bean[0] && bean[0].name || '--'})`;
     } else {
-      title = formatMessage({ id: 'oal.device.deleteDeviceTitle' }, { num: bean.length });
+      title = formatMessage({ id: 'oal.log.removeAuthoryTitle' }, { num: bean.length });
     }
   }
 
@@ -22,10 +22,10 @@ const TableDelModal = props => {
       onOk={() => handleSubmit()}
       onCancel={handleCancel}
       maskClosable={false}
-      okText={formatMessage({ id: 'oal.common.delete' })}
+      okText={formatMessage({ id: 'oal.log.remove' })}
       okType="danger"
     >
-      <p><FormattedMessage id="oal.face-visitor.deleteConfirm" /></p>
+      <p><FormattedMessage id="oal.log.removeAuthoryConfirm" /></p>
     </Modal>
   );
 };

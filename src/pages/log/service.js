@@ -23,7 +23,7 @@ export async function ajaxLog(data) {
  * @param query
  * @returns {Promise<*>}
  */
-export async function getDeviceList(data) {
+export async function ajaxDeviceList(data) {
   return get(`/api/device/list/${data.verity}`);
 }
 

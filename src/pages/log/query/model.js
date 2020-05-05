@@ -1,48 +1,55 @@
-import { demoAjax1, demoAjax2 } from './service';
+import { ajaxTest, ajaxLogQuery, ajaxDeviceList } from './service';
 
 const Model = {
   namespace: 'logQuery',
   state: {
-    demoState: {},
-    demoList: {},
+    deviceList: [],
+    logQueryList: [],
   },
   effects: {
-    *fetch({ payload }, { call, put, select }) {
-      const response = yield call(demoAjax1);
+    // 获取设备列表
+    *getDeviceList({ payload }, { call, put }) {
+      const response = yield call(ajaxDeviceList, payload);
+      if (response.res > 0) {
+        yield put({
+          type: 'saveDeviceList',
+          payload: response.data,
+        });
+      }
+      return Promise.resolve(response);
+    },
+    // 获取设备对应的记录查询
+    *fetchLogQuery({ payload }, { call, put, select }) {
+      console.log(8126, '获取设备对应的记录查询', payload);
+      const response = yield call(ajaxLogQuery, payload);
 
       if (response.res > 0) {
         yield put({
-          type: 'save',
+          type: 'saveLogQueryList',
           payload: response.data,
         });
       }
 
       return Promise.resolve(response);
     },
-    *fetchList({ payload }, { call, put, select }) {
-      const response = yield call(demoAjax2, payload);
-
-      if (response.res > 0) {
-        yield put({
-          type: 'saveList',
-          payload: response.data,
-        });
-      }
-
+    // 导出
+    *export({ payload }, { call, put, select }) {
+      console.log(8126, '导出', payload);
+      const response = yield call(ajaxTest, payload);
       return Promise.resolve(response);
     },
   },
   reducers: {
-    save(state, action) {
+    saveLogQueryList(state, action) {
       return {
         ...state,
-        demoState: action.payload,
+        logQueryList: action.payload,
       };
     },
-    saveList(state, action) {
+    saveDeviceList(state, action) {
       return {
         ...state,
-        demoList: action.payload,
+        deviceList: action.payload,
       };
     },
   },

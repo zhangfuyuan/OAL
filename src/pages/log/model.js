@@ -1,4 +1,4 @@
-import { ajaxTest, ajaxLog, getDeviceList, ajaxUser } from './service';
+import { ajaxTest, ajaxLog, ajaxDeviceList } from './service';
 
 const Model = {
   namespace: 'log',
@@ -9,7 +9,7 @@ const Model = {
   effects: {
     // 获取设备列表
     *getDeviceList({ payload }, { call, put }) {
-      const response = yield call(getDeviceList, payload);
+      const response = yield call(ajaxDeviceList, payload);
       if (response.res > 0) {
         yield put({
           type: 'saveDeviceList',
@@ -81,11 +81,11 @@ const Model = {
       return Promise.resolve(response);
     },
     // 根据分组节点获取对应用户列表
-    *fetchUsersByNode({ payload }, { call, put, select }) {
-      console.log(8126, '根据分组节点获取对应用户列表', payload);
-      const response = yield call(ajaxUser, payload);
-      return Promise.resolve(response);
-    },
+    // *fetchUsersByNode({ payload }, { call, put, select }) {
+    //   console.log(8126, '根据分组节点获取对应用户列表', payload);
+    //   const response = yield call(ajaxUser, payload);
+    //   return Promise.resolve(response);
+    // },
     // 移除授权
     *delAuthory({ payload }, { call, put, select }) {
       console.log(8126, '移除授权', payload);
