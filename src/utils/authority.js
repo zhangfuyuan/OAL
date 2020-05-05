@@ -1,3 +1,5 @@
+import { Icon } from 'antd';
+
 // use localStorage to store the authority info, which might be sent from server in actual project.
 export function getAuthority(str) {
   // return localStorage.getItem('antd-pro-authority') || ['admin', 'user'];
@@ -47,7 +49,7 @@ export function getPermissionRoutes(userType, orgType) {
         path: '/org',
         name: 'orgManger',
         locale: 'menu.orgManger',
-        icon: 'idcard',
+        icon: 'apartment',
       },
       {
         path: '/userManagement',
@@ -66,13 +68,19 @@ export function getPermissionRoutes(userType, orgType) {
         path: '/device',
         name: 'device',
         locale: 'menu.device',
-        icon: 'hdd',
+        icon: 'tablet',
       },
       {
         path: '/face',
         name: 'faceManger',
         locale: 'menu.faceManger',
-        icon: 'smile',
+        icon: <Icon component={() => (
+          <img
+            style={{ width: '1em', height: 'auto', marginTop: '-7px', }}
+            src={require('@/assets/menu_face.png')}
+            alt="icon"
+          />
+        )} />,
         routes: [
           {
             path: '/face/group',
@@ -95,7 +103,13 @@ export function getPermissionRoutes(userType, orgType) {
         path: '/log',
         name: 'log',
         locale: 'menu.log',
-        icon: 'global',
+        icon: <Icon component={() => (
+          <img
+            style={{ width: '1em', height: 'auto', marginTop: '-7px', }}
+            src={require('@/assets/menu_log.png')}
+            alt="icon"
+          />
+        )} />,
         routes: [
           {
             path: '/log/authory',
@@ -113,7 +127,7 @@ export function getPermissionRoutes(userType, orgType) {
         path: '/workAttendance',
         name: 'workAttendance',
         locale: 'menu.workAttendance',
-        icon: 'table',
+        icon: 'carry-out',
         routes: [
           {
             path: '/workAttendance/rule',
@@ -161,7 +175,7 @@ export function getPermissionRoutes(userType, orgType) {
     //       path: '/org',
     //       name: 'orgManger',
     //       locale: 'menu.orgManger',
-    //       icon: 'idcard',
+    //       icon: 'apartment',
     //     },
     //     {
     //       path: '/settings',
@@ -185,13 +199,19 @@ export function getPermissionRoutes(userType, orgType) {
         path: '/device',
         name: 'device',
         locale: 'menu.device',
-        icon: 'hdd',
+        icon: 'tablet',
       },
       {
         path: '/face',
         name: 'faceManger',
         locale: 'menu.faceManger',
-        icon: 'smile',
+        icon: <Icon component={() => (
+          <img
+            style={{ width: '1em', height: 'auto', marginTop: '-7px', }}
+            src={require('@/assets/menu_face.png')}
+            alt="icon"
+          />
+        )} />,
         routes: [
           {
             path: '/face/group',
@@ -214,7 +234,13 @@ export function getPermissionRoutes(userType, orgType) {
         path: '/log',
         name: 'log',
         locale: 'menu.log',
-        icon: 'global',
+        icon: <Icon component={() => (
+          <img
+            style={{ width: '1em', height: 'auto', marginTop: '-7px', }}
+            src={require('@/assets/menu_log.png')}
+            alt="icon"
+          />
+        )} />,
         routes: [
           {
             path: '/log/authory',
@@ -232,7 +258,7 @@ export function getPermissionRoutes(userType, orgType) {
         path: '/workAttendance',
         name: 'workAttendance',
         locale: 'menu.workAttendance',
-        icon: 'table',
+        icon: 'carry-out',
         routes: [
           {
             path: '/workAttendance/rule',
