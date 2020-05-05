@@ -1,25 +1,14 @@
 import { demoAjax1, demoAjax2 } from './service';
 
 const Model = {
-  namespace: 'workAttendanceRecord',
+  namespace: 'attendanceRecord',
   state: {
-    demoState: {},
-    demoList: {},
+    recordList: [],
   },
   effects: {
-    *fetch({ payload }, { call, put, select }) {
-      const response = yield call(demoAjax1);
-
-      if (response.res > 0) {
-        yield put({
-          type: 'save',
-          payload: response.data,
-        });
-      }
-
-      return Promise.resolve(response);
-    },
+    // 获取统计列表
     *fetchList({ payload }, { call, put, select }) {
+      console.log(8126, '获取统计列表', payload);
       const response = yield call(demoAjax2, payload);
 
       if (response.res > 0) {
@@ -31,18 +20,40 @@ const Model = {
 
       return Promise.resolve(response);
     },
+    // 获取考勤规则选项
+    *fetchAttendanceRuleList({ payload }, { call, put, select }) {
+      console.log(8126, '获取考勤规则选项', payload);
+      const response = yield call(demoAjax1, payload);
+      return Promise.resolve({
+        ...response,
+        data: [
+          {
+            ruleName: '考勤规则1',
+            _id: '1',
+          },
+          {
+            ruleName: '考勤规则2',
+            _id: '2',
+          },
+          {
+            ruleName: '考勤规则3',
+            _id: '3',
+          },
+        ]
+      });
+    },
+    // 导出
+    *export({ payload }, { call, put, select }) {
+      console.log(8126, '导出', payload);
+      const response = yield call(demoAjax1, payload);
+      return Promise.resolve(response);
+    },
   },
   reducers: {
-    save(state, action) {
-      return {
-        ...state,
-        demoState: action.payload,
-      };
-    },
     saveList(state, action) {
       return {
         ...state,
-        demoList: action.payload,
+        recordList: action.payload,
       };
     },
   },

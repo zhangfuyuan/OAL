@@ -460,4 +460,12 @@ export default {
   'oal.log-query.today': 'Today',
   'oal.log-query.latestWeek': 'Latest week',
   'oal.log-query.latestMonth': 'Latest month',
+  'oal.work-statistics.department': 'Department',
+  'oal.work-statistics.normal': 'Normal',
+  'oal.work-statistics.late': 'Late',
+  'oal.work-statistics.early': 'Early',
+  'oal.work-statistics.absence': 'Absence',
+  'oal.work-statistics.pleaseSelectAttendanceRule': 'Please select the attendance rule',
+  'oal.work-statistics.currentToTotal': 'There are {total} records',
+  'oal.work-record.attendanceTime': 'Attendance time',
 };

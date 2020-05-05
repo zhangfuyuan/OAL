@@ -9,13 +9,9 @@ import {
   Row,
   Select,
   message,
-  Badge,
-  Dropdown,
-  Menu,
   Icon,
   Spin,
-  Tree,
-  Tooltip,
+  DatePicker,
 } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import router from 'umi/router';
@@ -27,380 +23,343 @@ import moment from 'moment';
 import StandardTable from '@/components/StandardTable';
 import { SYSTEM_PATH } from '@/utils/constants';
 import styles from './style.less';
+// import DetailModal from './components/DetailModal';
 import { getPageQuery } from '@/utils/utils';
 
-const { TreeNode } = Tree;
 const FormItem = Form.Item;
 const { Option } = Select;
+const { RangePicker } = DatePicker;
+const initFormValues = {
+  date: [moment().subtract(1, 'days').format('YYYY-MM-DD'), moment().subtract(1, 'days').format('YYYY-MM-DD')],
+};
 
-const statusMap = ['error', 'success'];
-const status = ['oal.common.disable', 'oal.common.enable'];
+// 8126TODO 需要对接
+const getWorkStatus = bean => {
+  const { workRule, record } = bean;
+  const {
+    workStartTime: ruleWorkStartTime,
+    workEndTime: ruleWorkEndTime,
+  } = workRule || { workStartTime: '09:00', workEndTime: '18:00' };
+  const {
+    workStartTime: recordWorkStartTime,
+    workEndTime: recordWorkEndTime,
+  } = record || { workStartTime: '10:00:00', workEndTime: '10:00:22' };
+  let res = [];
 
-@connect(({ setting, workAttendanceRecord, loading }) => ({
-  setting,
-  workAttendanceRecord,
-  demoListLoading: loading.effects['workAttendanceRecord/fetchList'],
+  if (!recordWorkStartTime || !recordWorkEndTime) {
+    res.push(formatMessage({ id: 'oal.work-statistics.absence' }));
+  } else {
+    if (recordWorkStartTime > ruleWorkStartTime) {
+      res.push(formatMessage({ id: 'oal.work-statistics.late' }));
+    }
+
+    if (recordWorkEndTime < ruleWorkEndTime) {
+      res.push(formatMessage({ id: 'oal.work-statistics.early' }));
+    }
+  }
+
+  if (res.length === 0) {
+    res.push(formatMessage({ id: 'oal.work-statistics.normal' }));
+  }
+
+  return res.join('、');
+};
+
+@connect(({ attendanceRecord, loading }) => ({
+  attendanceRecord,
+  listLoading: loading.effects['attendanceRecord/fetchList'],
 }))
-class Demo extends Component {
+class AttendanceRecord extends Component {
 
   // constructor(props) {
   //   super(props);
   // }
 
   state = {
-    demoLoading: true,
-    treeData: [],
-    selectedRows: [],
-    formValues: {},
-    page: {
+    tableSelectedRows: [],
+    tableSelectedBean: {},
+    formValues: (() => {
+      let res = null;
+      const { ruleId, name, date, status } = getPageQuery() || {};
+
+      if (name) {
+        const [sDate, eDate] = date && date.split('~') || initFormValues.date;
+
+        // 从 "考勤统计" 跳转过来
+        res = {
+          ruleId,
+          name,
+          date: sDate && eDate ? [sDate, eDate] : initFormValues.date,
+          status,
+        }
+      } else {
+        res = { ...initFormValues };
+      }
+      console.log(8126, res);
+      return res;
+    })(),
+    tablePage: {
       current: 1,
       pageSize: 10,
     },
-    nodeTreeItem: null,
-    ruleId: getPageQuery().ruleId, // 8126TODO
+    sortedInfo: {
+      columnKey: '',
+      order: '', // ascend（正序）、descend（倒序）
+    },
+    // viewVisible: false,
+    attendanceRuleList: [],
   };
 
-  ref_leftDom = null;
+  ref_download = null;
 
   componentDidMount() {
-    this.tree_loadData();
     this.table_loadData();
-  }
 
-  componentWillUnmount() {
-    this.tree_clearMenu();
-  }
-
-  /************************************************* Tree *************************************************/
-
-  tree_loadData = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'workAttendanceRecord/fetch',
+      type: 'attendanceRecord/fetchAttendanceRuleList',
+      payload: {},
     }).then(res => {
-      if (res && res.res > 0) {
+      if (res && res.res > 0 && res.data.length > 0) {
         this.setState({
-          demoLoading: false,
-          treeData: [
-            { title: 'Expand to load', key: '0' },
-            { title: 'Expand to load', key: '1' },
-            { title: 'Tree Node', key: '2', isLeaf: true },
-          ],
+          attendanceRuleList: res.data,
         });
+      } else {
+        console.log(res);
       }
     }).catch(err => {
       console.log(err);
-    })
-  };
-
-  tree_onLoadData = treeNode =>
-    new Promise(resolve => {
-      if (treeNode.props.children) {
-        resolve();
-        return;
-      }
-      setTimeout(() => {
-        treeNode.props.dataRef.children = [
-          { title: 'Child Node', key: `${treeNode.props.eventKey}-0` },
-          { title: 'Child Node', key: `${treeNode.props.eventKey}-1` },
-        ];
-        this.setState({
-          treeData: [...this.state.treeData],
-        });
-        resolve();
-      }, 1000);
     });
-
-  tree_renderNodes = data =>
-    data.map(item => {
-      if (item.children) {
-        return (
-          <TreeNode title={item.title} key={item.key} dataRef={item}>
-            {this.tree_renderNodes(item.children)}
-          </TreeNode>
-        );
-      }
-      return <TreeNode key={item.key} {...item} dataRef={item} />;
-    });
-
-  tree_onMouseEnter = (e) => {
-    if (this.ref_leftDom && (!this.state.nodeTreeItem || !this.state.nodeTreeItem.isEditing)) {
-      const { left: pLeft, top: pTop } = this.ref_leftDom.getBoundingClientRect();
-      const { left, width, top } = e.event.currentTarget.getBoundingClientRect();
-      const x = left - pLeft + width + this.ref_leftDom.scrollLeft;
-      const y = top - pTop;
-      const { eventKey, dataRef } = e.node.props;
-
-      this.setState({
-        nodeTreeItem: {
-          nodeWidth: width,
-          pageX: x,
-          pageY: y,
-          id: eventKey,
-          dataRef,
-        }
-      });
-    }
-  };
-
-  tree_getNodeTreeMenu() {
-    if (this.state.nodeTreeItem) {
-      const { pageX, pageY, isEditing, nodeWidth, dataRef } = { ...this.state.nodeTreeItem };
-      const tmpStyle = {
-        position: 'absolute',
-        maxHeight: 40,
-        textAlign: 'center',
-        left: `${pageX + 10 - (isEditing ? nodeWidth + 10 : 0)}px`,
-        top: `${pageY}px`,
-        display: 'flex',
-        flexDirection: 'row',
-      };
-      const menu = (
-        <div
-          style={tmpStyle}
-          onClick={e => e.stopPropagation()}
-        >
-          {
-            isEditing ?
-              <Input
-                size="small"
-                defaultValue={dataRef && dataRef.title || ''}
-                style={{ width: `${nodeWidth}px`, minWidth: `56px`, marginRight: '10px', }}
-                autoFocus={true}
-                onBlur={this.tree_handleEditSubInput}
-                onPressEnter={this.tree_handleEditSubInput}
-              /> : ''
-          }
-          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleEditSub}>
-            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.modify' })}>
-              <Icon type='edit' />
-            </Tooltip>
-          </div>
-          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleDeleteSub}>
-            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.delete' })}>
-              <Icon type='minus-circle-o' />
-            </Tooltip>
-          </div>
-          <div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_handleAddSub}>
-            <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.addItems' })}>
-              <Icon type='plus-circle-o' />
-            </Tooltip>
-          </div>
-        </div>
-      );
-
-      return menu;
-    }
-
-    return '';
   }
 
-  tree_handleAddSub = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click add id :", this.state.nodeTreeItem.id);
-    }
-  };
-
-  tree_handleEditSub = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click edit id :", this.state.nodeTreeItem.id);
-      this.setState({
-        nodeTreeItem: {
-          ...this.state.nodeTreeItem,
-          isEditing: true,
-        },
-      });
-    }
-  };
-
-  tree_handleEditSubInput = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click edit value :", e.target.value);
-      this.state.nodeTreeItem.dataRef.title = e.target.value;
-      this.setState({
-        nodeTreeItem: null,
-        treeData: [...this.state.treeData],
-      });
-    }
-  };
-
-  tree_handleDeleteSub = (e) => {
-    if (this.state.nodeTreeItem) {
-      console.log("click delete id :", this.state.nodeTreeItem.id);
-    }
-  };
-
-  tree_clearMenu = () => {
-    this.setState({
-      nodeTreeItem: null,
-    });
-  };
-
-  tree_onSelect = (selectedKeys, e) => {
-    console.log('selectedKeys : ', selectedKeys, e);
-  };
+  componentWillUnmount() {
+  }
 
   /************************************************* Table *************************************************/
 
   table_loadData = () => {
     const { dispatch } = this.props;
-    const { page } = this.state;
+    const { tablePage, sortedInfo, formValues } = this.state;
     dispatch({
-      type: 'workAttendanceRecord/fetchList',
+      type: 'attendanceRecord/fetchList',
       payload: {
-        ...page,
+        ...tablePage,
+        ...sortedInfo,
+        ...formValues,
       },
     });
   };
 
   table_handleSelectRows = rows => {
     this.setState({
-      selectedRows: rows,
+      tableSelectedRows: rows,
     });
   };
 
   table_columns = () => {
-    const MoreBtn = ({ item }) => (
-      <Dropdown
-        overlay={
-          <Menu onClick={({ key }) => console.log('Dropdown', key, item)}>
-            <Menu.Item key="modify" disabled={item.state === 0}><FormattedMessage id="oal.common.modify" /></Menu.Item>
-            <Menu.Item key="open" disabled={item.state === 1}><FormattedMessage id="oal.common.enable" /></Menu.Item>
-            <Menu.Item key="close" disabled={item.state === 0}><FormattedMessage id="oal.common.disable" /></Menu.Item>
-          </Menu>
-        }
-      >
-        <a>
-          <FormattedMessage id="oal.common.more" /><Icon type="down" />
-        </a>
-      </Dropdown>
-    );
+    const {
+      sortedInfo: { columnKey, order }
+    } = this.state;
+
     const cl = [
       {
-        title: formatMessage({ id: 'oal.org.orgName' }),
+        title: formatMessage({ id: 'oal.common.date' }),
+        key: 'date',
+        dataIndex: 'date',
+        sorter: (a, b) => a.date - b.date,
+        sortOrder: columnKey === 'date' && order,
+        width: 150,
+        render: (text, record) => <span>{record.updateAt ? moment(record.updateAt).format('YYYY-MM-DD') : '2020-04-21'}</span>,
+      },
+      {
+        title: formatMessage({ id: 'oal.common.fullName' }),
+        key: 'name',
         dataIndex: 'name',
+        ellipsis: true,
+        sorter: (a, b) => a.name - b.name,
+        sortOrder: columnKey === 'name' && order,
+      },
+      {
+        title: formatMessage({ id: 'oal.face.staffid' }),
+        key: 'staffid',
+        dataIndex: 'staffid',
+        render: (text, record) => <span>{record.staffid || '-'}</span>,
+      },
+      {
+        title: formatMessage({ id: 'oal.work-rule.workRule' }),
+        key: 'workRule',
+        dataIndex: 'workRule',
+        sorter: (a, b) => a.workRule - b.workRule,
+        sortOrder: columnKey === 'workRule' && order,
+        render: (text, record) => <span>{record.workRule && record.workRule.ruleName || '-'}</span>,
+      },
+      {
+        title: formatMessage({ id: 'oal.work-rule.workTime' }),
+        key: 'workTime',
+        dataIndex: 'workTime',
+        sorter: (a, b) => a.workRule - b.workRule,
+        sortOrder: columnKey === 'workTime' && order,
+        render: (text, record) => <span>{record.workRule && `${record.workRule.workStartTime}~${record.workRule.workEndTime}` || '9:00-18:00'}</span>,
+      },
+      {
+        title: formatMessage({ id: 'oal.work-rule.workStartTime' }),
+        key: 'recordWorkStartTime',
+        dataIndex: 'recordWorkStartTime',
+        sorter: (a, b) => a.recordWorkStartTime - b.recordWorkStartTime,
+        sortOrder: columnKey === 'recordWorkStartTime' && order,
+        render: (text, record) => <span>{record.recordWorkStartTime || '11:00:02'}</span>,
+      },
+      {
+        title: formatMessage({ id: 'oal.work-rule.workEndTime' }),
+        key: 'recordWorkEndTime',
+        dataIndex: 'recordWorkEndTime',
+        sorter: (a, b) => a.recordWorkEndTime - b.recordWorkEndTime,
+        sortOrder: columnKey === 'recordWorkEndTime' && order,
+        render: (text, record) => <span>{record.recordWorkEndTime || '16:00:22'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.status' }),
-        dataIndex: 'state',
-        render(val) {
-          return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
-        },
+        key: 'status',
+        dataIndex: 'status',
+        render: (text, record) => <span>{getWorkStatus(record)}</span>,
       },
-      {
-        title: formatMessage({ id: 'oal.org.path' }),
-        dataIndex: 'path',
-        render: (_text, record) => (
-          <Fragment>
-            <a onClick={() => console.log('path', record.path)}>{record.path}</a>
-          </Fragment>
-        ),
-      },
-      {
-        title: formatMessage({ id: 'oal.org.contacts' }),
-        dataIndex: 'contactName',
-        render: (text, record) => <span>{(record && record.contact && record.contact.nickName) || formatMessage({ id: 'oal.org.notFill' })}</span>,
-      },
-      {
-        title: formatMessage({ id: 'oal.common.handle' }),
-        width: 150,
-        render: (text, record) => (
-          <Fragment>
-            <a onClick={() => console.log('handle', record)}><FormattedMessage id="oal.common.view" /></a>
-            <Divider type="vertical" />
-            <MoreBtn item={record} />
-          </Fragment>
-        ),
-      },
+      // {
+      //   title: formatMessage({ id: 'oal.common.handle' }),
+      //   width: 100,
+      //   render: (text, record) => (
+      //     <Fragment>
+      //       <a onClick={() => this.table_showViewModal(record)}><FormattedMessage id="oal.common.view" /></a>
+      //     </Fragment>
+      //   ),
+      // },
     ];
     return cl;
   };
 
-  table_handleChange = pagination => {
-    const { dispatch } = this.props;
-    const { formValues } = this.state;
-    const params = {
-      current: pagination.current,
-      pageSize: pagination.pageSize,
-      ...formValues,
-    };
-    console.log('table_handleChange', params);
+  table_handleChange = (pagination, filters, sorter) => {
+    this.setState({
+      tablePage: {
+        current: pagination.current,
+        pageSize: pagination.pageSize,
+      },
+      sortedInfo: {
+        columnKey: sorter.columnKey,
+        order: sorter.order,
+      }
+    }, () => {
+      this.table_loadData();
+    });
   };
 
   table_handleSearch = () => {
-    const { form, dispatch } = this.props;
-    const { page } = this.state;
+    const { form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
+      const { date } = fieldsValue;
       this.setState({
-        formValues: fieldsValue,
-        selectedRows: [],
+        formValues: {
+          ...fieldsValue,
+          date: date[0] && [date[0].format('YYYY-MM-DD'), date[1].format('YYYY-MM-DD')] || [],
+        },
+        tableSelectedRows: [],
+      }, () => {
+        this.table_loadData();
       });
-      const params = {
-        ...page,
-        ...fieldsValue,
-      };
-      console.log('table_handleSearch', params);
     });
   };
 
   table_handleFormReset = () => {
-    const { form, dispatch } = this.props;
+    const { form } = this.props;
     form.resetFields();
-    form.setFieldsValue({});
-    const { page } = this.state;
     this.setState({
-      formValues: {},
+      formValues: {
+        ...initFormValues,
+      },
+      tableSelectedRows: [],
+    }, () => {
+      this.table_loadData();
     });
-    const params = {
-      ...page,
-      pageNo: 1,
-    };
-    console.log('table_handleFormReset', params);
   };
 
   table_renderSimpleForm = () => {
-    const { form, loading } = this.props;
+    const { form, listLoading } = this.props;
     const { getFieldDecorator } = form;
+    const { formValues, attendanceRuleList } = this.state;
+    const { ruleId, name, date, status } = formValues;
     return (
       <Form layout="inline">
         <Row
           gutter={{
             md: 4,
-            lg: 24,
-            xl: 48,
+            lg: 12,
+            xl: 24,
           }}
         >
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label={formatMessage({ id: 'oal.org.orgName' })}>
-              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.org.enterOrgName' })} />)}
-            </FormItem>
-          </Col>
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label={formatMessage({ id: 'oal.org.path' })}>
-              {getFieldDecorator('path')(<Input placeholder={formatMessage({ id: 'oal.org.enterPath' })} />)}
-            </FormItem>
-          </Col>
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label={formatMessage({ id: 'oal.common.status' })}>
-              {getFieldDecorator('state')(
+          {
+            attendanceRuleList && attendanceRuleList.length > 0 ?
+              (<Col xxl={4} xl={5} lg={6} md={8} sm={24}>
+                <FormItem label="">
+                  {getFieldDecorator('attendanceRule', {
+                    initialValue: ruleId,
+                  })(
+                    <Select
+                      placeholder={formatMessage({ id: 'oal.work-statistics.pleaseSelectAttendanceRule' })}
+                      style={{
+                        width: '100%',
+                      }}
+                    >
+                      {
+                        attendanceRuleList.map(item => <Option key={item._id} value={item._id}>{item.ruleName}</Option>)
+                      }
+                    </Select>,
+                  )}
+                </FormItem>
+              </Col>) : ''
+          }
+          <Col xxl={3} xl={3} lg={4} md={6} sm={24}>
+            <FormItem label="">
+              {getFieldDecorator('status', {
+                initialValue: status,
+              })(
                 <Select
-                  placeholder={formatMessage({ id: 'oal.common.pleaseSelect' })}
+                  placeholder={formatMessage({ id: 'oal.common.status' })}
                   style={{
                     width: '100%',
                   }}
                 >
                   <Option value=""><FormattedMessage id="oal.common.all" /></Option>
-                  <Option value="0"><FormattedMessage id="oal.common.disable" /></Option>
-                  <Option value="1"><FormattedMessage id="oal.common.enable" /></Option>
+                  <Option value="0"><FormattedMessage id="oal.work-statistics.normal" /></Option>
+                  <Option value="1"><FormattedMessage id="oal.work-statistics.late" /></Option>
+                  <Option value="2"><FormattedMessage id="oal.work-statistics.early" /></Option>
+                  <Option value="3"><FormattedMessage id="oal.work-statistics.absence" /></Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
-          <Col xxl={4} lg={4} md={4} sm={24}>
+          <Col xxl={6} xl={8} lg={12} md={12} sm={24}>
+            <FormItem label="">
+              {getFieldDecorator('date', {
+                initialValue: [moment(date[0], 'YYYY-MM-DD'), moment(date[1], 'YYYY-MM-DD')],
+              })(<RangePicker
+                ranges={{
+                  [formatMessage({ id: 'oal.log-query.today' })]: [moment(), moment()],
+                  [formatMessage({ id: 'oal.log-query.latestWeek' })]: [moment().subtract(1, 'weeks'), moment()],
+                  [formatMessage({ id: 'oal.log-query.latestMonth' })]: [moment().subtract(1, 'months'), moment()],
+                }}
+              />)}
+            </FormItem>
+          </Col>
+          <Col xxl={4} xl={5} lg={6} md={8} sm={24}>
+            <FormItem label={formatMessage({ id: 'oal.common.fullName' })}>
+              {getFieldDecorator('name', {
+                initialValue: name,
+              })(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
+            </FormItem>
+          </Col>
+          <Col xxl={4} lg={6} md={6} sm={24}>
             <span className={styles.submitButtons}>
-              <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={loading}>
+              <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={listLoading}>
                 <FormattedMessage id="oal.common.query" />
               </Button>
               <Button
@@ -418,54 +377,81 @@ class Demo extends Component {
     );
   };
 
-  /************************************************* Other *************************************************/
+  handleExport = () => {
+    const { dispatch } = this.props;
+    const { sortedInfo, formValues, listSelectedBean } = this.state;
 
+    // 8126TODO 需对接
+    dispatch({
+      type: 'attendanceRecord/export',
+      payload: {
+        ...sortedInfo,
+        ...formValues,
+      },
+    }).then(res => {
+      if (res && res.res > 0) {
+        if (this.ref_download) {
+          this.ref_download.href = res.data.length > 0 ? res.data : `http://lango-tech.com/XBH/lango19/data/users.zip`;
+          this.ref_download.click();
+        }
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
+  };
 
+  // 查看
+  // table_showViewModal = bean => {
+  //   this.setState({ viewVisible: true, tableSelectedBean: bean })
+  // };
+
+  // table_closeViewModal = () => {
+  //   this.setState({ viewVisible: false, tableSelectedBean: {} })
+  // };
 
   /************************************************ Render ************************************************/
 
   render() {
     const {
-      workAttendanceRecord: { demoList },
-      demoListLoading,
+      attendanceRecord: { recordList },
+      listLoading,
     } = this.props;
+    const {
+      tableSelectedRows,
+      // viewVisible,
+      tableSelectedBean,
+    } = this.state;
+
+    recordList && recordList.pagination && (recordList.pagination.showTotal = (total, range) => (formatMessage({
+      id: 'oal.work-statistics.currentToTotal',
+    }, {
+      total,
+    })));
 
     return (
       <PageHeaderWrapper title=" " className={styles.myPageHeaderWrapper} >
         <Card bordered={false}>
           <div className={styles.main} >
-            <div
-              className={styles.left}
-              ref={ref => { this.ref_leftDom = ref; }}
-              onClick={this.tree_clearMenu}
-            >
-              <Spin spinning={this.state.demoLoading} />
-              <Tree
-                loadData={this.tree_onLoadData}
-                showLine={true}
-                // blockNode={true}
-                onMouseEnter={this.tree_onMouseEnter}
-                onSelect={this.tree_onSelect}
-              >
-                {this.tree_renderNodes(this.state.treeData)}
-              </Tree>
-              {this.state.nodeTreeItem ? this.tree_getNodeTreeMenu() : ''}
-            </div>
-
             <div className={styles.right}>
               <div className={styles.tableListForm}>{this.table_renderSimpleForm()}</div>
               <div className={styles.tableListOperator}>
-                <Button icon="plus" type="primary" onClick={() => console.log('plus')}>
-                  <FormattedMessage id="oal.common.new" />
+                <Button
+                  type="primary"
+                  onClick={this.handleExport}
+                >
+                  <FormattedMessage id="oal.common.export" />
                 </Button>
+                <a ref={el => { this.ref_download = el }} href="" />
               </div>
               <StandardTable
                 // eslint-disable-next-line no-underscore-dangle
                 rowKey={record => record._id}
                 needRowSelection={false}
-                selectedRows={this.state.selectedRows}
-                loading={demoListLoading}
-                data={demoList}
+                selectedRows={tableSelectedRows}
+                loading={listLoading}
+                data={recordList}
                 columns={this.table_columns()}
                 onSelectRow={this.table_handleSelectRows}
                 onChange={this.table_handleChange}
@@ -473,9 +459,16 @@ class Demo extends Component {
             </div>
           </div>
         </Card>
+
+        {/* <DetailModal
+          visible={viewVisible}
+          bean={tableSelectedBean}
+          handleCancel={this.table_closeViewModal}
+          handleSubmit={this.table_closeViewModal}
+        /> */}
       </PageHeaderWrapper>
     );
   }
 }
 
-export default Form.create()(Demo);
+export default Form.create()(AttendanceRecord);

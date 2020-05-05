@@ -460,4 +460,12 @@ export default {
   'oal.log-query.today': '今天',
   'oal.log-query.latestWeek': '最近一周',
   'oal.log-query.latestMonth': '最近一个月',
+  'oal.work-statistics.department': '部门',
+  'oal.work-statistics.normal': '正常',
+  'oal.work-statistics.late': '迟到',
+  'oal.work-statistics.early': '早退',
+  'oal.work-statistics.absence': '缺勤',
+  'oal.work-statistics.pleaseSelectAttendanceRule': '请选择考勤规则',
+  'oal.work-statistics.currentToTotal': '总共 {total} 条记录',
+  'oal.work-record.attendanceTime': '考勤时段',
 };

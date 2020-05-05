@@ -199,7 +199,7 @@ class logQuery extends Component {
       this.setState({
         formValues: {
           ...fieldsValue,
-          date: [date[0].format('YYYY-MM-DD'), date[1].format('YYYY-MM-DD')],
+          date: date[0] && [date[0].format('YYYY-MM-DD'), date[1].format('YYYY-MM-DD')] || [],
         },
         tableSelectedRows: [],
       }, () => {
