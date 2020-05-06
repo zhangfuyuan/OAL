@@ -1,5 +1,6 @@
 import { queryNotices } from '@/services/user';
-import { querySystemVersion } from '@/services/global';
+import { querySystemVersion, ajaxSystemOrigin } from '@/services/global';
+import { routerRedux } from 'dva/router';
 
 const GlobalModel = {
   namespace: 'global',
@@ -7,6 +8,7 @@ const GlobalModel = {
     collapsed: false,
     notices: [],
     systemVersion: '',
+    systemOrigin: '',
   },
   effects: {
     *fetchNotices(_, { call, put, select }) {
@@ -83,6 +85,31 @@ const GlobalModel = {
           version,
         },
       });
+
+      const { ip } = data;
+      yield put({
+        type: 'saveOrigin',
+        payload: {
+          origin: ip,
+        },
+      });
+
+      if (ip) {
+        try {
+          const { origin: curOrigin, href: curHref } = new URL(window.location.href);
+          if (!~curHref.indexOf(ip)) window.location.href = curHref.replace(curOrigin, /\/\/./.test(ip) ? ip : `//${ip}`);
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        yield put(routerRedux.replace('/user/initOrigin'));
+      }
+    },
+
+    // 初始化部署时，提交访问IP/域名
+    *updateSystemOrigin({ payload }, { call, put }) {
+      const response = yield call(ajaxSystemOrigin, payload);
+      return Promise.resolve(response);
     },
   },
   reducers: {
@@ -120,6 +147,9 @@ const GlobalModel = {
 
     saveVersion(state, { payload: { version } }) {
       return { ...state, systemVersion: version };
+    },
+    saveOrigin(state, { payload: { origin } }) {
+      return { ...state, systemOrigin: origin };
     },
   },
   subscriptions: {

@@ -10,6 +10,7 @@ import styles from './UserLayout.less';
 
 const UserLayout = props => {
   const {
+    systemVersion,
     route = {
       routes: [],
     },
@@ -65,7 +66,7 @@ const UserLayout = props => {
                 <span className={styles.title}>{oemName}</span>
               </Link>
             </div>
-            <div className={styles.desc}>{subTitle}</div>
+            <div className={styles.desc}>{systemVersion ? `v${systemVersion}` : ''}</div>
           </div>
           {children}
         </div>
@@ -74,4 +75,4 @@ const UserLayout = props => {
   );
 };
 
-export default connect(({ settings, login }) => ({ ...settings, login }))(UserLayout);
+export default connect(({ global: { systemVersion }, settings, login }) => ({ systemVersion, ...settings, login }))(UserLayout);

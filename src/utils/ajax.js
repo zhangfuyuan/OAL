@@ -38,6 +38,11 @@ const errorCode = {
   6005: 'oal.ajax.6005',
   6006: 'oal.ajax.6006',
 };
+
+const errorMsg = {
+  3004: 'oal.user-login.loginFailed',
+  3007: 'oal.user-login.loginFailed',
+};
 /**
  * 全局的处理
  */
@@ -60,8 +65,8 @@ request.interceptors.response.use(async (response, options) => {
   // console.info('http response:', data);
   if (data.res < 0) {
     notification.error({
-      message: formatMessage({ id: 'oal.ajax.requestFailed' }),
-      description: data.errorCode ? (errorCode[data.errorCode] && formatMessage({ id: errorCode[data.errorCode] }) || '') : '',
+      message: errorMsg[data.errcode] ? formatMessage({ id: errorMsg[data.errcode] }) : formatMessage({ id: 'oal.ajax.requestFailed' }),
+      description: data.errcode ? (errorCode[data.errcode] && formatMessage({ id: errorCode[data.errcode] }) || '') : '',
     });
   }
   return response;

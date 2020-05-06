@@ -18,8 +18,14 @@ const routes = [
     component: require('../../layouts/UserLayout').default,
     routes: [
       {
-        name: 'login',
+        path: '/user/initOrigin',
+        name: 'initOrigin',
+        component: require('../user/initOrigin').default,
+        exact: true,
+      },
+      {
         path: '/user/:org/login',
+        name: 'login',
         component: require('../user/login').default,
         exact: true,
       },

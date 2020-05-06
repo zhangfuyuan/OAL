@@ -10,10 +10,12 @@ export async function queryNotices() {
 
 // begin rel api
 export async function authByToken() {
-  return get('/api/user/authByToken');
+  // return get('/api/user/authByToken');
+  return get('/guard-web/a/user/authByToken');
 }
 export async function modifyPsw(data) {
-  return post('/api/user/modifyPsw', data);
+  // return post('/api/user/modifyPsw', data);
+  return post('/guard-web/a/user/modifyPsw', data);
 }
 
 export async function modifyUser(data) {

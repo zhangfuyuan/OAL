@@ -1,7 +1,7 @@
 import { routerRedux } from 'dva/router';
 import router from 'umi/router';
 import { stringify } from 'querystring';
-import { fakeAccountLogin, getFakeCaptcha, getOrg, signin } from '@/services/login';
+import { fakeAccountLogin, getFakeCaptcha, getOrg, signin, ajaxLogout } from '@/services/login';
 import { setAuthority, getPermissionRoutes } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import CONSTANTS from '@/utils/constants';
@@ -88,6 +88,8 @@ const Model = {
 
     // eslint-disable-next-line require-yield
     *logout() {
+      yield call(ajaxLogout, payload);
+
       const { redirect } = getPageQuery(); // redirect
 
       if (window.location.pathname !== `${publicPath}user/${localStorage.getItem(CONSTANTS.SYSTEM_PATH)}/login` && !redirect) {
@@ -98,7 +100,7 @@ const Model = {
         });
       }
     },
-// rel api
+    // rel api
     *getOrgInfo({ payload }, { call, put }) {
       const orgInfo = yield call(getOrg, payload);
       if (orgInfo.res > 0) {

@@ -114,12 +114,12 @@ class Login extends Component {
       <Result
         status="404"
         title={formatMessage({ id: 'oal.user-login.infoNotFound' })}
-        subTitle={formatMessage({ id: 'oal.user-login.infoNotFoundTips' })}
-        extra={
-          <Button size="large" type="primary">
-            <FormattedMessage id="oal.user-login.contactUs" />
-          </Button>
-        }
+        // subTitle={formatMessage({ id: 'oal.user-login.infoNotFoundTips' })}
+        // extra={
+        //   <Button size="large" type="primary">
+        //     <FormattedMessage id="oal.user-login.contactUs" />
+        //   </Button>
+        // }
       />
     );
   }
@@ -140,6 +140,14 @@ class Login extends Component {
       </div>
     );
   }
+
+  checkAccount = (rule, value, callback) => {
+    const reg = /^[A-Za-z]+$/;
+    if (value && !reg.test(value)) {
+      callback(formatMessage({ id: 'oal.user-login.enterAccountErrorTips' }));
+    }
+    callback();
+  };
 
   render() {
     const { userLogin, submitting, orgLoading, systemVersion } = this.props;
@@ -173,19 +181,22 @@ class Login extends Component {
           <UserName
             name="userName"
             placeholder={formatMessage({
-              id: 'user-login.login.userName',
+              id: 'oal.common.account',
             })}
             rules={[
               {
                 required: true,
                 message: formatMessage({
-                  id: 'user-login.userName.required',
+                  id: 'oal.user-login.enterAccountTips',
                 }),
+              },
+              {
+                validator: this.checkAccount,
               },
             ]}
           />
           <Password
-            name="password"
+            name="pwd"
             placeholder={formatMessage({
               id: 'user-login.login.password',
             })}
@@ -193,7 +204,7 @@ class Login extends Component {
               {
                 required: true,
                 message: formatMessage({
-                  id: 'user-login.password.required',
+                  id: 'oal.user-login.enterPasswordTips',
                 }),
               },
             ]}
@@ -222,9 +233,9 @@ class Login extends Component {
             <FormattedMessage id="user-login.login.login" />
           </Submit>
         </LoginComponents>
-        {systemVersion ?
+        {/* {systemVersion ?
           <div style={{ textAlign: 'center' }}><FormattedMessage id="oal.user-login.release" />: {systemVersion}</div> : null
-        }
+        } */}
       </div>
     );
   }

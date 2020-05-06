@@ -25,7 +25,7 @@ const SettingPsw = props => {
       if (value === '') {
         setNewPswError(
           formatMessage({
-            id: 'oal.common.enterPassword',
+            id: 'oal.user-login.enterPasswordTips',
           }),
         );
       } else if (!PSW_REG.test(value)) {
@@ -41,7 +41,7 @@ const SettingPsw = props => {
       if (value === '') {
         setReNewPswError(
           formatMessage({
-            id: 'oal.common.enterPassword',
+            id: 'oal.user-login.enterPasswordTips',
           }),
         );
       } else if (!PSW_REG.test(value)) {
@@ -67,7 +67,7 @@ const SettingPsw = props => {
       // message.error('请输入密码');
       setNewPswError(
         formatMessage({
-          id: 'oal.common.enterPassword',
+          id: 'oal.user-login.enterPasswordTips',
         }),
       );
       setReNewPswError(
@@ -100,17 +100,20 @@ const SettingPsw = props => {
       alignItems: 'center',
     }}>
       <Card bordered={false} style={{ width: 400 }}>
-        <Alert
-          message={formatMessage({
-            id: 'oal.common.setPassword',
-          })}
-          description={formatMessage({
-            id: 'oal.common.resetPasswordTips',
-          })}
-          type="error"
-          showIcon
-        />
-        <br/>
+        {
+          newpswError || renewpswError ?
+            (<Alert
+              message={formatMessage({
+                id: 'oal.common.setPassword',
+              })}
+              description={formatMessage({
+                id: 'oal.common.resetPasswordTips',
+              })}
+              type="error"
+              showIcon
+            />) : ''
+        }
+        <br />
         <Input.Password
           placeholder={formatMessage({
             id: 'oal.common.enterNewPassword',
@@ -118,11 +121,11 @@ const SettingPsw = props => {
           value={newpsw}
           onChange={e => onChange('newpsw', e.target.value)}
           onBlur={e => onBlur('newpsw', e.target.value)}
-          prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }}/>}
+          prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
         />
         <span style={{ color: '#ff0000' }}>{newpswError}</span>
-        <br/>
-        <br/>
+        <br />
+        <br />
         <Input.Password
           placeholder={formatMessage({
             id: 'oal.common.newPasswordConfirm',
@@ -130,11 +133,11 @@ const SettingPsw = props => {
           value={renewpsw}
           onChange={e => onChange('renewpsw', e.target.value)}
           onBlur={e => onBlur('renewpsw', e.target.value)}
-          prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }}/>}
+          prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
         />
         <span style={{ color: '#ff0000' }}>{renewpswError}</span>
-        <br/>
-        <br/>
+        <br />
+        <br />
         <Button onClick={onSubmit} type="primary" htmlType="submit" className="login-form-button" loading={props.loading} block>
           <FormattedMessage id="oal.common.nextStep" />
         </Button>

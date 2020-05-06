@@ -4,8 +4,13 @@ const routers = [
     component: '../layouts/UserLayout',
     routes: [
       {
-        name: 'login',
+        path: '/user/initOrigin',
+        name: 'initOrigin',
+        component: './user/initOrigin',
+      },
+      {
         path: '/user/:org/login',
+        name: 'login',
         component: './user/login',
       },
       {

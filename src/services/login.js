@@ -13,12 +13,13 @@ export async function getFakeCaptcha(mobile) {
 
 // begin rel api
 /**
- * 获取组织详情
+ * 非登录状态下，获取访问组织的相关信息
  * @param path
  * @returns {Promise<*>}
  */
 export async function getOrg(path) {
-  return get(`/api/org/getByPath/${path}`)
+  // return get(`/api/org/getByPath/${path}`)
+  return post(`/guard-web/f/com/getByPath`, { path });
 }
 
 /**
@@ -27,5 +28,16 @@ export async function getOrg(path) {
  * @returns {Promise<*>}
  */
 export async function signin(data) {
-  return post('/api/user/signin', data)
+  // return post('/api/user/signin', data)
+  return post('/guard-web/f/com/signin', data);
+}
+
+/**
+ * 退出登录
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxLogout() {
+  // return post('/api/user/signin', data)
+  return get('/guard-web/a/sys/office/logout');
 }
