@@ -1,12 +1,13 @@
 import { Alert, Checkbox, Icon, Result, Button, Spin } from 'antd';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import React, { Component } from 'react';
-import CryptoJS from 'crypto-js';
+// import CryptoJS from 'crypto-js';
 import { SYSTEM_PATH } from '@/utils/constants';
 import Link from 'umi/link';
 import { connect } from 'dva';
 import LoginComponents from './components/Login';
 import styles from './style.less';
+import { pswBase64Thrice } from '@/utils/utils';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;
 
@@ -53,7 +54,8 @@ class Login extends Component {
 
   handleSubmit = (err, values) => {
     const { org } = this.props.match.params;
-    values.password = CryptoJS.MD5(values.password).toString();
+    // values.password = CryptoJS.MD5(values.password).toString();
+    values.password = pswBase64Thrice(values.password);
     if (!err) {
       localStorage.setItem(SYSTEM_PATH, org);
       const { dispatch } = this.props;

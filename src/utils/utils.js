@@ -144,3 +144,19 @@ export function toTree(data) {
   });
   return result;
 }
+
+/**
+ * 加密
+ */
+export function pswBase64Thrice(value) {
+  let res = '';
+
+  try {
+    res = window.btoa(window.btoa(window.btoa(value)));
+  } catch (err) {
+    console.log(err);
+    res = value;
+  }
+
+  return res;
+}

@@ -1,42 +1,42 @@
 import { post, get } from '@/utils/ajax';
 
 /**
- * 新增组织
+ * （组织2）新建组织
  * @param data
  * @returns {Promise<*>}
  */
 export async function add(data) {
-  return post('/api/org/add', data);
+  return post('/guard-web/a/org/add', data);
 }
 
 /**
- * 查询组织
+ * （组织1）获取/搜索组织列表数据
  * @param query
  * @returns {Promise<*>}
  */
 export async function getOrg(query) {
-  return post('/api/org/fetchList', query);
+  return post('/guard-web/a/org/fetchList', query);
 }
 
 /**
- * 修改组织
+ * （组织3）修改组织信息
  */
 export async function modifyOrg(data) {
-  return post('/api/org/update', data);
+  return post('/guard-web/a/org/update', data);
 }
 
 /**
- * 禁用&&启用
+ * （组织5）禁/启用组织
  */
 export async function handleState(data) {
   // 8126TODO 参数放在body里
-  return get(`/api/org/${data.orgId}/setState/${data.state}`);
+  return post(`/guard-web/a/org/setState`, data);
 }
 
 /**
- * 重置密码
+ * （组织4）重置密码
  */
 export async function resetPsw(data) {
-  // 8126TODO 修改成 /api/org/updatePwd
-  return get(`/api/org/${data.orgId}/setState/${data.state}`);
+  // 8126TODO 修改成 /api/org/resetPsw
+  return post(`/guard-web/a/org/resetPsw`, data);
 }

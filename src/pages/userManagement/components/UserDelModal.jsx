@@ -3,19 +3,20 @@ import React from 'react';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const UserDelModal = props => {
-  const { userBean, visible, handleSubmit, handleCancel } = props;
+  const { userBean, visible, handleSubmit, handleCancel, confirmLoading } = props;
 
-  const title = `${formatMessage({ id: 'oal.user-manage.deleteAccount' })}(${userBean.userName})`;
+  // const title = `${formatMessage({ id: 'oal.user-manage.disableAccount' })}(${userBean.userName})`;
 
   return (
     <Modal
       destroyOnClose
-      title={title}
+      title={formatMessage({ id: 'oal.user-manage.disableAccount' })}
       visible={visible}
       onOk={() => handleSubmit(userBean)}
+      confirmLoading={confirmLoading}
       onCancel={handleCancel}
       maskClosable={false}
-      okText={formatMessage({ id: 'oal.common.delete' })}
+      okText={formatMessage({ id: 'oal.common.disable' })}
       okType="danger"
       cancelText={formatMessage({ id: 'oal.common.cancel' })}
     >

@@ -1,6 +1,6 @@
 import { Modal, Form, Input, Tooltip, Icon } from 'antd';
 import React from 'react';
-import { validateMobile } from '@/utils/utils';
+// import { validateMobile } from '@/utils/utils';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import defaultSettings from '../../../../config/defaultSettings';
 
@@ -24,7 +24,7 @@ const AddOrUpdateOrg = props => {
 
   let title = formatMessage({ id: 'oal.org.newOrg' });
   if (isEdit) {
-    title = `${formatMessage({ id: 'oal.org.modifyOrg' })}(${orgBean.name})`;
+    title = formatMessage({ id: 'oal.org.modifyOrg' });
   }
 
   const handleOk = () => {
@@ -42,16 +42,25 @@ const AddOrUpdateOrg = props => {
   };
 
   const checkMobile = (rule, value, callback) => {
-    if (value && !validateMobile(value)) {
-      callback(formatMessage({ id: 'oal.common.enterPhoneNumber' }));
+    const reg = /^[\d*#+]{0,14}$/;
+    if (value && !reg(value)) {
+      callback(formatMessage({ id: 'oal.common.formatError' }));
     }
     callback();
   };
 
   const checkPath = (rule, value, callback) => {
-    const reg = /^[0-9A-Za-z]+$/;
+    const reg = /^[A-Za-z]+$/;
     if (value && !reg.test(value)) {
       callback(formatMessage({ id: 'oal.org.enterEnglishString' }));
+    }
+    callback();
+  };
+
+  const checkIllegalCharacter = (rule, value, callback) => {
+    const errReg = /[<>|*?/:\s]/;
+    if (value && errReg.test(value)) {
+      callback(formatMessage({ id: 'oal.common.illegalCharacterTips' }));
     }
     callback();
   };
@@ -78,9 +87,30 @@ const AddOrUpdateOrg = props => {
                 max: 40,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '40' }),
               },
+              {
+                validator: checkIllegalCharacter,
+              },
             ],
             initialValue: orgBean.name,
           })(<Input placeholder={formatMessage({ id: 'oal.org.orgName' })} />)}
+        </Form.Item>
+        <Form.Item label={formatMessage({ id: 'oal.settings.sysname' })}>
+          {getFieldDecorator('saasName', {
+            rules: [
+              {
+                required: true,
+                message: formatMessage({ id: 'oal.org.enterSaasNameTips' }),
+              },
+              {
+                max: 40,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
+              },
+              {
+                validator: checkIllegalCharacter,
+              },
+            ],
+            initialValue: orgBean.saasName,
+          })(<Input placeholder={formatMessage({ id: 'oal.settings.sysname' })} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.org.contacts' })}>
           {getFieldDecorator('contactName', {
@@ -88,7 +118,10 @@ const AddOrUpdateOrg = props => {
               {
                 max: 20,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
-              }
+              },
+              {
+                validator: checkIllegalCharacter,
+              },
             ],
             initialValue: orgBean && orgBean.contact && orgBean.contact.nickName,
           })(<Input placeholder={formatMessage({ id: 'oal.org.contactName' })} />)}
@@ -131,6 +164,10 @@ const AddOrUpdateOrg = props => {
               {
                 required: true,
                 message: formatMessage({ id: 'oal.org.enterPathTips' }),
+              },
+              {
+                max: 10,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '10' }),
               },
               {
                 validator: checkPath,

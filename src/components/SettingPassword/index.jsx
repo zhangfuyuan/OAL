@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Card, Alert, Input, Button, Icon, message } from 'antd';
-import CryptoJS from 'crypto-js';
+// import CryptoJS from 'crypto-js';
 import { PSW_REG } from '@/utils/constants';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import { pswBase64Thrice } from '@/utils/utils';
 
 const SettingPsw = props => {
   const [newpsw, setNewPsw] = useState('');
@@ -86,7 +87,8 @@ const SettingPsw = props => {
       );
       return;
     }
-    const data = { newpassword: CryptoJS.MD5(newpsw).toString() };
+    // const data = { newpassword: CryptoJS.MD5(newpsw).toString() };
+    const data = { newpassword: pswBase64Thrice(newpsw) };
     props.onSubmit(data);
   }
 

@@ -1,4 +1,4 @@
-import { addUser, getUserList, operateUser, modifyUser } from './service';
+import { addUser, getUserList, operateUser, modifyUser, ajaxSetState, ajaxResetPsw } from './service';
 
 const Model = {
   namespace: 'userManagement',
@@ -38,6 +38,16 @@ const Model = {
     *modify({ payload }, { call }) {
       const response = yield call(modifyUser, payload);
       // console.log('add response-->', response);
+      return Promise.resolve(response);
+    },
+    *handleState({ payload }, { call }) {
+      const response = yield call(ajaxSetState, payload);
+      // console.log('handleState response-->', response);
+      return Promise.resolve(response);
+    },
+    *resetPsw({ payload }, { call, put }) {
+      // console.log('operate payload--->', payload);
+      const response = yield call(ajaxResetPsw, payload);
       return Promise.resolve(response);
     },
   },

@@ -8,11 +8,17 @@ export async function queryNotices() {
   return request('/api/notices');
 }
 
-// begin rel api
+/**
+ * （通用5）获取当前用户信息
+ */
 export async function authByToken() {
   // return get('/api/user/authByToken');
-  return get('/guard-web/a/user/authByToken');
+  return get('/guard-web/a/sys/user/authByToken');
 }
+
+/**
+ * （通用6）修改密码
+ */
 export async function modifyPsw(data) {
   // return post('/api/user/modifyPsw', data);
   return post('/guard-web/a/user/modifyPsw', data);

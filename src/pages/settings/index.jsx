@@ -3,7 +3,7 @@ import { GridContent } from '@ant-design/pro-layout';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Menu, message } from 'antd';
 import { connect } from 'dva';
-import CryptoJS from 'crypto-js';
+// import CryptoJS from 'crypto-js';
 import BaseView from './components/BaseView';
 import SecurityView from './components/SecurityView';
 import SystemView from './components/SystemView';
@@ -16,6 +16,7 @@ import FaceKeyModal from './components/FaceKeyModal';
 import FaceLibrary from './components/FaceLibrary';
 import styles from './style.less';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import { pswBase64Thrice } from '@/utils/utils';
 
 const { Item } = Menu;
 
@@ -146,8 +147,10 @@ class Settings extends Component {
   submitModifyPsw = values => {
     const { dispatch } = this.props;
     const params = {
-      oldpassword: CryptoJS.MD5(values.oldpassword).toString(),
-      newpassword: CryptoJS.MD5(values.newpassword).toString(),
+      // oldpassword: CryptoJS.MD5(values.oldpassword).toString(),
+      // newpassword: CryptoJS.MD5(values.newpassword).toString(),
+      oldpassword: pswBase64Thrice(values.oldpassword),
+      newpassword: pswBase64Thrice(values.newpassword),
     };
     dispatch({
       type: 'user/modifyPassword',

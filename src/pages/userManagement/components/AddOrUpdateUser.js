@@ -14,13 +14,13 @@ const formItemLayout = {
   },
 };
 const AddOrUpdateUser = props => {
-  const { form, userBean, visible, handleSubmit, confirmLoading, handleCancel } = props;
+  const { form, userBean, currentUser, visible, handleSubmit, confirmLoading, handleCancel } = props;
   const { getFieldDecorator } = form;
   const isEdit = !!(userBean && userBean._id);
 
-  let title = formatMessage({ id: 'oal.user-manage.newUsers' });
+  let title = formatMessage({ id: 'oal.user-manage.newAccount' });
   if (isEdit) {
-    title = `${formatMessage({ id: 'oal.user-manage.modifyUsers' })}(${userBean.userName})`;
+    title = formatMessage({ id: 'oal.common.modify' });
   }
 
   const handleOk = () => {
@@ -28,6 +28,7 @@ const AddOrUpdateUser = props => {
       // console.log('---------fieldsValue----------', fieldsValue)
       if (err) return;
       const params = fieldsValue;
+      if (isEdit) params.userId = userBean._id;
       handleSubmit(params, () => {
         form.resetFields();
       });
@@ -35,8 +36,17 @@ const AddOrUpdateUser = props => {
   };
 
   const checkMobile = (rule, value, callback) => {
-    if (value && !validateMobile(value)) {
-      callback(formatMessage({ id: 'oal.common.enterPhoneNumber' }));
+    const reg = /^[\d*#+]{0,14}$/;
+    if (value && !reg(value)) {
+      callback(formatMessage({ id: 'oal.common.formatError' }));
+    }
+    callback();
+  };
+
+  const checkIllegalCharacter = (rule, value, callback) => {
+    const errReg = /[<>|*?/:\s]/;
+    if (value && errReg.test(value)) {
+      callback(formatMessage({ id: 'oal.common.illegalCharacterTips' }));
     }
     callback();
   };
@@ -60,7 +70,7 @@ const AddOrUpdateUser = props => {
                 message: formatMessage({ id: 'oal.user-manage.enterAccountNameTips' }),
               },
               {
-                pattern: /^[a-zA-Z0-9]+$/,
+                pattern: /^[a-zA-Z]+$/,
                 message: formatMessage({ id: 'oal.user-manage.enterUsernameError' }),
               },
               {
@@ -68,8 +78,8 @@ const AddOrUpdateUser = props => {
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '10' }),
               },
             ],
-            initialValue: userBean.userName,
-          })(<Input placeholder={formatMessage({ id: 'oal.user-manage.accountName' })} disabled={isEdit} />)}
+            initialValue: isEdit ? userBean.userName : '',
+          })(<Input placeholder={formatMessage({ id: 'oal.user-manage.accountName' })} disabled={isEdit ? currentUser.userName !== userBean.userName : false} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.common.nickname' })}>
           {getFieldDecorator('nickName', {
@@ -82,9 +92,12 @@ const AddOrUpdateUser = props => {
                 max: 20,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
               },
+              {
+                validator: checkIllegalCharacter,
+              },
             ],
-            initialValue: userBean.profile && userBean.profile.nickName || '',
-          })(<Input placeholder={formatMessage({ id: 'oal.common.nickname' })} />)}
+            initialValue: isEdit ? userBean.profile && userBean.profile.nickName : '',
+          })(<Input placeholder={formatMessage({ id: 'oal.common.nickname' })} disabled={isEdit ? currentUser.userName !== userBean.userName : false} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.common.phoneNumber' })}>
           {getFieldDecorator('mobile', {
@@ -93,7 +106,7 @@ const AddOrUpdateUser = props => {
                 validator: checkMobile,
               },
             ],
-            initialValue: userBean.profile && userBean.profile.mobile || '',
+            initialValue: isEdit ? userBean.profile && userBean.profile.mobile : '',
           })(<Input placeholder={formatMessage({ id: 'oal.common.phoneNumber' })} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.common.emailAddress' })}>
@@ -101,10 +114,14 @@ const AddOrUpdateUser = props => {
             rules: [
               {
                 type: 'email',
-                message: formatMessage({ id: 'oal.common.enterCorrectEmailAddress' }),
+                message: formatMessage({ id: 'oal.common.formatError' }),
+              },
+              {
+                max: 80,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '80' }),
               },
             ],
-            initialValue: userBean.profile && userBean.profile.email || '',
+            initialValue: isEdit ? userBean.profile && userBean.profile.email : '',
           })(<Input placeholder={formatMessage({ id: 'oal.common.emailAddress' })} />)}
         </Form.Item>
       </Form>

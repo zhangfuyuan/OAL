@@ -31,10 +31,12 @@ const { confirm } = Modal;
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@connect(({ userManagement, loading }) => ({
+@connect(({ user: { currentUser }, userManagement, loading }) => ({
+  currentUser,
   userManagement,
   userListLoading: loading.effects['userManagement/fetch'],
   addOrUpdateLoading: loading.effects['userManagement/add'],
+  handleStateLoading: loading.effects['userManagement/handleState'],
 }))
 class UserManagement extends Component {
   state = {
@@ -103,7 +105,11 @@ class UserManagement extends Component {
           <Divider type="vertical" />
           <a onClick={() => this.openResetModal(record)}><FormattedMessage id="oal.user-manage.resetPassword" /></a>
           <Divider type="vertical" />
-          <a onClick={() => this.openDelModal(record)} disabled={!record.type}><FormattedMessage id="oal.common.delete" /></a>
+          {
+            record.state === 1 ?
+              <a onClick={() => this.openDelModal(record)} disabled={this.props.currentUser.userName === record.userName}><FormattedMessage id="oal.common.disable" /></a> :
+              <a onClick={() => this.handleState(1, record._id)} disabled={this.props.currentUser.userName === record.userName}><FormattedMessage id="oal.common.enable" /></a>
+          }
           {/* <Popconfirm title={formatMessage({ id: 'oal.user-manage.confirmDeleteUser' })} okText={formatMessage({ id: 'oal.common.confirm' })} cancelText={formatMessage({ id: 'oal.common.cancel' })} onConfirm={() => this.deleteUser(record)}>
                 <a href="#" disabled={!record.type}><FormattedMessage id="oal.common.delete" /></a>
               </Popconfirm>
@@ -116,47 +122,65 @@ class UserManagement extends Component {
     },
   ];
 
+  handleState = (state, userId) => {
+    const { dispatch } = this.props;
+    const _state = state;
+    dispatch({
+      type: 'userManagement/handleState',
+      payload: {
+        userId,
+        state,
+      },
+    }).then(res => {
+      if (res.res > 0) {
+        message.success(formatMessage({ id: _state ? 'oal.user-manage.beenEnabled' : 'oal.user-manage.beenDisabled' }));
+        this.loadUserList();
+      }
+    })
+  };
+
   componentDidMount() {
     this.loadUserList();
   }
 
   loadUserList = () => {
     const { dispatch } = this.props;
-    const { page } = this.state;
+    const { page, formValues } = this.state;
     dispatch({
       type: 'userManagement/fetch',
       payload: {
         ...page,
+        ...formValues,
       },
     });
   };
 
   deleteUser = userBean => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'userManagement/operate',
-      payload: {
-        // eslint-disable-next-line no-underscore-dangle
-        userId: userBean._id,
-        action: 'delete',
-      },
-    }).then(res => {
-      if (res && res.res > 0) {
-        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
-        this.closeDelModal();
-        this.loadUserList();
-      }
-    });
+    this.handleState(0, userBean._id);
+    // const { dispatch } = this.props;
+    // dispatch({
+    //   type: 'userManagement/operate',
+    //   payload: {
+    //     // eslint-disable-next-line no-underscore-dangle
+    //     userId: userBean._id,
+    //     action: 'delete',
+    //   },
+    // }).then(res => {
+    //   if (res && res.res > 0) {
+    //     message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+    //     this.closeDelModal();
+    //     this.loadUserList();
+    //   }
+    // });
   };
 
   resetPsw = userBean => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'userManagement/operate',
+      type: 'userManagement/resetPsw',
       payload: {
         // eslint-disable-next-line no-underscore-dangle
         userId: userBean._id,
-        action: 'resetPsw',
       },
     }).then(res => {
       if (res && res.res > 0) {
@@ -168,40 +192,37 @@ class UserManagement extends Component {
   };
 
   handleSearch = () => {
-    const { form, dispatch } = this.props;
-    const { page } = this.state;
+    const { form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
+      const { page } = this.state;
       this.setState({
+        page: {
+          ...page,
+          current: 1,
+        },
         formValues: fieldsValue,
         selectedRows: [],
-      });
-      dispatch({
-        type: 'userManagement/fetch',
-        payload: {
-          ...page,
-          ...fieldsValue,
-        },
+      }, () => {
+        this.loadUserList();
       });
     });
   };
 
   handleFormReset = () => {
-    const { form, dispatch } = this.props;
+    const { form } = this.props;
     form.resetFields();
     form.setFieldsValue({});
-    const { page } = this.state;
     this.setState({
+      page: {
+        current: 1,
+        pageSize: 10,
+      },
       formValues: {},
-    });
-    const params = {
-      ...page,
-      current: 1,
-    };
-    dispatch({
-      type: 'userManagement/fetch',
-      payload: params,
+      selectedRows: [],
+    }, () => {
+      this.loadUserList();
     });
   };
 
@@ -240,17 +261,17 @@ class UserManagement extends Component {
     if (selectedUser && selectedUser._id) {
       console.log(8126, '修改用户信息', values);
       // 8126TODO 对接修改账号信息接口
-      // dispatch({
-      //   type: 'userManagement/modify',
-      //   payload: values,
-      // }).then(res => {
-      //   if (res && res.res > 0) {
-      //     message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
-      //     this.closeAddOrUpdateModal();
-      //     this.loadUserList();
-      //     callback();
-      //   }
-      // });
+      dispatch({
+        type: 'userManagement/modify',
+        payload: values,
+      }).then(res => {
+        if (res && res.res > 0) {
+          message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+          this.closeAddOrUpdateModal();
+          this.loadUserList();
+          callback();
+        }
+      });
       message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
       this.closeAddOrUpdateModal();
       this.loadUserList();
@@ -261,7 +282,7 @@ class UserManagement extends Component {
         payload: values,
       }).then(res => {
         if (res && res.res > 0) {
-          message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
+          message.success(formatMessage({ id: 'oal.face.addSuccessfully' }));
           this.closeAddOrUpdateModal();
           this.loadUserList();
           callback();
@@ -321,18 +342,15 @@ class UserManagement extends Component {
   };
 
   handleStandardTableChange = pagination => {
-    const { dispatch } = this.props;
-    const { formValues } = this.state;
-    const params = {
-      current: pagination.current,
-      pageSize: pagination.pageSize,
-      ...formValues,
-    };
-    dispatch({
-      type: 'userManagement/fetch',
-      payload: params,
+    this.setState({
+      page: {
+        current: pagination.current,
+        pageSize: pagination.pageSize
+      },
+      selectedRows: [],
+    }, () => {
+      this.loadUserList();
     });
-    this.setState({ page: { current: pagination.current, pageSize: pagination.pageSize } })
   };
 
   user_showTotal = (total, range) => (formatMessage({
@@ -346,6 +364,8 @@ class UserManagement extends Component {
       userManagement: { userList },
       loading,
       addOrUpdateLoading,
+      handleStateLoading,
+      currentUser,
     } = this.props;
     userList && userList.pagination && (userList.pagination.showTotal = this.user_showTotal);
     const { selectedRows, modalVisible, selectedUser, resetVisible, delVisible } = this.state;
@@ -374,6 +394,7 @@ class UserManagement extends Component {
         </Card>
         <AddOrUpdateUser
           confirmLoading={addOrUpdateLoading}
+          currentUser={currentUser}
           visible={modalVisible}
           userBean={selectedUser}
           handleCancel={this.closeAddOrUpdateModal}
@@ -388,6 +409,7 @@ class UserManagement extends Component {
         <UserDelModal
           visible={delVisible}
           userBean={selectedUser}
+          confirmLoading={handleStateLoading}
           handleCancel={this.closeDelModal}
           handleSubmit={this.deleteUser}
         />

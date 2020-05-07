@@ -13,7 +13,7 @@ export async function getFakeCaptcha(mobile) {
 
 // begin rel api
 /**
- * 非登录状态下，获取访问组织的相关信息
+ * （通用3）非登录状态下，获取访问组织的相关信息
  * @param path
  * @returns {Promise<*>}
  */
@@ -23,7 +23,7 @@ export async function getOrg(path) {
 }
 
 /**
- * 用户登录
+ * （通用4）登录
  * @param data
  * @returns {Promise<*>}
  */
@@ -33,11 +33,8 @@ export async function signin(data) {
 }
 
 /**
- * 退出登录
- * @param data
- * @returns {Promise<*>}
+ * （通用7）退出登录
  */
 export async function ajaxLogout() {
-  // return post('/api/user/signin', data)
   return get('/guard-web/a/sys/office/logout');
 }

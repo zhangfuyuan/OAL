@@ -34,7 +34,7 @@ const Model = {
     },
     *resetPsw({ payload }, { call }) {
       const response = yield call(resetPsw, payload);
-      // console.log('handleState response-->', response);
+      // console.log('resetPsw response-->', response);
       return Promise.resolve(response);
     },
   },

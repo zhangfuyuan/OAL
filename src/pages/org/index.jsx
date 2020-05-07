@@ -35,7 +35,9 @@ const { publicPath } = defaultSettings;
 @connect(({ org, loading }) => ({
   org,
   orgListLoading: loading.effects['org/fetch'],
-  addOrUpdateOrgLoading: loading.effects['org/add'],
+  addOrgLoading: loading.effects['org/add'],
+  updateOrgLoading: loading.effects['org/update'],
+  resetPswLoading: loading.effects['org/resetPsw'],
 }))
 class OrgList extends Component {
   state = {
@@ -99,27 +101,27 @@ class OrgList extends Component {
       type: 'org/fetch',
       payload: {
         ...page,
-        creator: formValues.creator,
+        ...formValues,
       },
     });
   };
 
   columns = () => {
-    const MoreBtn = ({ item }) => (
-      <Dropdown
-        overlay={
-          <Menu onClick={({ key }) => this.moreAction(key, item)}>
-            <Menu.Item key="modify" disabled={item.state === 0}><FormattedMessage id="oal.common.modify" /></Menu.Item>
-            <Menu.Item key="open" disabled={item.state === 1}><FormattedMessage id="oal.common.enable" /></Menu.Item>
-            <Menu.Item key="close" disabled={item.state === 0}><FormattedMessage id="oal.common.disable" /></Menu.Item>
-          </Menu>
-        }
-      >
-        <a>
-          <FormattedMessage id="oal.common.more" /><Icon type="down" />
-        </a>
-      </Dropdown>
-    );
+    // const MoreBtn = ({ item }) => (
+    //   <Dropdown
+    //     overlay={
+    //       <Menu onClick={({ key }) => this.moreAction(key, item)}>
+    //         <Menu.Item key="modify" disabled={item.state === 0}><FormattedMessage id="oal.common.modify" /></Menu.Item>
+    //         <Menu.Item key="open" disabled={item.state === 1}><FormattedMessage id="oal.common.enable" /></Menu.Item>
+    //         <Menu.Item key="close" disabled={item.state === 0}><FormattedMessage id="oal.common.disable" /></Menu.Item>
+    //       </Menu>
+    //     }
+    //   >
+    //     <a>
+    //       <FormattedMessage id="oal.common.more" /><Icon type="down" />
+    //     </a>
+    //   </Dropdown>
+    // );
     const cl = [
       {
         title: formatMessage({ id: 'oal.org.orgName' }),
@@ -216,15 +218,14 @@ class OrgList extends Component {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       this.setState({
+        page: {
+          ...page,
+          current: 1,
+        },
         formValues: fieldsValue,
         selectedRows: [],
-      });
-      dispatch({
-        type: 'org/fetch',
-        payload: {
-          ...page,
-          ...fieldsValue,
-        },
+      }, () => {
+        this.loadOrgList();
       });
     });
   };
@@ -235,17 +236,18 @@ class OrgList extends Component {
     form.setFieldsValue({
       creator: '',
     });
-    const { page } = this.state;
     this.setState({
-      formValues: {},
-    });
-    const params = {
-      ...page,
-      pageNo: 1,
-    };
-    dispatch({
-      type: 'org/fetch',
-      payload: params,
+      page: {
+        pageNo: 1,
+        pageSize: 10,
+        current: 1,
+      },
+      formValues: {
+        creator: '',
+      },
+      selectedRows: [],
+    }, () => {
+      this.loadOrgList();
     });
   };
 
@@ -277,7 +279,6 @@ class OrgList extends Component {
       type: 'org/resetPsw',
       payload: {
         orgId: selectedOrg._id,
-        state: 1,
       },
     }).then(res => {
       if (res && res.res > 0) {
@@ -321,7 +322,7 @@ class OrgList extends Component {
         payload: values,
       }).then(res => {
         if (res.res === 1) {
-          message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
+          message.success(formatMessage({ id: 'oal.common.createSuccessfully' }));
           this.closeAddOrUpdateOrgModal();
           this.loadOrgList();
           callback();
@@ -362,7 +363,9 @@ class OrgList extends Component {
           </Col>
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.status' })}>
-              {getFieldDecorator('state')(
+              {getFieldDecorator('state', {
+                initialValue: '',
+              })(
                 <Select
                   placeholder={formatMessage({ id: 'oal.common.pleaseSelect' })}
                   style={{
@@ -403,16 +406,14 @@ class OrgList extends Component {
   };
 
   handleStandardTableChange = pagination => {
-    const { dispatch } = this.props;
-    const { formValues } = this.state;
-    const params = {
-      current: pagination.current,
-      pageSize: pagination.pageSize,
-      ...formValues,
-    };
-    dispatch({
-      type: 'org/fetch',
-      payload: params,
+    this.setState({
+      page: {
+        current: pagination.current,
+        pageSize: pagination.pageSize,
+      },
+      selectedRows: [],
+    }, () => {
+      this.loadOrgList();
     });
   };
 
@@ -425,8 +426,10 @@ class OrgList extends Component {
   render() {
     const {
       org: { orgList },
-      loading,
-      addOrUpdateOrgLoading,
+      orgListLoading,
+      addOrgLoading,
+      updateOrgLoading,
+      resetPswLoading,
     } = this.props;
     orgList && orgList.pagination && (orgList.pagination.showTotal = this.org_showTotal);
     const { selectedRows, modalVisible, selectedOrg, detailVisible, resetVisible } = this.state;
@@ -445,7 +448,7 @@ class OrgList extends Component {
               rowKey={record => record._id}
               needRowSelection={false}
               selectedRows={selectedRows}
-              loading={loading}
+              loading={orgListLoading}
               data={orgList}
               columns={this.columns()}
               onSelectRow={this.handleSelectRows}
@@ -454,7 +457,7 @@ class OrgList extends Component {
           </div>
         </Card>
         <AddOrUpdateOrg
-          confirmLoading={addOrUpdateOrgLoading}
+          confirmLoading={addOrgLoading || updateOrgLoading}
           visible={modalVisible}
           orgBean={selectedOrg}
           handleCancel={this.closeAddOrUpdateOrgModal}
@@ -469,6 +472,7 @@ class OrgList extends Component {
         <OrgResetModal
           visible={resetVisible}
           orgBean={selectedOrg}
+          confirmLoading={resetPswLoading}
           handleCancel={this.closeResetModal}
           handleSubmit={this.submitReset}
         />
