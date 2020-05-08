@@ -1,4 +1,4 @@
-import { Alert, Checkbox, Icon, Result, Button, Spin } from 'antd';
+import { Alert, Checkbox, Icon, Result, Button, Spin, notification } from 'antd';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import React, { Component } from 'react';
 // import CryptoJS from 'crypto-js';
@@ -7,7 +7,7 @@ import Link from 'umi/link';
 import { connect } from 'dva';
 import LoginComponents from './components/Login';
 import styles from './style.less';
-import { pswBase64Thrice } from '@/utils/utils';
+import { pswBase64Thrice, pswBase64ThriceRestore } from '@/utils/utils';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;
 
@@ -55,13 +55,29 @@ class Login extends Component {
   handleSubmit = (err, values) => {
     const { org } = this.props.match.params;
     // values.password = CryptoJS.MD5(values.password).toString();
-    values.password = pswBase64Thrice(values.password);
+    values.pwd = pswBase64Thrice(values.pwd);
     if (!err) {
       localStorage.setItem(SYSTEM_PATH, org);
       const { dispatch } = this.props;
+      const params = { ...values, path: org };
+
       dispatch({
         type: 'login/login',
-        payload: { ...values, path: org },
+        payload: params,
+      }).then(res => {
+        if (res && res.res === 0) {
+          console.log('自动登录两次╮(╯▽╰)╭');
+          this.handleSubmit(null, {
+            ...params,
+            pwd: pswBase64ThriceRestore(params.pwd),
+          });
+        }
+      }).catch(err => {
+        console.log(err);
+        notification.error({
+          message: formatMessage({ id: 'oal.ajax.401-message' }),
+          description: formatMessage({ id: 'oal.ajax.401-description' }),
+        });
       });
     }
   };
@@ -116,12 +132,12 @@ class Login extends Component {
       <Result
         status="404"
         title={formatMessage({ id: 'oal.user-login.infoNotFound' })}
-        // subTitle={formatMessage({ id: 'oal.user-login.infoNotFoundTips' })}
-        // extra={
-        //   <Button size="large" type="primary">
-        //     <FormattedMessage id="oal.user-login.contactUs" />
-        //   </Button>
-        // }
+      // subTitle={formatMessage({ id: 'oal.user-login.infoNotFoundTips' })}
+      // extra={
+      //   <Button size="large" type="primary">
+      //     <FormattedMessage id="oal.user-login.contactUs" />
+      //   </Button>
+      // }
       />
     );
   }

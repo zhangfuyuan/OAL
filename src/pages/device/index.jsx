@@ -1,4 +1,20 @@
-import { Card, Tabs, message, Alert, Button, Badge, Divider, Popconfirm, Modal, Menu, Dropdown, Icon } from 'antd';
+import {
+  Card,
+  Tabs,
+  message,
+  Alert,
+  Button,
+  Badge,
+  Divider,
+  Popconfirm,
+  Modal,
+  Menu,
+  Dropdown,
+  Icon,
+  Form,
+  Row,
+  Col,
+} from 'antd';
 import React, { Component, Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
@@ -13,6 +29,7 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import styles from './style.less';
 import StandardTable from '@/components/StandardTable';
 
+const FormItem = Form.Item;
 // const { TabPane } = Tabs;
 
 // const tabArray = [
@@ -46,7 +63,8 @@ class Device extends Component {
       current: 1,
       pageSize: 10,
     },
-    sortedInfo: {},
+    // sortedInfo: {},
+    formValues: {}
   };
 
   componentDidMount() {
@@ -90,10 +108,13 @@ class Device extends Component {
     // const tabBean = tabArray.find(item => item.key === key);
     // const verity = tabBean ? tabBean.value : 1;
     const { dispatch } = this.props;
+    const { page, formValues } = this.state;
+
     dispatch({
       type: 'device/fetch',
       payload: {
-        verity: 1,
+        ...page,
+        ...formValues,
       },
     });
   };
@@ -205,8 +226,8 @@ class Device extends Component {
         dataIndex: 'name',
         render: text => text || '--',
         key: 'name',
-        sorter: (a, b) => a.name - b.name,
-        sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
+        // sorter: (a, b) => a.name - b.name,
+        // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
       },
       {
         title: formatMessage({ id: 'oal.common.status' }),
@@ -215,16 +236,18 @@ class Device extends Component {
           return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
         },
         key: 'networkState',
-        sorter: (a, b) => a.networkState - b.networkState,
-        sortOrder: this.state.sortedInfo.columnKey === 'networkState' && this.state.sortedInfo.order,
+        // sorter: (a, b) => a.networkState - b.networkState,
+        // sortOrder: this.state.sortedInfo.columnKey === 'networkState' && this.state.sortedInfo.order,
       },
       {
         title: formatMessage({ id: 'oal.device.mac' }),
+        key: 'mac',
         dataIndex: 'mac',
         render: text => text || '--',
       },
       {
-        title: formatMessage({ id: 'oal.device.ipAddress' }),
+        title: 'IP',
+        key: 'ip',
         dataIndex: 'ip',
         render: text => text || '--',
       },
@@ -237,12 +260,13 @@ class Device extends Component {
       //   },
       // },
       {
-        title: formatMessage({ id: 'oal.device.softwareRelease' }),
-        dataIndex: 'deviceVersion',
+        title: 'ID',
+        dataIndex: 'deviceUuid',
         render: text => text || '--',
-        key: 'deviceVersion',
-        sorter: (a, b) => a.deviceVersion - b.deviceVersion,
-        sortOrder: this.state.sortedInfo.columnKey === 'deviceVersion' && this.state.sortedInfo.order,
+        key: 'deviceUuid',
+        ellipsis: true,
+        // sorter: (a, b) => a.deviceVersion - b.deviceVersion,
+        // sortOrder: this.state.sortedInfo.columnKey === 'deviceVersion' && this.state.sortedInfo.order,
       },
       {
         title: formatMessage({ id: 'oal.common.handle' }),
@@ -272,25 +296,121 @@ class Device extends Component {
   };
 
   table_handleChange = (pagination, filters, sorter) => {
-    const { dispatch } = this.props;
-    const params = {
-      current: pagination.current,
-      pageSize: pagination.pageSize,
-      sortedInfo: sorter,
-    };
     this.setState({
-      page: pagination,
-      sortedInfo: sorter,
-    });
-    // 8126TODO 接口需增加分页、排序等参数
-    dispatch({
-      type: 'device/fetch',
-      payload: {
-        verity: 1,
-        ...params,
+      page: {
+        current: pagination.current,
+        pageSize: pagination.pageSize,
       },
+      selectedRows: [],
+    }, () => {
+      this.loadData();
     });
-    console.log('table_handleChange', params);
+  };
+
+  renderSimpleForm = () => {
+    const { form, loading } = this.props;
+    const { getFieldDecorator } = form;
+
+    return (
+      <Form layout="inline">
+        <Row
+          gutter={{
+            md: 4,
+            lg: 24,
+            xl: 48,
+          }}
+        >
+          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
+            <FormItem label={formatMessage({ id: 'oal.device.deviceName' })}>
+              {getFieldDecorator('name')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
+            <FormItem label="IP">
+              {getFieldDecorator('ip')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
+            <FormItem label="ID">
+              {getFieldDecorator('deviceUuid')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
+            <FormItem label={formatMessage({ id: 'oal.common.status' })}>
+              {getFieldDecorator('networkState', {
+                initialValue: '',
+              })(
+                <Select
+                  placeholder={formatMessage({ id: 'oal.common.pleaseSelect' })}
+                  style={{
+                    width: '100%',
+                  }}
+                >
+                  <Option value=""><FormattedMessage id="oal.common.all" /></Option>
+                  <Option value="1"><FormattedMessage id="oal.device.online" /></Option>
+                  <Option value="0"><FormattedMessage id="oal.device.offline" /></Option>
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col xxl={4} lg={4} md={4} sm={24}>
+            <span className={styles.submitButtons}>
+              <Button onClick={this.handleSearch} type="primary" htmlType="submit" loading={loading}>
+                <FormattedMessage id="oal.common.query" />
+              </Button>
+              <Button
+                style={{
+                  marginLeft: 8,
+                }}
+                onClick={this.handleFormReset}
+              >
+                <FormattedMessage id="oal.common.reset" />
+              </Button>
+            </span>
+          </Col>
+        </Row>
+      </Form>
+    );
+  };
+
+  handleSearch = () => {
+    const { form, dispatch } = this.props;
+    const { page } = this.state;
+
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      this.setState({
+        page: {
+          ...page,
+          current: 1,
+        },
+        formValues: fieldsValue,
+        selectedRows: [],
+      }, () => {
+        this.loadData();
+      });
+    });
+  };
+
+  handleFormReset = () => {
+    const { form, dispatch } = this.props;
+    form.resetFields();
+    form.setFieldsValue({
+      creator: '',
+    });
+    this.setState({
+      page: {
+        pageNo: 1,
+        pageSize: 10,
+        current: 1,
+      },
+      formValues: {
+        creator: '',
+      },
+      selectedRows: [],
+    }, () => {
+      this.loadData();
+    });
   };
 
   device_showTotal = (total, range) => (formatMessage({
@@ -312,8 +432,13 @@ class Device extends Component {
       deviceList.pagination.showTotal = this.device_showTotal;
       deviceTableData = deviceList;
     } else {
-      page.showTotal = this.device_showTotal;
-      deviceTableData = { list: deviceList, pagination: page };
+      deviceTableData = {
+        list: deviceList,
+        pagination: {
+          ...page,
+          showTotal: this.device_showTotal,
+        }
+      };
     }
 
     // const { type } = this.props.match.params.type ? this.props.match.params : { type: 'pass' };
@@ -324,6 +449,25 @@ class Device extends Component {
           <Alert message={<div><FormattedMessage id="oal.device.deviceRegistrationPath" />: <span style={{ color: 'red', marginLeft: 12 }}>{loginUser.currentUser.org.path}</span></div>} type="info" showIcon style={{ marginBottom: 8 }} closable afterClose={this.handleClose} />
         ) : null}
         <Card bordered={false}>
+          <div className={styles.tableList}>
+            {/* <div className={styles.tableListForm}>{this.renderSimpleForm()}</div> */}
+            <div className={styles.tableListOperator}>
+              <Button type="danger" onClick={this.handleBatchDelete} disabled={!selectedRows || selectedRows.length === 0}>
+                <FormattedMessage id="oal.common.delete" />
+              </Button>
+            </div>
+            <StandardTable
+              // eslint-disable-next-line no-underscore-dangle
+              rowKey={record => record._id}
+              needRowSelection
+              selectedRows={selectedRows}
+              loading={deviceListLoading}
+              data={deviceTableData}
+              columns={this.table_columns()}
+              onSelectRow={this.table_handleSelectRows}
+              onChange={this.table_handleChange}
+            />
+          </div>
           {/* <Tabs activeKey={type} onChange={this.changeTab}>
             {
               tabArray.map(item => (
@@ -340,43 +484,29 @@ class Device extends Component {
               ))
             }
           </Tabs> */}
-          <div className={styles.tableListOperator}>
-            <Button type="danger" onClick={this.handleBatchDelete} disabled={!selectedRows || selectedRows.length===0}>
-              <FormattedMessage id="oal.common.delete" />
-            </Button>
-          </div>
-          <StandardTable
-            // eslint-disable-next-line no-underscore-dangle
-            rowKey={record => record._id}
-            needRowSelection
-            selectedRows={this.state.selectedRows}
-            loading={deviceListLoading}
-            data={deviceTableData}
-            columns={this.table_columns()}
-            onSelectRow={this.table_handleSelectRows}
-            onChange={this.table_handleChange}
-          />
-          <DetailModal
-            visible={detailModalVisible}
-            bean={deviceBean}
-            handleCancel={this.closeDetailModal}
-            handleSubmit={this.closeDetailModal}
-          />
-          <RenameModal
-            visible={modalVisible}
-            bean={deviceBean}
-            handleCancel={this.closeRenameModal}
-            handleSubmit={this.renameDevice}
-          />
-          <DeviceDelModal
-            visible={delModalVisible}
-            deviceBeanList={delBean}
-            handleCancel={this.closeDelModal}
-            handleSubmit={this.submitDelete}
-          />
         </Card>
+
+        <DetailModal
+          visible={detailModalVisible}
+          bean={deviceBean}
+          handleCancel={this.closeDetailModal}
+          handleSubmit={this.closeDetailModal}
+        />
+        <RenameModal
+          visible={modalVisible}
+          bean={deviceBean}
+          handleCancel={this.closeRenameModal}
+          handleSubmit={this.renameDevice}
+        />
+        <DeviceDelModal
+          visible={delModalVisible}
+          deviceBeanList={delBean}
+          handleCancel={this.closeDelModal}
+          handleSubmit={this.submitDelete}
+        />
       </PageHeaderWrapper>
     )
   }
 }
-export default Device;
+
+export default Form.create()(Device);

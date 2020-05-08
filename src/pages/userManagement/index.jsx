@@ -56,11 +56,14 @@ class UserManagement extends Component {
     {
       title: formatMessage({ id: 'oal.common.account' }),
       dataIndex: 'userName',
+      key: 'userName',
       ellipsis: true,
     },
     {
       title: formatMessage({ id: 'oal.common.nickname' }),
       ellipsis: true,
+      key: 'nickname',
+      dataIndex: 'nickname',
       render: (text, record) => (
         <span>
           {record && record.profile && record.profile.nickName ? record.profile.nickName : '--'}
@@ -70,6 +73,8 @@ class UserManagement extends Component {
     {
       title: formatMessage({ id: 'oal.common.phoneNumber' }),
       ellipsis: true,
+      key: 'phoneNumber',
+      dataIndex: 'phoneNumber',
       render: (text, record) => (
         <span>
           {record && record.profile && record.profile.mobile ? record.profile.mobile : ''}
@@ -79,6 +84,8 @@ class UserManagement extends Component {
     {
       title: formatMessage({ id: 'oal.common.email' }),
       ellipsis: true,
+      key: 'email',
+      dataIndex: 'email',
       render: (text, record) => (
         <span>
           {record && record.profile && record.profile.email ? record.profile.email : ''}
@@ -87,6 +94,7 @@ class UserManagement extends Component {
     },
     {
       title: formatMessage({ id: 'oal.user-manage.orgNum' }),
+      key: 'orgNum',
       dataIndex: 'orgNum',
       width: 120,
       render: (text, record) => (
@@ -99,6 +107,7 @@ class UserManagement extends Component {
     {
       title: formatMessage({ id: 'oal.common.handle' }),
       width: 200,
+      key: 'handle',
       render: (text, record) => (
         <Fragment>
           <a onClick={() => this.handleUpdateModalVisible(record)}><FormattedMessage id="oal.common.modify" /></a>

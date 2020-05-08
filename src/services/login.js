@@ -29,12 +29,13 @@ export async function getOrg(path) {
  */
 export async function signin(data) {
   // return post('/api/user/signin', data)
-  return post('/guard-web/f/com/signin', data);
+  // return post('/guard-web/f/com/signin', data);
+  return post('/guard-web/a/login', data);
 }
 
 /**
  * （通用7）退出登录
  */
 export async function ajaxLogout() {
-  return get('/guard-web/a/sys/office/logout');
+  return get('/guard-web/a/sys/user/logout');
 }

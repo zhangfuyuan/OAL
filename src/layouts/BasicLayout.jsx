@@ -34,9 +34,13 @@ const BasicLayout = props => {
       if (agent && agent.saasName) {
         sysName = agent.saasName;
       }
+      const params = { title: sysName };
+      if (agent && agent.saasIconsUrl) {
+        params.logo = agent.saasIconsUrl;
+      }
       dispatch({
-        type: 'settings/changeSettingName',
-        payload: { title: sysName },
+        type: 'settings/changeSettingInfo',
+        payload: params,
       });
     });
   }
@@ -62,13 +66,16 @@ const BasicLayout = props => {
     if (dispatch) {
       dispatch({
         type: 'user/modifyPassword',
-        payload,
+        payload: {
+          userId: user._id,
+          ...payload,
+        },
       });
     }
   };
   const setSaasInfo = payload => {
     // eslint-disable-next-line no-underscore-dangle
-    payload._id = user.org._id;
+    payload.orgId = user.org._id;
     if (dispatch) {
       dispatch({
         type: 'user/modifySaasInfo',
@@ -77,10 +84,10 @@ const BasicLayout = props => {
     }
   };
   if (user.passwordVersion === 0) {
-    return <SettingPassword onSubmit={setPsw} loading={modifyPwdLoading}/>
+    return <SettingPassword onSubmit={setPsw} loading={modifyPwdLoading} />
   }
   if (user.type === 0 && user.org.type === 0 && !user.org.saasName) {
-    return <SettingSaasInfo onSubmit={setSaasInfo} loading={modifyPwdLoading}/>
+    return <SettingSaasInfo onSubmit={setSaasInfo} loading={modifyPwdLoading} />
   }
   return (
     <ProLayout
@@ -108,8 +115,8 @@ const BasicLayout = props => {
         return first ? (
           <Link to={route.path}>{route.breadcrumbName}</Link>
         ) : (
-          <span>{route.breadcrumbName}</span>
-        );
+            <span>{route.breadcrumbName}</span>
+          );
       }}
       footerRender={footerRender}
       menuDataRender={() => menuList}

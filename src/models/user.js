@@ -20,7 +20,7 @@ const UserModel = {
     },
     *fetchCurrent(_, { call, put }) {
       const response = yield call(authByToken);
-      if (response.res > 0) {
+      if (response && response.res > 0) {
         yield put({
           type: 'saveCurrentUser',
           payload: response,

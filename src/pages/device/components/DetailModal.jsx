@@ -5,7 +5,8 @@ import moment from 'moment';
 
 const recognitionModeType = {
   '0': 'oal.device.standardMode',
-  '1': 'oal.device.maskMode',
+  '1': 'oal.device.attendanceMode',
+  '2': 'oal.device.maskMode',
 };
 
 const infraredThermometerType = {

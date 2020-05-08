@@ -160,3 +160,36 @@ export function pswBase64Thrice(value) {
 
   return res;
 }
+
+/**
+ * 解密
+ */
+export function pswBase64ThriceRestore(value) {
+  let res = '';
+
+  try {
+    res = window.atob(window.atob(window.atob(value)));
+  } catch (err) {
+    console.log(err);
+    res = value;
+  }
+
+  return res;
+}
+
+/**
+ * 温度单位，摄氏度转成华氏度
+ * 
+ * return 保留小数点后一位的字符串
+ */
+export function temperatureC2F(value) {
+  let res = parseFloat(value) || 0;
+
+  try {
+    res = res * 9 / 5 + 32;
+  } catch (err) {
+    console.log(err);
+  }
+
+  return res.toFixed(1);
+}

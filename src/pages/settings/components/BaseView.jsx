@@ -22,6 +22,14 @@ class BaseView extends Component {
     callback();
   };
 
+  checkIllegalCharacter = (rule, value, callback) => {
+    const errReg = /[<>|*?/:\s]/;
+    if (value && errReg.test(value)) {
+      callback(formatMessage({ id: 'oal.common.illegalCharacterTips' }));
+    }
+    callback();
+  };
+
   render() {
     const {
       form: { getFieldDecorator },
@@ -32,6 +40,27 @@ class BaseView extends Component {
       <div className={styles.baseView} ref={this.getViewDom}>
         <div className={styles.left}>
           <Form layout="vertical">
+            <FormItem
+              label={formatMessage({ id: 'oal.settings.nameOfAccount' })}
+            >
+              {getFieldDecorator('userName', {
+                rules: [
+                  {
+                    required: true,
+                    message: formatMessage({ id: 'oal.user-manage.enterAccountNameTips' }),
+                  },
+                  {
+                    pattern: /^[a-zA-Z]+$/,
+                    message: formatMessage({ id: 'oal.user-manage.enterUsernameError' }),
+                  },
+                  {
+                    max: 10,
+                    message: formatMessage({ id: 'oal.common.maxLength' }, { num: '10' }),
+                  },
+                ],
+                initialValue: currentUser && currentUser.userName,
+              })(<Input placeholder={formatMessage({ id: 'oal.settings.nameOfAccount' })} disabled />)}
+            </FormItem>
             <FormItem
               label={formatMessage({ id: 'oal.common.nickname' })}
             >
@@ -45,11 +74,14 @@ class BaseView extends Component {
                     max: 20,
                     message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
                   },
+                  {
+                    validator: checkIllegalCharacter,
+                  },
                 ],
                 initialValue: currentUser && currentUser.profile && currentUser.profile.nickName,
               })(<Input placeholder={formatMessage({ id: 'oal.common.nickname' })} />)}
             </FormItem>
-            <FormItem
+            {/* <FormItem
               label={formatMessage({ id: 'oal.settings.organisation' })}
             >
               {getFieldDecorator('org', {
@@ -84,7 +116,7 @@ class BaseView extends Component {
               })(
                 <Input placeholder={formatMessage({ id: 'oal.settings.contactNumber' })} />,
               )}
-            </FormItem>
+            </FormItem> */}
             <Button type="primary" onClick={this.handlerSubmit}>
               <FormattedMessage id="oal.common.save" />
             </Button>

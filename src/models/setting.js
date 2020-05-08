@@ -78,7 +78,7 @@ const SettingModel = {
       window.history.replaceState(null, 'setting', urlParams.href);
       return { ...state, ...payload };
     },
-    changeSettingName(state = defaultSettings, { payload }) {
+    changeSettingInfo(state = defaultSettings, { payload }) {
       // console.log('changeSettingName---->', payload);
       return { ...state, ...payload };
     },

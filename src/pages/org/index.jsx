@@ -55,40 +55,6 @@ class OrgList extends Component {
     },
   };
 
-  // columns = [
-  //   {
-  //     title: '组织名称',
-  //     dataIndex: 'name',
-  //   },
-  //   {
-  //     title: '状态',
-  //     dataIndex: 'state',
-  //     render(val) {
-  //       return <Badge status={statusMap[val]} text={status[val]} />;
-  //     },
-  //   },
-  //   {
-  //     title: '路径',
-  //     dataIndex: 'path',
-  //     render: (text, record) => (
-  //       <Fragment>
-  //         <a onClick={() => this.openWin(record.path)}>{record.path}</a>
-  //       </Fragment>
-  //     ),
-  //   },
-  //   {
-  //     title: '操作',
-  //     render: (text, record) => (
-  //       <Fragment>
-  //         <a onClick={() => this.handleUpdateModalVisible(record)}>修改</a>
-  //         <Divider type="vertical"/>
-  //         <a onClick={() => this.openDetailModal(record)}>查看</a>
-  //         {/* <MoreBtn item={item}/>, */}
-  //       </Fragment>
-  //     ),
-  //   },
-  // ];
-
   componentDidMount() {
     this.loadOrgList();
   }
@@ -126,10 +92,12 @@ class OrgList extends Component {
       {
         title: formatMessage({ id: 'oal.org.orgName' }),
         dataIndex: 'name',
+        key: 'name',
       },
       {
         title: formatMessage({ id: 'oal.org.orgStatus' }),
         dataIndex: 'state',
+        key: 'state',
         render(val) {
           return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
         },
@@ -137,6 +105,7 @@ class OrgList extends Component {
       {
         title: formatMessage({ id: 'oal.org.path' }),
         dataIndex: 'path',
+        key: 'path',
         render: (_text, record) => (
           <Fragment>
             <a onClick={() => this.openWin(record.path)}>{record.path}</a>
@@ -146,28 +115,31 @@ class OrgList extends Component {
       {
         title: formatMessage({ id: 'oal.org.contacts' }),
         dataIndex: 'contactName',
+        key: 'contactName',
         render: (text, record) => <span>{(record && record.contact && record.contact.nickName) || formatMessage({ id: 'oal.org.notFill' })}</span>,
       },
       {
         title: formatMessage({ id: 'oal.org.creator' }),
         dataIndex: 'creator',
+        key: 'creator',
         render: (text, record) => <span>{text || '--'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.handle' }),
         width: 250,
+        key: 'handle',
         render: (text, record) => (
           <Fragment>
-            <a onClick={() => this.openDetailModal(record)}><FormattedMessage id="oal.common.view" /></a>
+            <a key="view" onClick={() => this.openDetailModal(record)}><FormattedMessage id="oal.common.view" /></a>
             <Divider type="vertical" />
-            <a onClick={() => this.moreAction('modify', record)}><FormattedMessage id="oal.common.modify" /></a>
+            <a key="modify" onClick={() => this.moreAction('modify', record)}><FormattedMessage id="oal.common.modify" /></a>
             <Divider type="vertical" />
-            <a onClick={() => this.openResetModal(record)}><FormattedMessage id="oal.org.resetPassword" /></a>
+            <a key="resetPassword" onClick={() => this.openResetModal(record)}><FormattedMessage id="oal.org.resetPassword" /></a>
             <Divider type="vertical" />
             {
               record.state === 1 ?
-                <a onClick={() => this.moreAction('close', record)}><FormattedMessage id="oal.common.disable" /></a> :
-                <a onClick={() => this.moreAction('open', record)}><FormattedMessage id="oal.common.enable" /></a>
+                <a key="disable" onClick={() => this.moreAction('close', record)}><FormattedMessage id="oal.common.disable" /></a> :
+                <a key="enable" onClick={() => this.moreAction('open', record)}><FormattedMessage id="oal.common.enable" /></a>
             }
             {/* <MoreBtn item={record} /> */}
           </Fragment>
@@ -332,7 +304,7 @@ class OrgList extends Component {
   };
 
   renderSimpleForm = () => {
-    const { form, loading } = this.props;
+    const { form, orgListLoading } = this.props;
     const { formValues } = this.state;
     const { getFieldDecorator } = form;
     return (
@@ -381,7 +353,7 @@ class OrgList extends Component {
           </Col>
           <Col xxl={4} lg={4} md={4} sm={24}>
             <span className={styles.submitButtons}>
-              <Button onClick={this.handleSearch} type="primary" htmlType="submit" loading={loading}>
+              <Button onClick={this.handleSearch} type="primary" htmlType="submit" loading={orgListLoading}>
                 <FormattedMessage id="oal.common.query" />
               </Button>
               <Button

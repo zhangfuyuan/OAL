@@ -25,10 +25,18 @@ const ModifySysName = props => {
     });
   };
 
+  const checkIllegalCharacter = (rule, value, callback) => {
+    const errReg = /[<>|*?/:\s]/;
+    if (value && errReg.test(value)) {
+      callback(formatMessage({ id: 'oal.common.illegalCharacterTips' }));
+    }
+    callback();
+  };
+
   return (
     <Modal
       destroyOnClose
-      title={formatMessage({ id: 'oal.settings.modifySysname' })}
+      title={formatMessage({ id: 'oal.common.modify' })}
       visible={visible}
       onOk={handleOk}
       confirmLoading={confirmLoading}
@@ -46,6 +54,9 @@ const ModifySysName = props => {
               {
                 max: 20,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
+              },
+              {
+                validator: checkIllegalCharacter,
               },
             ],
             initialValue: currentUser && currentUser.org && currentUser.org.saasName,

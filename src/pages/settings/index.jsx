@@ -10,7 +10,7 @@ import SystemView from './components/SystemView';
 import DeveloperView from './components/DeveloperView';
 import ModifyPswModal from './components/ModifyPswModal';
 import ModifySysName from './components/ModifySysName';
-import ModifySysIcons from './components/ModifySysIcons';
+// import ModifySysIcons from './components/ModifySysIcons';
 import FaceKey from './components/FaceKey';
 import FaceKeyModal from './components/FaceKeyModal';
 import FaceLibrary from './components/FaceLibrary';
@@ -49,10 +49,9 @@ class Settings extends Component {
       selectKey: 'base',
       modifyPswVisible: false,
       modifySysNameVisible: false,
-      modifySysIconsVisible: false,
+      // modifySysIconsVisible: false,
       faceKeyVisible: false,
       selectedFaceKey: {},
-      updateSysIcons: null,
     };
   }
 
@@ -103,10 +102,13 @@ class Settings extends Component {
   };
 
   submitBaseInfo = values => {
-    const { dispatch } = this.props;
+    const { dispatch, currentUser } = this.props;
     dispatch({
       type: 'user/modifyUser',
-      payload: values,
+      payload: {
+        userId: currentUser._id,
+        ...values,
+      },
     }).then(res => {
       if (res && res.res > 0) {
         message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
@@ -145,7 +147,7 @@ class Settings extends Component {
   };
 
   submitModifyPsw = values => {
-    const { dispatch } = this.props;
+    const { dispatch, currentUser } = this.props;
     const params = {
       // oldpassword: CryptoJS.MD5(values.oldpassword).toString(),
       // newpassword: CryptoJS.MD5(values.newpassword).toString(),
@@ -154,7 +156,10 @@ class Settings extends Component {
     };
     dispatch({
       type: 'user/modifyPassword',
-      payload: params,
+      payload: {
+        userId: currentUser._id,
+        ...params,
+      },
     }).then(res => {
       if (res && res.res > 0) {
         message.success(formatMessage({ id: 'oal.settings.modifyPasswordSuccessfullyTips' }));
@@ -169,39 +174,45 @@ class Settings extends Component {
     this.setState({ modifySysNameVisible: true });
   };
 
-  openModifySysIcons = () => {
-    this.setState({ modifySysIconsVisible: true });
-  };
+  // openModifySysIcons = () => {
+  //   this.setState({ modifySysIconsVisible: true });
+  // };
 
   closeModifySysName = () => {
     this.setState({ modifySysNameVisible: false });
   };
 
-  closeModifySysIcons = () => {
-    this.setState({ modifySysIconsVisible: false });
-  };
+  // closeModifySysIcons = () => {
+  //   this.setState({ modifySysIconsVisible: false });
+  // };
 
   submitSysName = values => {
-    const { dispatch } = this.props;
+    const { dispatch, currentUser } = this.props;
     dispatch({
       type: 'user/modifySaasInfo',
-      payload: values,
+      payload: {
+        orgId: currentUser.org._id,
+        ...values,
+      },
     }).then(res => {
       if (res && res.res > 0) {
         message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
         this.closeModifySysName();
         dispatch({
-          type: 'settings/changeSettingName',
+          type: 'settings/changeSettingInfo',
           payload: { title: values.saasName },
         });
       }
     });
   };
 
-  submitSysIcons = values => {
-    // 8126TODO 上传系统图标
-    this.setState({ updateSysIcons: values });
-    this.closeModifySysIcons();
+  submitSysIcons = saasIconsUrl => {
+    // this.closeModifySysIcons();
+    message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+    dispatch({
+      type: 'settings/changeSettingInfo',
+      payload: { logo: saasIconsUrl },
+    });
   };
 
   setFaceKeyModal = flag => {
@@ -287,7 +298,7 @@ class Settings extends Component {
 
   renderChildren = () => {
     const { currentUser, devInfo, devInfoLoading, faceKeyList, faceKeyListLoading, sysConfigs, systemVersion } = this.props;
-    const { selectKey, updateSysIcons } = this.state;
+    const { selectKey } = this.state;
     switch (selectKey) {
       case 'base':
         return <BaseView
@@ -302,9 +313,10 @@ class Settings extends Component {
         return <SystemView
           version={systemVersion}
           currentUser={currentUser}
+          orgId={currentUser && currentUser.org && currentUser.org._id || ''}
           openModal={this.openModifySysName}
-          openUploadModal={this.openModifySysIcons}
-          icons={updateSysIcons}
+          updateSysIcons={this.submitSysIcons}
+        // openUploadModal={this.openModifySysIcons}
         />;
       case 'developer':
         return <DeveloperView
@@ -347,7 +359,7 @@ class Settings extends Component {
       selectKey,
       modifyPswVisible,
       modifySysNameVisible,
-      modifySysIconsVisible,
+      // modifySysIconsVisible,
       faceKeyVisible,
       selectedFaceKey,
     } = this.state;
@@ -386,12 +398,13 @@ class Settings extends Component {
           handleCancel={this.closeModifySysName}
           handleSubmit={this.submitSysName}
         />
-        <ModifySysIcons
+        {/* <ModifySysIcons
           visible={modifySysIconsVisible}
           currentUser={currentUser}
+          orgId={currentUser && currentUser.org && currentUser.org._id || ''}
           handleCancel={this.closeModifySysIcons}
           handleSubmit={this.submitSysIcons}
-        />
+        /> */}
         <FaceKeyModal
           visible={faceKeyVisible}
           handleSubmit={this.submitFaceKey}

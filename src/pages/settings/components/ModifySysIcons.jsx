@@ -14,7 +14,7 @@ const getBase64 = (img, callback) => {
 };
 
 const ModifySysIcons = props => {
-  const { visible, currentUser, handleSubmit, confirmLoading, handleCancel } = props;
+  const { visible, currentUser, handleSubmit, confirmLoading, handleCancel, orgId } = props;
   const [imgLoading, setImgLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
@@ -108,10 +108,11 @@ const ModifySysIcons = props => {
   // 初始化 WebUploader 实例对象
   const wuInit = newFileList => {
     if (uploader) wuDestroy();
+    const _orgId = orgId;
 
     uploader = window.WebUploader.create({
       swf: (process.env === 'production' ? publicPath : '/') + 'lib/webuploader/Uploader.swf', // 请根据实际项目部署路径配置swf文件路径
-      server: 'https://www.mocky.io/v2/5cc8019d300000980a055e76', // 8126TODO 文件接收服务端
+      server: '/guard-web/a/org/editSaasIcons', // 8126TODO 文件接收服务端
       thumb: false, // 不生成缩略图
       compress: false, // 如果此选项为false, 则图片在上传前不进行压缩
       prepareNextFile: true, // 是否允许在文件传输时提前把下一个文件准备好
@@ -123,6 +124,7 @@ const ModifySysIcons = props => {
       let newfile = new window.WebUploader.File(wuFile);
 
       newfile.index = index;
+      newfile.orgId = _orgId;
       uploader.addFiles(newfile);
       wuFile = null;
       newfile = null;
@@ -153,7 +155,7 @@ const ModifySysIcons = props => {
     });
 
     uploader.on('uploadSuccess', (file, response) => {
-      // const { errcode, data, msg } = response;
+      // const { res, data, msg } = response;
       // 8126TODO 上传成功返回数据
 
       if (response.status === 'done' && response.url) {
@@ -165,12 +167,12 @@ const ModifySysIcons = props => {
 
       setUploadLoading(false);
 
-      // if (errcode === 0 && data && data.fileLink) {
+      // if (res > 0 && data && data.fileUrl) {
       //   message.success('uploadSuccess');
       //   setUploadLoading(false);
-      // } else if (errcode === 0 && data === 'upload_chunk') {
+      // } else if (res === 0) {
       //   // 分片文件上传成功时返回，啥也不做
-      // } else if (msg && /false/i.test(msg)) {
+      // } else if (res < 0 || /false/i.test(msg)) {
       //   message.error('false');
       //   setUploadLoading(false);
       // }

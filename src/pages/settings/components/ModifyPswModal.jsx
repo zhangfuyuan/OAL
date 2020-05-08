@@ -37,7 +37,7 @@ const ModifyPswModal = props => {
   return (
     <Modal
       destroyOnClose
-      title={formatMessage({ id: 'oal.settings.modifyPassword' })}
+      title={formatMessage({ id: 'oal.common.modify' })}
       visible={visible}
       onOk={handleOk}
       confirmLoading={confirmLoading}
@@ -50,7 +50,7 @@ const ModifyPswModal = props => {
             rules: [
               {
                 required: true,
-                message: formatMessage({ id: 'oal.settings.enterOldPassword' }),
+                message: formatMessage({ id: 'oal.user-login.enterPasswordTips' }),
               },
             ],
           })(<Input.Password placeholder={formatMessage({ id: 'oal.settings.oldPassword' })} />)}
@@ -61,7 +61,7 @@ const ModifyPswModal = props => {
               {
                 required: true,
                 message: formatMessage({
-                  id: 'oal.common.enterNewPassword',
+                  id: 'oal.user-login.enterPasswordTips',
                 }),
               },
               {
@@ -79,7 +79,7 @@ const ModifyPswModal = props => {
               {
                 required: true,
                 message: formatMessage({
-                  id: 'oal.common.enterConfirmPassword',
+                  id: 'oal.user-login.enterPasswordTips',
                 }),
               },
               {

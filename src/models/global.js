@@ -73,8 +73,9 @@ const GlobalModel = {
     },
 
     *getSystemVersion(_, { call, put }) {
-      const { res, data } = yield call(querySystemVersion);
-      let version = '0.0.0';
+      const response = yield call(querySystemVersion);
+      const { res, data } = response || {};
+      let version = 'v2.0.0';
       if (res && data && data.version) {
         // eslint-disable-next-line prefer-destructuring
         version = data.version;
@@ -86,23 +87,25 @@ const GlobalModel = {
         },
       });
 
-      const { ip } = data;
-      yield put({
-        type: 'saveOrigin',
-        payload: {
-          origin: ip,
-        },
-      });
+      if (process.env.NODE_ENV === 'production' && res && data) {
+        const { ip } = data;
+        yield put({
+          type: 'saveOrigin',
+          payload: {
+            origin: ip,
+          },
+        });
 
-      if (ip) {
-        try {
-          const { origin: curOrigin, href: curHref } = new URL(window.location.href);
-          if (!~curHref.indexOf(ip)) window.location.href = curHref.replace(curOrigin, /\/\/./.test(ip) ? ip : `//${ip}`);
-        } catch (err) {
-          console.log(err);
+        if (ip) {
+          try {
+            const { origin: curOrigin, href: curHref } = new URL(window.location.href);
+            if (!~curHref.indexOf(ip)) window.location.href = curHref.replace(curOrigin, /\/\/./.test(ip) ? ip : `//${ip}`);
+          } catch (err) {
+            console.log(err);
+          }
+        } else {
+          yield put(routerRedux.replace('/user/initOrigin'));
         }
-      } else {
-        yield put(routerRedux.replace('/user/initOrigin'));
       }
     },
 

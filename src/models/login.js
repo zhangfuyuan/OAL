@@ -19,7 +19,7 @@ const Model = {
   effects: {
     *login({ payload }, { call, put }) {
       const response = yield call(signin, payload);
-      if (response.res > 0) {
+      if (response && response.res > 0) {
         // 登录成功
         let loginState = {
           status: 'ok',
@@ -70,7 +70,7 @@ const Model = {
         const { redirect } = getPermissionRoutes(type, org.type);
 
         yield put(routerRedux.replace(redirect || '/'));
-      } else {
+      } else if (!response || response.res !== 0) {
         console.error('login error:', response);
         let loginState = {
           status: 'error',
@@ -80,6 +80,8 @@ const Model = {
           payload: loginState,
         });
       }
+
+      return Promise.resolve(response);
     },
 
     *getCaptcha({ payload }, { call }) {
@@ -87,8 +89,8 @@ const Model = {
     },
 
     // eslint-disable-next-line require-yield
-    *logout() {
-      yield call(ajaxLogout, payload);
+    *logout(_, { call, put }) {
+      yield call(ajaxLogout);
 
       const { redirect } = getPageQuery(); // redirect
 
@@ -103,7 +105,7 @@ const Model = {
     // rel api
     *getOrgInfo({ payload }, { call, put }) {
       const orgInfo = yield call(getOrg, payload);
-      if (orgInfo.res > 0) {
+      if (orgInfo && orgInfo.res > 0) {
         yield put({
           type: 'setOrg',
           payload: orgInfo.data.org,

@@ -21,19 +21,22 @@ export async function authByToken() {
  */
 export async function modifyPsw(data) {
   // return post('/api/user/modifyPsw', data);
-  return post('/guard-web/a/user/modifyPsw', data);
-}
-
-export async function modifyUser(data) {
-  return post('/api/user/update', data);
+  return post('/guard-web/a/sys/user/modifyPsw', data);
 }
 
 /**
- * 修改Saas
+ * （账号3）修改账号
+ */
+export async function modifyUser(data) {
+  return post('/guard-web/a/user/update', data);
+}
+
+/**
+ * （设置3-1）修改系统信息
  * @param data
  * @returns {Promise<*>}
  */
 export async function editSaasInfo(data) {
-  return post('/api/org/editSaasInfo', data)
+  return post('/guard-web/a/org/editSaasInfo', data)
 }
 // /api/user/modifyPsw

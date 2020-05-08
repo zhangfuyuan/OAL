@@ -12,7 +12,7 @@ const OrgDetailModal = props => {
 
   const { origin } = window.location;
   const href = `${origin}${publicPath}user/${orgBean.path}/login`;
-  const copyText = `${formatMessage({ id: 'oal.org.accessAddress' })} : ${href}\n${formatMessage({ id: 'oal.org.loginAccount' })} : admin\n${formatMessage({ id: 'oal.org.initialPassword' })} : admin`;
+  const copyText = `${formatMessage({ id: 'oal.org.accessAddress' })} : ${href}\n${formatMessage({ id: 'oal.org.loginAccount' })} : admin\n${formatMessage({ id: 'oal.org.initialPassword' })} : 123456`;
 
   const handleOk = () => {
     const copyArea = document.getElementById('copyArea');
