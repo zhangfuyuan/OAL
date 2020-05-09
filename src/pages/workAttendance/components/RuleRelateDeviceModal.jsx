@@ -33,7 +33,7 @@ const RuleRelateDeviceModal = props => {
     setSelectedItems([]);
   };
 
-  const title = `${formatMessage({ id: 'oal.work-rule.relateDevice' })}(${selectedBean && selectedBean.ruleName || '--'})`;
+  const title = `${formatMessage({ id: 'oal.work-rule.relateDevice' })}(${selectedBean && selectedBean.name || '--'})`;
 
   const handleChange = selectedItems => {
     setSelectedItems(selectedItems);

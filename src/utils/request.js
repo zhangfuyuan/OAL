@@ -6,6 +6,9 @@ import { extend } from 'umi-request';
 import { notification } from 'antd';
 import { AUTH_TOKEN } from './constants';
 import { formatMessage } from 'umi-plugin-react/locale';
+import defaultSettings from '../../config/defaultSettings';
+
+const { isAjaxOAL } = defaultSettings;
 
 const codeMessage = {
   200: 'oal.ajax.200',
@@ -65,9 +68,11 @@ request.interceptors.request.use((url, options) => {
   options.headers = {
     ...options.headers,
   };
-  const authToken = sessionStorage.getItem(AUTH_TOKEN) || localStorage.getItem(AUTH_TOKEN);
-  if (authToken) {
-    options.headers.Authorization = `Bearer ${authToken}`
+  if (isAjaxOAL) {
+    const authToken = sessionStorage.getItem(AUTH_TOKEN) || localStorage.getItem(AUTH_TOKEN);
+    if (authToken) {
+      options.headers.Authorization = `Bearer ${authToken}`
+    }
   }
   return (
     {

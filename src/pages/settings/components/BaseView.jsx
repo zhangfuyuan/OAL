@@ -75,7 +75,7 @@ class BaseView extends Component {
                     message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
                   },
                   {
-                    validator: checkIllegalCharacter,
+                    validator: this.checkIllegalCharacter,
                   },
                 ],
                 initialValue: currentUser && currentUser.profile && currentUser.profile.nickName,

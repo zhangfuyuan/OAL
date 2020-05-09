@@ -1,14 +1,16 @@
 import { Alert, Checkbox, Icon, Result, Button, Spin, notification } from 'antd';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import React, { Component } from 'react';
-// import CryptoJS from 'crypto-js';
+import CryptoJS from 'crypto-js';
 import { SYSTEM_PATH } from '@/utils/constants';
 import Link from 'umi/link';
 import { connect } from 'dva';
 import LoginComponents from './components/Login';
 import styles from './style.less';
 import { pswBase64Thrice, pswBase64ThriceRestore } from '@/utils/utils';
+import defaultSettings from '../../../../config/defaultSettings';
 
+const { isAjaxOAL } = defaultSettings;
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;
 
 @connect(({ login, global: { systemVersion }, loading }) => ({
@@ -54,8 +56,11 @@ class Login extends Component {
 
   handleSubmit = (err, values) => {
     const { org } = this.props.match.params;
-    // values.password = CryptoJS.MD5(values.password).toString();
-    values.pwd = pswBase64Thrice(values.pwd);
+    const { pwd } = values;
+
+    isAjaxOAL && (values.password = CryptoJS.MD5(pwd).toString());
+    values.pwd = pswBase64Thrice(pwd);
+
     if (!err) {
       localStorage.setItem(SYSTEM_PATH, org);
       const { dispatch } = this.props;

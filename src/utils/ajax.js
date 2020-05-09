@@ -5,7 +5,7 @@ import request from './request';
 import router from 'umi/router';
 import { notification } from 'antd';
 import { stringify } from 'qs';
-import { SYSTEM_PATH } from '@/utils/constants';
+import { SYSTEM_PATH, AUTH_TOKEN } from '@/utils/constants';
 import { formatMessage } from 'umi-plugin-react/locale';
 
 const errorCode = {
@@ -55,6 +55,8 @@ request.interceptors.response.use(async (response, options) => {
         message: formatMessage({ id: 'oal.ajax.401-message' }),
         description: formatMessage({ id: 'oal.ajax.401-description' }),
       });
+      localStorage.removeItem(AUTH_TOKEN);
+      sessionStorage.removeItem(AUTH_TOKEN);
       router.replace({
         pathname: `/user/${localStorage.getItem(SYSTEM_PATH)}/login`,
       });

@@ -40,11 +40,8 @@ export function setAuthority(authority) {
 export function getPermissionRoutes(userType, orgType) {
   let redirect = '/';
   let menuList = [];
-
-  if (orgType === 0) {
-    // admin 组织
-    redirect = '/org';
-    menuList = [
+  const menuMap = {
+    admin: [
       {
         path: '/org',
         name: 'orgManger',
@@ -57,37 +54,8 @@ export function getPermissionRoutes(userType, orgType) {
         locale: 'menu.userManagement',
         icon: 'user',
       },
-      {
-        path: '/settings',
-        name: 'settings',
-        locale: 'menu.settings',
-        icon: 'setting',
-      },
-    ];
-
-    // if (userType === 0) {
-    //   // admin 用户
-    // } else {
-    //   // 其他用户
-    //   menuList = [
-    //     {
-    //       path: '/org',
-    //       name: 'orgManger',
-    //       locale: 'menu.orgManger',
-    //       icon: 'apartment',
-    //     },
-    //     {
-    //       path: '/settings',
-    //       name: 'settings',
-    //       locale: 'menu.settings',
-    //       icon: 'setting',
-    //     }
-    //   ];
-    // }
-  } else {
-    // 其他组织
-    redirect = '/device';
-    menuList = [
+    ],
+    other: [
       // {
       //   path: '/dashboard',
       //   name: 'dashboard2',
@@ -194,13 +162,50 @@ export function getPermissionRoutes(userType, orgType) {
           },
         ],
       },
+    ],
+    common: [
       {
         path: '/settings',
         name: 'settings',
         locale: 'menu.settings',
         icon: 'setting',
       },
-    ];
+    ],
+  };
+
+  if (process.env.NODE_ENV === 'production') {
+    if (orgType === 0) {
+      // admin 组织
+      redirect = '/org';
+      menuList = menuMap.admin.concat(menuMap.common);
+
+      // if (userType === 0) {
+      //   // admin 用户
+      // } else {
+      //   // 其他用户
+      //   menuList = [
+      //     {
+      //       path: '/org',
+      //       name: 'orgManger',
+      //       locale: 'menu.orgManger',
+      //       icon: 'apartment',
+      //     },
+      //     {
+      //       path: '/settings',
+      //       name: 'settings',
+      //       locale: 'menu.settings',
+      //       icon: 'setting',
+      //     }
+      //   ];
+      // }
+    } else {
+      // 其他组织
+      redirect = '/device';
+      menuList = menuMap.other.concat(menuMap.common);
+    }
+  } else {
+    // 开发时所有菜单均显示
+    menuList = menuMap.admin.concat(menuMap.other, menuMap.common);
   }
 
   return { redirect, menuList };

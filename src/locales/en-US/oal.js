@@ -496,4 +496,7 @@ export default {
   'oal.device.normallyOpen': `Normally open`,
   'oal.device.normallyClose': `Normally close`,
   'oal.device.waitShutdownTime': `Wait shutdown time`,
+  'oal.common.certifiedPeople': `Certified people`,
+  'oal.common.blacklist': `Blacklist`,
+  'oal.common.visitor': `Visitor`,
 };

@@ -11,7 +11,7 @@ const Model = {
     *fetch({ payload }, { call, put }) {
       const response = yield call(fetchList, payload);
       // console.log('fetch response-->', response);
-      if (response.res > 0) {
+      if (response && response.res > 0) {
         yield put({
           type: 'save',
           payload: response.data,

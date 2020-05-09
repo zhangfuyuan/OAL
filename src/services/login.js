@@ -1,5 +1,8 @@
 import request from '@/utils/request';
 import { post, get } from '@/utils/ajax';
+import defaultSettings from '../../config/defaultSettings';
+
+const { isAjaxOAL } = defaultSettings;
 
 export async function fakeAccountLogin(params) {
   return request('/api/login/account', {
@@ -18,8 +21,7 @@ export async function getFakeCaptcha(mobile) {
  * @returns {Promise<*>}
  */
 export async function getOrg(path) {
-  // return get(`/api/org/getByPath/${path}`)
-  return post(`/guard-web/f/com/getByPath`, { path });
+  return isAjaxOAL ? get(`/api/org/getByPath/${path}`) : post(`/guard-web/f/com/getByPath`, { path });
 }
 
 /**
@@ -28,9 +30,7 @@ export async function getOrg(path) {
  * @returns {Promise<*>}
  */
 export async function signin(data) {
-  // return post('/api/user/signin', data)
-  // return post('/guard-web/f/com/signin', data);
-  return post('/guard-web/a/login', data);
+  return isAjaxOAL ? post('/api/user/signin', data) : post('/guard-web/a/login', data);
 }
 
 /**

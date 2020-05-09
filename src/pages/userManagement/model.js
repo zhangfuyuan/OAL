@@ -14,7 +14,7 @@ const Model = {
   },
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(getUserList, payload);
+      const response = yield call(getUserList, payload) || {};
       // console.log('fetch response-->', response);
       const { res, data } = response;
       if (res > 0) {

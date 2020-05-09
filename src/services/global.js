@@ -1,11 +1,13 @@
 import { get, post } from '@/utils/ajax';
+import defaultSettings from '../../config/defaultSettings';
+
+const { isAjaxOAL } = defaultSettings;
 
 /**
  * （通用1）非登录状态下，获取系统版本号等信息
  */
 export async function querySystemVersion() {
-  // return get('/api/release');
-  return get('/guard-web/f/com/release');
+  return isAjaxOAL ? get('/api/release') : get('/guard-web/f/com/release');
 }
 
 /**

@@ -496,4 +496,7 @@ export default {
   'oal.device.normallyOpen': `常开`,
   'oal.device.normallyClose': `常关`,
   'oal.device.waitShutdownTime': `等待关闭时间`,
+  'oal.common.certifiedPeople': `认证人员`,
+  'oal.common.blacklist': `黑名单`,
+  'oal.common.visitor': `访客`,
 };

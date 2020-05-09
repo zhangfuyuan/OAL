@@ -26,14 +26,20 @@ import moment from 'moment';
 import StandardTable from '@/components/StandardTable';
 import { SYSTEM_PATH } from '@/utils/constants';
 import styles from './style.less';
+import { temperatureC2F } from '@/utils/utils';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const initFormValues = {
-  type: '',
   date: [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
 };
+const peopleTypeMap = {
+  '': 'oal.common.all',
+  '0': 'oal.common.certifiedPeople',
+  '1': 'oal.common.blacklist',
+  '2': 'oal.common.visitor',
+}
 
 @connect(({ logQuery, loading }) => ({
   logQuery,
@@ -139,28 +145,41 @@ class logQuery extends Component {
         title: formatMessage({ id: 'oal.common.fullName' }),
         key: 'name',
         dataIndex: 'name',
-        ellipsis: true,
-        sorter: (a, b) => a.name - b.name,
-        sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
+        // ellipsis: true,
+        // sorter: (a, b) => a.name - b.name,
+        // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
+      },
+      {
+        title: formatMessage({ id: 'oal.face.staffid' }),
+        key: 'staffid',
+        dataIndex: 'staffid',
+        render: (text, record) => <span>{record.staffid || '--'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.log-query.group' }),
         key: 'group',
         dataIndex: 'group',
-        render: (text, record) => <span>{record.group && record.group.name || '-'}</span>,
+        render: (text, record) => <span>{record.group && record.group.length > 0 && record.group[0].name || '-'}</span>,
       },
       {
-        title: formatMessage({ id: 'oal.log-query.device' }),
-        key: 'device',
-        dataIndex: 'device',
-        render: (text, record) => <span>{record.device && record.device.name || '-'}</span>,
+        title: formatMessage({ id: 'oal.common.type' }),
+        key: 'peopleType',
+        dataIndex: 'peopleType',
+        render: (text, record) => <span>{peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] }) || '-'}</span>,
       },
+      // {
+      //   title: formatMessage({ id: 'oal.log-query.device' }),
+      //   key: 'device',
+      //   dataIndex: 'device',
+      //   render: (text, record) => <span>{record.device && record.device.name || '-'}</span>,
+      // },
       {
         title: formatMessage({ id: 'oal.log-query.animalHeat' }),
         key: 'animalHeat',
         dataIndex: 'animalHeat',
         sorter: (a, b) => a.animalHeat - b.animalHeat,
         sortOrder: this.state.sortedInfo.columnKey === 'animalHeat' && this.state.sortedInfo.order,
+        render: (text, record) => <span>{record.animalHeat ? (record.device && record.device.length > 0 && record.device[0].temperatureUnit === '1' ? temperatureC2F(record.animalHeat) + '℉' : record.animalHeat + '℃') : '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.time' }),
@@ -169,7 +188,7 @@ class logQuery extends Component {
         sorter: (a, b) => a.time - b.time,
         sortOrder: this.state.sortedInfo.columnKey === 'time' && this.state.sortedInfo.order,
         width: 150,
-        render: (text, record) => <span>{record.time || '2020-04-12 15:16'}</span>,
+        render: (text, record) => <span>{moment(record.updateAt).format('YYYY-MM-DD HH:mm') || '2020-04-12 15:16'}</span>,
       },
     ];
     return cl;
@@ -225,7 +244,7 @@ class logQuery extends Component {
     const { form, logQueryListLoading } = this.props;
     const { getFieldDecorator } = form;
     const { formValues } = this.state;
-    const { type, date } = formValues;
+    const { date } = formValues;
     return (
       <Form layout="inline">
         <Row
@@ -237,35 +256,34 @@ class logQuery extends Component {
         >
           <Col xxl={6} xl={6} lg={8} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.type' })}>
-              {getFieldDecorator('type', {
-                initialValue: type,
+              {getFieldDecorator('peopleType', {
+                initialValue: '',
               })(
                 <Select
                   placeholder={formatMessage({ id: 'oal.common.pleaseSelect' })}
                   style={{
                     width: '100%',
                   }}
-                  onChange={this.handleTypeChange}
+                // onChange={this.handleTypeChange}
                 >
-                  <Option value=""><FormattedMessage id="oal.common.all" /></Option>
-                  <Option value="0"><FormattedMessage id="menu.faceManger.faceGroup" /></Option>
-                  {/* <Option value="1"><FormattedMessage id="menu.faceManger.faceBlacklist" /></Option> */}
-                  <Option value="2"><FormattedMessage id="menu.faceManger.faceVisitor" /></Option>
-                  <Option value="3"><FormattedMessage id="oal.log-query.stranger" /></Option>
+                  <Option value=""><FormattedMessage id={peopleTypeMap['']} /></Option>
+                  <Option value="0"><FormattedMessage id={peopleTypeMap['0']} /></Option>
+                  {/* <Option value="1"><FormattedMessage id={peopleTypeMap['1']} /></Option> */}
+                  <Option value="2"><FormattedMessage id={peopleTypeMap['2']} /></Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
-          {
-            formValues && formValues.type === '0' ?
+          {/* {
+            formValues && formValues.peopleType === '0' ?
               (<Col xxl={6} xl={6} lg={8} md={8} sm={24}>
                 <FormItem label={formatMessage({ id: 'oal.log-query.selectGroup' })}>
                   {getFieldDecorator('group')(<Input placeholder={formatMessage({ id: 'oal.log-query.pleaseSelectGroup' })} />)}
                 </FormItem>
               </Col>) : ''
-          }
+          } */}
           <Col xxl={6} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label={formatMessage({ id: 'oal.face.search' })}>
+            <FormItem label={formatMessage({ id: 'oal.common.fullName' })}>
               {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
             </FormItem>
           </Col>
@@ -302,16 +320,16 @@ class logQuery extends Component {
     );
   };
 
-  handleTypeChange = value => {
-    const { formValues } = this.state;
+  // handleTypeChange = value => {
+  //   const { formValues } = this.state;
 
-    this.setState({
-      formValues: {
-        ...formValues,
-        type: value,
-      }
-    })
-  };
+  //   this.setState({
+  //     formValues: {
+  //       ...formValues,
+  //       peopleType: value,
+  //     }
+  //   })
+  // };
 
   handleExport = () => {
     const { dispatch } = this.props;

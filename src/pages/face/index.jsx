@@ -304,9 +304,15 @@ class Face extends Component {
         title: formatMessage({ id: 'oal.common.fullName' }),
         key: 'name',
         dataIndex: 'name',
-        ellipsis: true,
-        sorter: (a, b) => a.name - b.name,
-        sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
+        // ellipsis: true,
+        // sorter: (a, b) => a.name - b.name,
+        // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
+      },
+      {
+        title: formatMessage({ id: 'oal.face.staffid' }),
+        key: 'staffid',
+        dataIndex: 'staffid',
+        render: (text, record) => <span>{record.staffid || '--'}</span>,
       },
       // {
       //   title: '状态',
@@ -317,27 +323,27 @@ class Face extends Component {
     ];
     // 遍历人脸属性列表，根据人脸列表字段profile里面的进行对应渲染，其中如果是下拉控件（type=2），还要拿到value对应的text
     // eslint-disable-next-line no-unused-expressions
-    faceKeyList && faceKeyList.length > 0 && faceKeyList.map((item, index) => {
-      (index === 0) && cl.push({
-        title: item.name,
-        key: item.key,
-        ellipsis: true,
-        render: (text, record) => {
-          const type = item.componentInfo && item.componentInfo.type; // 文本框1，下拉框2
-          const data = item.componentInfo && item.componentInfo.data; // 下拉选项value，text的对象数组
-          let spanText = '';
-          if (record && record.profile && record.profile[item.key]) {
-            if (type === 2 && data && data.length > 0) {
-              const option = data.find(bean => bean.value == record.profile[item.key]);
-              spanText = (option && option.text) || '';
-            } else {
-              spanText = record.profile[item.key];
-            }
-          }
-          return <span>{spanText}</span>
-        },
-      });
-    });
+    // faceKeyList && faceKeyList.length > 0 && faceKeyList.map((item, index) => {
+    //   (index === 0) && cl.push({
+    //     title: item.name,
+    //     key: item.key,
+    //     ellipsis: true,
+    //     render: (text, record) => {
+    //       const type = item.componentInfo && item.componentInfo.type; // 文本框1，下拉框2
+    //       const data = item.componentInfo && item.componentInfo.data; // 下拉选项value，text的对象数组
+    //       let spanText = '';
+    //       if (record && record.profile && record.profile[item.key]) {
+    //         if (type === 2 && data && data.length > 0) {
+    //           const option = data.find(bean => bean.value == record.profile[item.key]);
+    //           spanText = (option && option.text) || '';
+    //         } else {
+    //           spanText = record.profile[item.key];
+    //         }
+    //       }
+    //       return <span>{spanText}</span>
+    //     },
+    //   });
+    // });
 
     cl.push(
       // {

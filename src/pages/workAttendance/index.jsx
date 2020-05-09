@@ -74,8 +74,8 @@ class AttendanceList extends Component {
       type: 'report/fetch',
       payload: {
         ...page,
-        begin,
-        end,
+        // begin,
+        // end,
       },
     });
   };
@@ -113,12 +113,12 @@ class AttendanceList extends Component {
     const cl = [
       {
         title: formatMessage({ id: 'oal.work-rule.workRule' }),
-        key: 'ruleName',
-        dataIndex: 'ruleName',
+        key: 'name',
+        dataIndex: 'name',
         ellipsis: true,
         render: (_text, record) => (
           <span>
-            {record && record.ruleName || '--'}
+            {record && record.name || '--'}
           </span>
         ),
       },
@@ -145,8 +145,7 @@ class AttendanceList extends Component {
         render: (_text, record) => (
           <span>
             {
-              (record && record.attendanceDevices && record.attendanceDevices.map(item => item.name).join('、')) ||
-              (record && record.deviceInfo && record.deviceInfo.name) ||
+              (record.device && record.device.length > 0 && record.device.map(item => item.name).join('、')) ||
               '--'
             }
           </span>
@@ -586,34 +585,42 @@ class AttendanceList extends Component {
   };
 
   handleStandardTableChange = pagination => {
-    const { dispatch, faceKeyList } = this.props;
-    const { formValues } = this.state;
-    const params = {
-      current: pagination.current,
-      pageSize: pagination.pageSize,
-      faceName: formValues.faceName,
-      deviceRegion: formValues.deviceRegion,
-    };
-    if (formValues.date) {
-      params.begin = moment(formValues.date[0]).format('YYYY-MM-DD');
-      params.end = moment(formValues.date[1]).format('YYYY-MM-DD');
-    } else {
-      params.begin = begin;
-      params.end = end;
-    }
-    params.profileQuery = {};
-    // eslint-disable-next-line no-unused-expressions
-    faceKeyList && faceKeyList.length > 0 && faceKeyList.map(item => {
-      if (item.reportQuery) {
-        params.profileQuery[item.key] = formValues[item.key];
+    this.setState({
+      page: {
+        current: pagination.current,
+        pageSize: pagination.pageSize,
       }
-    });
-    dispatch({
-      type: 'report/fetch',
-      payload: {
-        ...params,
-      },
-    });
+    }, () => {
+      this.loadAttendList();
+    })
+    // const { dispatch, faceKeyList } = this.props;
+    // const { formValues } = this.state;
+    // const params = {
+    //   current: pagination.current,
+    //   pageSize: pagination.pageSize,
+    //   faceName: formValues.faceName,
+    //   deviceRegion: formValues.deviceRegion,
+    // };
+    // if (formValues.date) {
+    //   params.begin = moment(formValues.date[0]).format('YYYY-MM-DD');
+    //   params.end = moment(formValues.date[1]).format('YYYY-MM-DD');
+    // } else {
+    //   params.begin = begin;
+    //   params.end = end;
+    // }
+    // params.profileQuery = {};
+    // // eslint-disable-next-line no-unused-expressions
+    // faceKeyList && faceKeyList.length > 0 && faceKeyList.map(item => {
+    //   if (item.reportQuery) {
+    //     params.profileQuery[item.key] = formValues[item.key];
+    //   }
+    // });
+    // dispatch({
+    //   type: 'report/fetch',
+    //   payload: {
+    //     ...params,
+    //   },
+    // });
   };
 
   attend_showTotal = (total, range) => (formatMessage({
@@ -709,7 +716,7 @@ class AttendanceList extends Component {
             </div>
             <StandardTable
               // eslint-disable-next-line no-underscore-dangle
-              rowKey={record => `${record._id && record._id.faceId}_${Math.random()}`}
+              rowKey={record => record._id}
               needRowSelection={false}
               selectedRows={selectedRows}
               loading={attendListLoading}

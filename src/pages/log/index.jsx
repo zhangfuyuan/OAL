@@ -35,6 +35,12 @@ import { toTree } from '@/utils/utils';
 
 const FormItem = Form.Item;
 const { Option } = Select;
+const peopleTypeMap = {
+  '': 'oal.common.all',
+  '0': 'oal.common.certifiedPeople',
+  '1': 'oal.common.blacklist',
+  '2': 'oal.common.visitor',
+}
 
 @connect(({ log, loading }) => ({
   log,
@@ -156,20 +162,26 @@ class Log extends Component {
         key: 'name',
         dataIndex: 'name',
         ellipsis: true,
-        sorter: (a, b) => a.name - b.name,
-        sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
+        // sorter: (a, b) => a.name - b.name,
+        // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
       },
       {
-        title: formatMessage({ id: 'oal.face.staffid' }) + '/ID',
+        title: formatMessage({ id: 'oal.face.staffid' }),
         key: 'staffid',
         dataIndex: 'staffid',
-        render: (text, record) => <span>{record.staffid || record._id}</span>,
+        render: (text, record) => <span>{record.staffid || '--'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.log.sourceGroup' }),
         key: 'group',
         dataIndex: 'group',
-        render: (text, record) => <span>{record.group && record.group.name || ''}</span>,
+        render: (text, record) => <span>{record.group && record.group.length > 0 && record.group[0].name || ''}</span>,
+      },
+      {
+        title: formatMessage({ id: 'oal.common.type' }),
+        key: 'peopleType',
+        dataIndex: 'peopleType',
+        render: (text, record) => <span>{peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] }) || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.handle' }),
@@ -239,7 +251,7 @@ class Log extends Component {
         >
           <Col xxl={6} xl={6} lg={6} md={6} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.type' })}>
-              {getFieldDecorator('type', {
+              {getFieldDecorator('peopleType', {
                 initialValue: '',
               })(
                 <Select
@@ -248,17 +260,17 @@ class Log extends Component {
                     width: '100%',
                   }}
                 >
-                  <Option value=""><FormattedMessage id="oal.common.all" /></Option>
-                  <Option value="0"><FormattedMessage id="menu.faceManger.faceGroup" /></Option>
-                  {/* <Option value="1"><FormattedMessage id="menu.faceManger.faceBlacklist" /></Option> */}
-                  <Option value="2"><FormattedMessage id="menu.faceManger.faceVisitor" /></Option>
+                  <Option value=""><FormattedMessage id={peopleTypeMap['']} /></Option>
+                  <Option value="0"><FormattedMessage id={peopleTypeMap['0']} /></Option>
+                  {/* <Option value="1"><FormattedMessage id={peopleTypeMap['1']} /></Option> */}
+                  <Option value="2"><FormattedMessage id={peopleTypeMap['2']} /></Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} xl={6} lg={6} md={6} sm={24}>
-            <FormItem label={formatMessage({ id: 'oal.face.search' })}>
-              {getFieldDecorator('search')(<Input placeholder={formatMessage({ id: 'oal.log.enterNameOrStaffidOrId' })} />)}
+            <FormItem label={formatMessage({ id: 'oal.common.fullName' })}>
+              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={6} md={6} sm={12}>

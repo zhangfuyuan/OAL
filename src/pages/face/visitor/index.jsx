@@ -119,8 +119,14 @@ class Visitor extends Component {
         dataIndex: 'name',
         ellipsis: true,
         key: 'name',
-        sorter: (a, b) => a.name - b.name,
-        sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
+        // sorter: (a, b) => a.name - b.name,
+        // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
+      },
+      {
+        title: formatMessage({ id: 'oal.face.staffid' }),
+        key: 'staffid',
+        dataIndex: 'staffid',
+        render: (text, record) => <span>{record.staffid || '--'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.phoneNumber' }),
@@ -131,8 +137,8 @@ class Visitor extends Component {
         title: formatMessage({ id: 'oal.face-visitor.validity' }),
         key: 'validity',
         dataIndex: 'validity',
-        sorter: (a, b) => a.validity - b.validity,
-        sortOrder: this.state.sortedInfo.columnKey === 'validity' && this.state.sortedInfo.order,
+        // sorter: (a, b) => a.validity - b.validity,
+        // sortOrder: this.state.sortedInfo.columnKey === 'validity' && this.state.sortedInfo.order,
       },
       {
         title: formatMessage({ id: 'oal.common.handle' }),
