@@ -49,7 +49,14 @@ const TableAddOrModifyModal = props => {
   const [uploadLoading, setUploadLoading] = useState(false);
 
   const isEdit = !!bean && !!bean._id;
-  const title = formatMessage({ id: (isEdit ? 'oal.common.edit' : 'oal.face.add') });
+  const title = formatMessage({ id: (isEdit ? 'oal.common.modify' : 'oal.face.add') });
+
+  // 建议：每次 Modal 关闭时重置
+  useEffect(() => {
+    if (visible === false) {
+      resetAllVar();
+    }
+  }, [visible]);
 
   const resetAllVar = () => {
     // 重置 state
@@ -75,48 +82,40 @@ const TableAddOrModifyModal = props => {
 
   const checkUserPhotos = (rule, value, callback) => {
     const len = value && value.length || 0;
+
     if (value && len > 0) {
       const curFile = value[len - 1].originFileObj;
-      console.log('图片信息：', curFile.type, curFile.size);
+      const staffid = form.getFieldValue('staffid');
+      console.log('图片信息：', curFile.type, curFile.size, curFile.name);
 
       const fileType = curFile.type;
       const isJpgOrPng = fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/jpg';
-      const isGt500KB = curFile.size / 1024 > 500;
+      const isLt240KB = curFile.size / 1024 < 240;
+      const isMatchStaffid = staffid && curFile.name.indexOf(staffid) > -1;
 
       if (!isJpgOrPng) {
-        notification.error({
-          message: formatMessage({ id: 'oal.face.failToUpload' }),
-          description: formatMessage({ id: 'oal.face.uploadImageFormatLimit' }),
-        });
-        setFieldsValue({
-          userPhotos: [],
-        });
-        setImageUrl(null);
         callback(formatMessage({ id: 'oal.face.uploadImageFormatLimit' }));
-      }
-      if (isGt500KB) {
-        notification.error({
-          message: formatMessage({ id: 'oal.face.failToUpload' }),
-          description: formatMessage({ id: 'oal.face.uploadImageSizeLimit' }),
-        });
-        setFieldsValue({
-          userPhotos: [],
-        });
         setImageUrl(null);
-        callback(formatMessage({ id: 'oal.face.uploadImageSizeLimit' }));
       }
-      if (isJpgOrPng && !isGt500KB) {
+      if (!isLt240KB) {
+        callback(formatMessage({ id: 'oal.face.uploadImageSizeLimit' }));
+        setImageUrl(null);
+      }
+      if (!isMatchStaffid) {
+        callback(formatMessage({ id: 'oal.face.uploadImageNotMatchStaffid' }));
+        setImageUrl(null);
+      }
+      if (isJpgOrPng && isLt240KB && isMatchStaffid) {
         getBase64(curFile, imageUrl => {
           setImageUrl(imageUrl);
         });
       }
     }
+
     callback();
   };
 
-  const beforeUpload = () => {
-    return false;
-  };
+  const beforeUpload = () => false;
 
   const handleOk = () => {
     form.validateFields((err, fieldsValue) => {
@@ -126,42 +125,44 @@ const TableAddOrModifyModal = props => {
         name,
         staffid,
         groupId,
+        isEdit,
       }
 
-      isEdit && (params._id = bean._id);
+      isEdit && (params.faceId = bean._id);
       setUploadLoading(true);
       dispatch({
-        type: 'face/addOrEditFace',
+        type: 'face/addOrEditInfo',
         payload: params,
       }).then(res => {
+        if (!visible) return;
+
         if (res && res.res > 0) {
           const len = userPhotos && userPhotos.length || 0;
 
           if (window.WebUploader && len > 0) {
-            console.log(8126, '添加/更新人脸图片', userPhotos);
             wuInit([userPhotos[len - 1].originFileObj]);
           } else if (isEdit) {
             // 编辑，可不修改图片直接结束
-            handleSubmit();
+            handleSubmit(isEdit);
             resetAllVar();
           } else {
             console.log(userPhotos);
             setUploadLoading(false);
           }
-        } else if (res && res.res === 10001) {
-          // 8126TODO 异常情况1：工号重复
+        } else if (res && res.errcode === 6007) {
+          // 异常情况1：工号重复
           notification.error({
             message: formatMessage({ id: 'oal.face.staffidRepeat' }),
             description: formatMessage({ id: 'oal.face.staffidRepeatTips' }),
           });
           setUploadLoading(false);
-        } else if (res && res.res === 10002) {
-          // 8126TODO 异常情况2：用户数已超出
-          notification.error({
-            message: formatMessage({ id: 'oal.face.addFailed' }),
-            description: formatMessage({ id: 'oal.face.userNumLimit' }),
-          });
-          setUploadLoading(false);
+          // } else if (res && res.res === 10002) {
+          //   // 8126TODO 异常情况2：用户数已超出
+          //   notification.error({
+          //     message: formatMessage({ id: 'oal.face.addFailed' }),
+          //     description: formatMessage({ id: 'oal.face.userNumLimit' }),
+          //   });
+          //   setUploadLoading(false);
         } else {
           console.log(res);
           setUploadLoading(false);
@@ -170,19 +171,6 @@ const TableAddOrModifyModal = props => {
         console.log(err);
         setUploadLoading(false);
       });
-
-
-      // const params = {};
-      // params.faceId = bean._id;
-      // params.name = fieldsValue.name;
-      // params.profile = {};
-      // // eslint-disable-next-line no-unused-expressions
-      // faceKeyList && faceKeyList.length > 0 && faceKeyList.map(item => {
-      //   params.profile[item.key] = fieldsValue[item.key];
-      // });
-      // handleSubmit(params, () => {
-      //   form.resetFields();
-      // });
     });
   };
 
@@ -194,7 +182,7 @@ const TableAddOrModifyModal = props => {
 
     uploader = window.WebUploader.create({
       swf: (process.env === 'production' ? publicPath : '/') + 'lib/webuploader/Uploader.swf', // 请根据实际项目部署路径配置swf文件路径
-      server: 'https://www.mocky.io/v2/5cc8019d300000980a055e76', // 8126TODO 文件接收服务端
+      server: '/guard-web/a/sys/face/addOrEditFace',
       thumb: false, // 不生成缩略图
       compress: false, // 如果此选项为false, 则图片在上传前不进行压缩
       prepareNextFile: true, // 是否允许在文件传输时提前把下一个文件准备好
@@ -205,9 +193,9 @@ const TableAddOrModifyModal = props => {
       let wuFile = new window.WebUploader.Lib.File(window.WebUploader.guid('rt_'), item);
       let newfile = new window.WebUploader.File(wuFile);
 
-      newfile.index = index;
-      isEdit && (newfile._id = bean._id);
+      isEdit && (newfile.faceId = bean._id);
       newfile.groupId = groupId;
+      newfile.isEdit = isEdit;
       uploader.addFiles(newfile);
       wuFile = null;
       newfile = null;
@@ -223,53 +211,63 @@ const TableAddOrModifyModal = props => {
     // uploader.on('uploadStart', file => {});
 
     uploader.on('uploadBeforeSend', (block, data) => {
-      data.md5 = block.file.md5;
-      isEdit && (data._id = block.file._id);
-      data.groupId = block.file.groupId;
+      if (!visible) return;
+      const { file: { md5, groupId, isEdit, _id } } = block;
+
+      data.md5 = md5;
+      data.groupId = groupId;
+      data.isEdit = isEdit;
+      isEdit && (data.faceId = _id);
     });
 
     uploader.on('uploadProgress', (file, percentage) => {
+      if (!visible) return;
       setUploadProgress(parseInt(percentage * 100));
     });
 
     uploader.on('uploadError', (file, reason) => {
+      if (!visible) return;
       console.log(`${file.name} : ${reason}`);
 
-      message.error('uploadError');
+      notification.error({
+        message: formatMessage({ id: 'oal.face.failToUpload' }),
+        description: formatMessage({ id: 'oal.face.pleaseUploadFileAgain' }),
+      });
       setUploadLoading(false);
+      setUploadProgress(0);
     });
 
     uploader.on('uploadSuccess', (file, response) => {
-      // const { errcode, data, msg } = response;
-      // 8126TODO 上传成功返回数据
+      if (!visible) return;
+      const { res, errcode, msg } = response;
 
-      if (response.status === 'done' && response.url) {
+      if (res > 0) {
         handleSubmit(isEdit);
         resetAllVar();
-      } else {
-        message.error('false');
+      } else if (res === 0) {
+        // 分片文件上传成功时返回，啥也不做
+      } else if (res < 0 || errcode === 500 || /false/i.test(msg)) {
+        notification.error({
+          message: formatMessage({ id: 'oal.face.failToUpload' }),
+          description: formatMessage({ id: 'oal.face.pleaseUploadFileAgain' }),
+        });
+        setUploadLoading(false);
+        setUploadProgress(0);
       }
-
-      setUploadLoading(false);
-
-      // if (errcode === 0 && data && data.fileLink) {
-      //   message.success('uploadSuccess');
-      //   setUploadLoading(false);
-      // } else if (errcode === 0 && data === 'upload_chunk') {
-      //   // 分片文件上传成功时返回，啥也不做
-      // } else if (msg && /false/i.test(msg)) {
-      //   message.error('false');
-      //   setUploadLoading(false);
-      // }
     });
 
     // uploader.on('uploadComplete', file => {});
 
     uploader.on('error', type => {
+      if (!visible) return;
       console.log(`errorType：`, type);
 
-      message.error('error');
+      notification.error({
+        message: formatMessage({ id: 'oal.face.failToUpload' }),
+        description: formatMessage({ id: 'oal.face.pleaseUploadFileAgain' }),
+      });
       setUploadLoading(false);
+      setUploadProgress(0);
     });
 
     uploader.upload();
@@ -284,6 +282,14 @@ const TableAddOrModifyModal = props => {
   };
 
   /********************************************** WebUploader API End **********************************************/
+
+  const checkIllegalCharacter = (rule, value, callback) => {
+    const errReg = /[<>|*?/:\s]/;
+    if (value && errReg.test(value)) {
+      callback(formatMessage({ id: 'oal.common.illegalCharacterTips' }));
+    }
+    callback();
+  };
 
   return (
     <Modal
@@ -301,11 +307,14 @@ const TableAddOrModifyModal = props => {
             rules: [
               {
                 required: true,
-                message: formatMessage({ id: 'oal.face.enterFullNameTips' }),
+                message: formatMessage({ id: 'oal.common.pleaseEnter' }),
               },
               {
                 max: 20,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
+              },
+              {
+                validator: checkIllegalCharacter,
               },
             ],
             initialValue: bean && bean.name || '',
@@ -316,7 +325,7 @@ const TableAddOrModifyModal = props => {
             rules: [
               {
                 required: true,
-                message: formatMessage({ id: 'oal.face.enterStaffidTips' }),
+                message: formatMessage({ id: 'oal.common.pleaseEnter' }),
               },
               {
                 max: 20,
@@ -357,12 +366,12 @@ const TableAddOrModifyModal = props => {
               accept="image/*"
               listType="picture"
               showUploadList={false}
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+              action="/guard-web/a/sys/face/addOrEditFace"
               withCredentials
               beforeUpload={beforeUpload}
             >
               <Button>
-                <Icon type="upload" /> <FormattedMessage id="oal.face.uploadFile" />
+                <Icon type="upload" /> <FormattedMessage id="oal.common.upload" />
               </Button>
             </Upload>,
           )}
@@ -372,48 +381,6 @@ const TableAddOrModifyModal = props => {
           <p style={{ color: '#999', margin: '-8px 0 0', lineHeight: '22px', }}><FormattedMessage id="oal.face.uploadExplainP2" /></p>
           <p style={{ color: '#999', margin: 0, lineHeight: '22px', }}><FormattedMessage id="oal.face.uploadExplainP3" /></p>
         </Form.Item>
-        {/* {faceKeyList && faceKeyList.length > 0 && faceKeyList.map(item => {
-          const type = item.componentInfo && item.componentInfo.type;
-          const data = item.componentInfo && item.componentInfo.data;
-          if (type === 2 && data && data.length > 0) {
-            return (
-              <Form.Item label={item.name} key={`formItem_${item.key}`}>
-                {getFieldDecorator(item.key, {
-                  rules: [
-                    item.required ?
-                      {
-                        required: true,
-                        message: `${formatMessage({ id: 'oal.common.pleaseSelect' })}${item.name}`,
-                      }
-                      :
-                      {},
-                  ],
-                  initialValue: bean.profile && bean.profile[item.key],
-                })(<Select placeholder={`${formatMessage({ id: 'oal.common.pleaseSelect' })}${item.name}`} disabled={!!item.readOnly && !!bean.profile && !!bean.profile[item.key]}>
-                  {data.map(option => (
-                    <Option value={option.value} key={`option_${option.value}`}>{option.text}</Option>
-                  ))}
-                </Select>)}
-              </Form.Item>
-            )
-          }
-          return (
-            <Form.Item label={item.name} key={`formItem_${item.key}`}>
-              {getFieldDecorator(item.key, {
-                rules: [
-                  item.required ?
-                    {
-                      required: true,
-                      message: `${formatMessage({ id: 'oal.common.pleaseEnter' })}${item.name}`,
-                    }
-                    :
-                    {},
-                ],
-                initialValue: bean.profile && bean.profile[item.key],
-              })(<Input placeholder={`${formatMessage({ id: 'oal.common.pleaseEnter' })}${item.name}`} disabled={!!item.readOnly && !!bean.profile && !!bean.profile[item.key]} />)}
-            </Form.Item>
-          )
-        })} */}
       </Form>
     </Modal>
   );

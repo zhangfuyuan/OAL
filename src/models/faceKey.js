@@ -1,6 +1,7 @@
 import { getFaceKeyList, addFaceKey, updateFaceKey, deleteFaceKey } from '@/services/faceKey';
 import { formatMessage } from 'umi-plugin-react/locale';
 
+// 8126TODO 该模块待删
 const Model = {
   namespace: 'faceKey',
   state: {

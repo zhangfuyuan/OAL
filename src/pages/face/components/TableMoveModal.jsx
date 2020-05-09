@@ -32,12 +32,12 @@ const TableMoveModal = props => {
     data.map(item => {
       if (item.children && item.children.length > 0) {
         return (
-          <TreeNode key={item.id} title={`${item.name} (${item.num})`} dataRef={item}>
+          <TreeNode key={item._id} title={`${item.name} (${item.num})`} dataRef={item}>
             {renderNodes(item.children)}
           </TreeNode>
         );
       }
-      return <TreeNode key={item.id} title={`${item.name} (${item.num})`} {...item} dataRef={item} />;
+      return <TreeNode key={item._id} title={`${item.name} (${item.num})`} {...item} dataRef={item} />;
     });
 
   return (

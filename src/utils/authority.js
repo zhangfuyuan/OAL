@@ -205,6 +205,7 @@ export function getPermissionRoutes(userType, orgType) {
     }
   } else {
     // 开发时所有菜单均显示
+    redirect = '/org';
     menuList = menuMap.admin.concat(menuMap.other, menuMap.common);
   }
 

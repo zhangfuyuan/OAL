@@ -37,12 +37,15 @@ const errorCode = {
   6004: 'oal.ajax.6004',
   6005: 'oal.ajax.6005',
   6006: 'oal.ajax.6006',
+  6007: 'oal.face.staffidRepeatTips',
 };
 
 const errorMsg = {
   3004: 'oal.user-login.loginFailed',
   3007: 'oal.user-login.loginFailed',
+  6007: 'oal.face.staffidRepeat',
 };
+
 /**
  * 全局的处理
  */

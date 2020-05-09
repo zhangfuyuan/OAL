@@ -19,7 +19,7 @@ const TableDelModal = props => {
       destroyOnClose
       title={title}
       visible={visible}
-      onOk={() => handleSubmit()}
+      onOk={() => handleSubmit(0, bean)}
       onCancel={handleCancel}
       maskClosable={false}
       okText={formatMessage({ id: 'oal.common.delete' })}

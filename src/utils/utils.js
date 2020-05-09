@@ -119,7 +119,7 @@ export function exportCSV(headers, data, fileName) {
 /**
  * js 数组 转为树形结构
  * 
- * [{ id, pid }, { id, pid }] => [{ id, pid, children }]
+ * [{ _id, pid }, { _id, pid }] => [{ _id, pid, children }]
  * 
  */
 export function toTree(data) {
@@ -132,7 +132,7 @@ export function toTree(data) {
   });
   let map = {};
   data.forEach(item => {
-    map[item.id] = item;
+    map[item._id] = item;
   });
   data.forEach(item => {
     let parent = map[item.pid];
