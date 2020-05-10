@@ -52,6 +52,12 @@ const ModifyPswModal = props => {
                 required: true,
                 message: formatMessage({ id: 'oal.user-login.enterPasswordTips' }),
               },
+              {
+                pattern: PSW_REG,
+                message: formatMessage({
+                  id: 'oal.common.enterPasswordError',
+                }),
+              },
             ],
           })(<Input.Password placeholder={formatMessage({ id: 'oal.settings.oldPassword' })} />)}
         </Form.Item>

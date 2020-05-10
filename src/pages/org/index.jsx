@@ -95,7 +95,7 @@ class OrgList extends Component {
         key: 'name',
       },
       {
-        title: formatMessage({ id: 'oal.org.orgStatus' }),
+        title: formatMessage({ id: 'oal.common.status' }),
         dataIndex: 'state',
         key: 'state',
         render(val) {
@@ -171,7 +171,7 @@ class OrgList extends Component {
       },
     }).then(res => {
       if (res.res > 0) {
-        message.success(formatMessage({ id: 'oal.org.setSuccessfully' }));
+        message.success(formatMessage({ id: 'oal.common.setSuccessfully' }));
         this.loadOrgList();
       }
     })
@@ -240,7 +240,7 @@ class OrgList extends Component {
   };
 
   submitCopy = () => {
-    this.closeDetailModal();
+    // this.closeDetailModal();
   };
 
   submitReset = () => {
@@ -281,7 +281,7 @@ class OrgList extends Component {
         type: 'org/update',
         payload: values,
       }).then(res => {
-        if (res.res === 1) {
+        if (res && res.res > 0) {
           message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
           this.closeAddOrUpdateOrgModal();
           this.loadOrgList();
@@ -293,8 +293,8 @@ class OrgList extends Component {
         type: 'org/add',
         payload: values,
       }).then(res => {
-        if (res.res === 1) {
-          message.success(formatMessage({ id: 'oal.common.createSuccessfully' }));
+        if (res && res.res > 0) {
+          message.success(formatMessage({ id: 'oal.face.addSuccessfully' }));
           this.closeAddOrUpdateOrgModal();
           this.loadOrgList();
           callback();
@@ -345,8 +345,8 @@ class OrgList extends Component {
                   }}
                 >
                   <Option value=""><FormattedMessage id="oal.common.all" /></Option>
-                  <Option value="0"><FormattedMessage id="oal.common.disable" /></Option>
                   <Option value="1"><FormattedMessage id="oal.common.enable" /></Option>
+                  <Option value="0"><FormattedMessage id="oal.common.disable" /></Option>
                 </Select>,
               )}
             </FormItem>
@@ -354,12 +354,13 @@ class OrgList extends Component {
           <Col xxl={4} lg={4} md={4} sm={24}>
             <span className={styles.submitButtons}>
               <Button onClick={this.handleSearch} type="primary" htmlType="submit" loading={orgListLoading}>
-                <FormattedMessage id="oal.common.query" />
+                <FormattedMessage id="oal.face.search" />
               </Button>
               <Button
                 style={{
                   marginLeft: 8,
                 }}
+                loading={orgListLoading}
                 onClick={this.handleFormReset}
               >
                 <FormattedMessage id="oal.common.reset" />
@@ -412,7 +413,7 @@ class OrgList extends Component {
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <div className={styles.tableListOperator}>
               <Button icon="plus" type="primary" onClick={() => this.toAdd()}>
-                <FormattedMessage id="oal.common.new" />
+                <FormattedMessage id="oal.face.add" />
               </Button>
             </div>
             <StandardTable

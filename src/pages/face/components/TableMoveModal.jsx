@@ -5,7 +5,7 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 const { TreeNode } = Tree;
 
 const TableMoveModal = props => {
-  const { treeData, visible, handleSubmit, handleCancel } = props;
+  const { treeData, visible, handleSubmit, handleCancel, confirmLoading } = props;
   const [treeFocusKey, setTreeFocusKey] = useState('');
 
   const resetAllVar = () => {
@@ -14,7 +14,6 @@ const TableMoveModal = props => {
   };
 
   const handleSelect = (selectedKeys, e) => {
-    console.log(8126, '移动用户到', selectedKeys[0]);
     setTreeFocusKey(selectedKeys[0]);
   };
 
@@ -32,12 +31,12 @@ const TableMoveModal = props => {
     data.map(item => {
       if (item.children && item.children.length > 0) {
         return (
-          <TreeNode key={item._id} title={`${item.name} (${item.num})`} dataRef={item}>
+          <TreeNode key={item._id} title={item.name} dataRef={item}>
             {renderNodes(item.children)}
           </TreeNode>
         );
       }
-      return <TreeNode key={item._id} title={`${item.name} (${item.num})`} {...item} dataRef={item} />;
+      return <TreeNode key={item._id} title={item.name} {...item} dataRef={item} />;
     });
 
   return (
@@ -48,10 +47,11 @@ const TableMoveModal = props => {
       onOk={handleOk}
       onCancel={handleCancel}
       maskClosable={false}
+      confirmLoading={confirmLoading}
       okText={formatMessage({ id: 'oal.common.save' })}
     >
       <Tree
-        defaultExpandAll
+        defaultExpandedKeys={[treeData && treeData.length > 0 && treeData[0]._id || '0']}
         blockNode
         onSelect={handleSelect}
       >

@@ -38,6 +38,8 @@ const { TreeNode } = Tree;
   addGroupNodeLoading: loading.effects['face/addGroupNode'],
   modifyGroupNodeLoading: loading.effects['face/modifyGroupNode'],
   delGroupNodeLoading: loading.effects['face/delGroupNode'],
+  moveFaceLoading: loading.effects['face/moveFace'],
+  setFaceStateLoading: loading.effects['face/setFaceState'],
 }))
 class Face extends Component {
   state = {
@@ -259,7 +261,6 @@ class Face extends Component {
         title: formatMessage({ id: 'oal.common.fullName' }),
         key: 'name',
         dataIndex: 'name',
-        // ellipsis: true,
         // sorter: (a, b) => a.name - b.name,
         // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
       },
@@ -555,18 +556,22 @@ class Face extends Component {
 
   table_submitTableDelModal = (state, bean, callback) => {
     const { dispatch } = this.props;
+    const _state = state;
     dispatch({
       type: 'face/setFaceState',
       payload: {
         faceId: bean && bean._id || '',
-        state,
+        state: _state,
       },
     }).then(res => {
       if (res && res.res > 0) {
-        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
-        this.table_closeTableDelModal();
+        message.success(formatMessage({ id: _state === 1 ? 'oal.user-manage.beenEnabled' : 'oal.user-manage.beenDisabled' }));
         this.table_loadFaceList();
-        callback && callback();
+
+        if (_state === 0) {
+          this.table_closeTableDelModal();
+          callback && callback();
+        }
       } else {
         console.log(res);
       }
@@ -598,6 +603,8 @@ class Face extends Component {
       addGroupNodeLoading,
       modifyGroupNodeLoading,
       delGroupNodeLoading,
+      moveFaceLoading,
+      setFaceStateLoading,
     } = this.props;
     const {
       treeData,
@@ -775,12 +782,14 @@ class Face extends Component {
           <TableMoveModal
             visible={tableMoveVisible}
             treeData={treeData}
+            confirmLoading={moveFaceLoading}
             handleCancel={this.table_closeTableMoveModal}
             handleSubmit={this.table_submitTableMoveModal}
           />
           <TableDelModal
             visible={tableDelVisible}
-            bean={tableSelectedBean && tableSelectedBean._id ? [tableSelectedBean] : tableSelectedRows}
+            confirmLoading={setFaceStateLoading}
+            bean={tableSelectedBean}
             handleCancel={this.table_closeTableDelModal}
             handleSubmit={this.table_submitTableDelModal}
           />

@@ -58,7 +58,7 @@ class BaseView extends Component {
                     message: formatMessage({ id: 'oal.common.maxLength' }, { num: '10' }),
                   },
                 ],
-                initialValue: currentUser && currentUser.userName,
+                initialValue: currentUser && currentUser.userName || '',
               })(<Input placeholder={formatMessage({ id: 'oal.settings.nameOfAccount' })} disabled />)}
             </FormItem>
             <FormItem
@@ -78,7 +78,7 @@ class BaseView extends Component {
                     validator: this.checkIllegalCharacter,
                   },
                 ],
-                initialValue: currentUser && currentUser.profile && currentUser.profile.nickName,
+                initialValue: currentUser && currentUser.profile && currentUser.profile.nickName || '',
               })(<Input placeholder={formatMessage({ id: 'oal.common.nickname' })} />)}
             </FormItem>
             {/* <FormItem

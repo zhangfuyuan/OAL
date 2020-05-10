@@ -115,7 +115,6 @@ class AttendanceList extends Component {
         title: formatMessage({ id: 'oal.work-rule.workRule' }),
         key: 'name',
         dataIndex: 'name',
-        ellipsis: true,
         render: (_text, record) => (
           <span>
             {record && record.name || '--'}
@@ -141,7 +140,6 @@ class AttendanceList extends Component {
         title: formatMessage({ id: 'oal.work.attendanceDevice' }),
         key: 'deviceName',
         dataIndex: 'deviceName',
-        ellipsis: true,
         render: (_text, record) => (
           <span>
             {

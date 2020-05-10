@@ -10,6 +10,7 @@ let uploader = null;
 let myImgList = [];
 let myUploadAllSuccessNum = 0;
 let taskId = '';
+let myUploadLoading = false;
 
 const userImportTemplateLinkMap = {
   'zh-CN': 'http://lango-tech.com/XBH/lango19/data/users.zip',
@@ -29,10 +30,12 @@ const TableBatchAddModal = props => {
 
   // 建议：每次 Modal 关闭时重置
   useEffect(() => {
+    myUploadLoading = uploadLoading;
+
     if (visible === false) {
       resetAllVar();
     }
-  }, [visible]);
+  }, [visible, uploadLoading]);
 
   const resetAllVar = () => {
     // 重置 state
@@ -47,6 +50,7 @@ const TableBatchAddModal = props => {
     myImgList = [];
     myUploadAllSuccessNum = 0;
     taskId = '';
+    myUploadLoading = false;
   };
 
   const handleUploadAbort = (unNotification) => {
@@ -64,6 +68,7 @@ const TableBatchAddModal = props => {
     if (uploader) wuDestroy();
     myUploadAllSuccessNum = 0;
     taskId = '';
+    myUploadLoading = false;
   };
 
   const beforeUploadXls = file => {
@@ -120,7 +125,7 @@ const TableBatchAddModal = props => {
         groupId,
       },
     }).then(res => {
-      if (!visible) return;
+      if (!visible || !myUploadLoading) return;
 
       if (res && res.res > 0 && res.data && res.data.taskId) {
         taskId = res.data.taskId;
@@ -130,6 +135,7 @@ const TableBatchAddModal = props => {
       }
     }).catch(err => {
       handleUploadAbort();
+      console.log(err);
     });
   };
 
@@ -151,7 +157,7 @@ const TableBatchAddModal = props => {
         taskId,
       },
     }).then(res => {
-      if (!visible || !uploadLoading) return;
+      if (!visible || !myUploadLoading) return;
 
       if (res && res.res > 0 && res.data) {
         const { taskProgress, successNum } = res.data;
@@ -162,7 +168,7 @@ const TableBatchAddModal = props => {
           setUploadProgress(taskProgress || 1);
 
           setTimeout(() => {
-            if (!visible || !uploadLoading) return;
+            if (!visible || !myUploadLoading) return;
 
             submit4_getBatchAddTaskProgress(taskId);
           }, 2000);
@@ -172,6 +178,7 @@ const TableBatchAddModal = props => {
       }
     }).catch(err => {
       handleUploadAbort();
+      console.log(err);
     });
   };
 
@@ -183,7 +190,7 @@ const TableBatchAddModal = props => {
         taskId,
       },
     }).then(res => {
-      if (!visible) return;
+      if (!visible || !myUploadLoading) return;
 
       if (res && res.res > 0) {
         handleUploadAbort(true);
@@ -192,6 +199,7 @@ const TableBatchAddModal = props => {
       }
     }).catch(err => {
       handleUploadAbort();
+      console.log(err);
     });
   };
 
@@ -230,7 +238,7 @@ const TableBatchAddModal = props => {
     // uploader.on('uploadStart', file => {});
 
     uploader.on('uploadBeforeSend', (block, data) => {
-      if (!visible) return;
+      if (!visible || !myUploadLoading) return;
       data.md5 = block.file.md5;
       data.taskId = block.file.taskId;
     });
@@ -240,18 +248,14 @@ const TableBatchAddModal = props => {
     // });
 
     uploader.on('uploadError', (file, reason) => {
-      if (!visible) return;
+      if (!visible || !myUploadLoading) return;
       console.log(`${file.name} : ${reason}`);
 
-      // 8126TODO 测试
-      // handleUploadAbort();
-      myUploadAllSuccessNum++;
-      setUploadProgress(parseInt(myUploadAllSuccessNum / (imgListLen + 1) * 100));
-      uploadSuccessCheck();
+      handleUploadAbort();
     });
 
     uploader.on('uploadSuccess', (file, response) => {
-      if (!visible) return;
+      if (!visible || !myUploadLoading) return;
       const { res, errcode, msg } = response;
 
       if (res > 0) {
@@ -268,7 +272,7 @@ const TableBatchAddModal = props => {
     // uploader.on('uploadComplete', file => {});
 
     uploader.on('error', type => {
-      if (!visible) return;
+      if (!visible || !myUploadLoading) return;
       console.log(`errorType：`, type);
 
       handleUploadAbort();
@@ -288,13 +292,13 @@ const TableBatchAddModal = props => {
   /********************************************** WebUploader API End **********************************************/
 
   const handleDelXlsFile = () => {
-    if (uploadLoading) return;
+    if (myUploadLoading) return;
 
     setXlsFile(null);
   };
 
   const handleDelImgList = () => {
-    if (uploadLoading) return;
+    if (myUploadLoading) return;
 
     myImgList = [];
     setImgListLen(0);
@@ -370,14 +374,17 @@ const TableBatchAddModal = props => {
                         >
                           {xlsFile.name}
                         </span>
-                        <span className="ant-upload-list-item-card-actions ">
-                          <a
-                            title={formatMessage({ id: 'oal.common.delete' })}
-                            onClick={handleDelXlsFile}
-                          >
-                            <Icon type="close" />
-                          </a>
-                        </span>
+                        {
+                          !uploadLoading ?
+                            (<span className="ant-upload-list-item-card-actions ">
+                              <a
+                                title={formatMessage({ id: 'oal.common.delete' })}
+                                onClick={handleDelXlsFile}
+                              >
+                                <Icon type="close" />
+                              </a>
+                            </span>) : ''
+                        }
                       </span>
                     </div>
                   </div>
@@ -398,14 +405,17 @@ const TableBatchAddModal = props => {
                         >
                           <FormattedMessage id="oal.face.personnelPhotosNum" values={{ num1: imgListLen, num2: imgListLen }} />
                         </span>
-                        <span className="ant-upload-list-item-card-actions ">
-                          <a
-                            title={formatMessage({ id: 'oal.common.delete' })}
-                            onClick={handleDelImgList}
-                          >
-                            <Icon type="close" />
-                          </a>
-                        </span>
+                        {
+                          !uploadLoading ?
+                            (<span className="ant-upload-list-item-card-actions ">
+                              <a
+                                title={formatMessage({ id: 'oal.common.delete' })}
+                                onClick={handleDelImgList}
+                              >
+                                <Icon type="close" />
+                              </a>
+                            </span>) : ''
+                        }
                       </span>
                     </div>
                   </div>
@@ -442,7 +452,7 @@ const TableBatchAddModal = props => {
         maskClosable={false}
         title={formatMessage({ id: isUnderAnalysis ? 'oal.face.underAnalysis' : 'oal.face.inImport' })}
         centered
-        visible={!!uploadProgress}
+        visible={uploadLoading && !!uploadProgress}
         closable={false}
         width="30%"
         footer={[

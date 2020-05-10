@@ -13,6 +13,7 @@ import {
   ajaxGetBatchAddTaskId,
   ajaxGetBatchAddTaskProgress,
   ajaxCancelBatchAddTask,
+  ajaxMoveFace,
 } from './service';
 import { getSysConfig } from '@/services/sys';
 
@@ -74,7 +75,7 @@ const Model = {
                   name: '分组名称',
                 }],
                 featureState: 0,
-                state: 1,
+                state: 0,
                 _id: '5ea93b2c3f6da70130b0f60a',
                 name: '阿萨',
                 creator: '5e8216ca2d93465736e3bfea',
@@ -224,9 +225,17 @@ const Model = {
     },
     // 移动人脸
     *moveFace({ payload }, { call, put, select }) {
-      console.log(8126, '移动人脸', payload);
-      const response = yield call(fetchGroup, payload);
-      return Promise.resolve(response);
+      const response = yield call(ajaxMoveFace, payload);
+      
+      if (response && response.res > 0) {
+        return Promise.resolve(response);
+      } else {
+        // 8126TODO 测试数据
+        return Promise.resolve({
+          res: 1,
+          data: {},
+        });
+      }
     },
     // 禁/启用认证人员
     *setFaceState({ payload }, { call, put, select }) {
@@ -235,6 +244,7 @@ const Model = {
       if (response && response.res > 0) {
         return Promise.resolve(response);
       } else {
+        // 8126TODO 测试数据
         return Promise.resolve({
           res: 1,
           data: {},
@@ -248,6 +258,7 @@ const Model = {
       if (response && response.res > 0) {
         return Promise.resolve(response);
       } else {
+        // 8126TODO 测试数据
         return Promise.resolve({
           res: 1,
           data: {
@@ -263,6 +274,7 @@ const Model = {
       if (response && response.res > 0) {
         return Promise.resolve(response);
       } else {
+        // 8126TODO 测试数据
         return Promise.resolve({
           res: 1,
           data: {
@@ -279,6 +291,7 @@ const Model = {
       if (response && response.res > 0) {
         return Promise.resolve(response);
       } else {
+        // 8126TODO 测试数据
         return Promise.resolve({
           res: 1,
           data: {},

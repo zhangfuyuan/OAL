@@ -48,7 +48,7 @@ const OrgDetailModal = props => {
         <p><FormattedMessage id="oal.org.giveUserFollowingInfo" /> : </p>
         <p><FormattedMessage id="oal.org.accessAddress" /> : {href}</p>
         <p><FormattedMessage id="oal.org.loginAccount" /> : admin</p>
-        <p><FormattedMessage id="oal.org.initialPassword" /> : admin</p>
+        <p><FormattedMessage id="oal.org.initialPassword" /> : 123456</p>
         <textarea cols="40" rows="5" id="copyArea" defaultValue={copyText} style={{ position: 'absolute', top: '-999px', left: '-999px' }}/>
     </Modal>
   );

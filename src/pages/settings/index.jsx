@@ -31,6 +31,8 @@ const { Item } = Menu;
   faceKeyListLoading: loading.effects['faceKey/faceKeyList'],
   addFaceKeyLoading: loading.effects['faceKey/addFaceKey'],
   sysConfigs: settingInfo.sysConfigs,
+  modifyPasswordLoading: loading.effects['user/modifyPassword'],
+  modifySaasInfoLoading: loading.effects['user/modifySaasInfo'],
 }))
 class Settings extends Component {
   constructor(props) {
@@ -200,7 +202,7 @@ class Settings extends Component {
         this.closeModifySysName();
         dispatch({
           type: 'settings/changeSettingInfo',
-          payload: { title: values.saasName },
+          payload: { title: res.data && res.data.org && res.data.org.saasName || values.saasName },
         });
       }
     });
@@ -208,11 +210,23 @@ class Settings extends Component {
 
   submitSysIcons = saasIconsUrl => {
     // this.closeModifySysIcons();
-    message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+    const { dispatch, currentUser: { org } } = this.props;
+
     dispatch({
-      type: 'settings/changeSettingInfo',
-      payload: { logo: saasIconsUrl },
-    });
+      type: 'user/modifySaasIconsUrl',
+      payload: {
+        org: {
+          ...org,
+          saasIconsUrl,
+        }
+      },
+    }).then(() => {
+      message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+      dispatch({
+        type: 'settings/changeSettingInfo',
+        payload: { logo: saasIconsUrl },
+      });
+    })
   };
 
   setFaceKeyModal = flag => {
@@ -352,7 +366,12 @@ class Settings extends Component {
   }
 
   render() {
-    const { currentUser, addFaceKeyLoading } = this.props;
+    const {
+      currentUser,
+      addFaceKeyLoading,
+      modifyPasswordLoading,
+      modifySaasInfoLoading,
+    } = this.props;
     const { type } = currentUser;
     const {
       mode,
@@ -387,14 +406,17 @@ class Settings extends Component {
             {this.renderChildren()}
           </div>
         </div>
+
         <ModifyPswModal
           visible={modifyPswVisible}
+          confirmLoading={modifyPasswordLoading}
           handleCancel={this.closeModifyPswModal}
           handleSubmit={this.submitModifyPsw}
         />
         <ModifySysName
           visible={modifySysNameVisible}
           currentUser={currentUser}
+          confirmLoading={modifySaasInfoLoading}
           handleCancel={this.closeModifySysName}
           handleSubmit={this.submitSysName}
         />

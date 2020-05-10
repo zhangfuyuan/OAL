@@ -90,7 +90,14 @@ export async function ajaxCancelBatchAddTask(data) {
   return post('/guard-web/a/sys/face/cancelBatchAddTask', data);
 }
 
-
+/**
+ * （人员-认证-列表5）移动人员至其它分组
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxMoveFace(data) {
+  return post('/guard-web/a/sys/face/moveFace', data);
+}
 
 
 

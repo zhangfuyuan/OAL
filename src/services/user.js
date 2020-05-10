@@ -21,6 +21,7 @@ export async function authByToken() {
 
 /**
  * （通用6）修改密码
+ * （设置2）admin组织的安全设置-修改密码
  */
 export async function modifyPsw(data) {
   // return post('/api/user/modifyPsw', data);
@@ -28,10 +29,10 @@ export async function modifyPsw(data) {
 }
 
 /**
- * （账号3）修改账号
+ * （设置1）admin组织账号设置
  */
 export async function modifyUser(data) {
-  return post('/guard-web/a/user/update', data);
+  return post('/guard-web/a/sys/office/update', data);
 }
 
 /**
@@ -40,6 +41,5 @@ export async function modifyUser(data) {
  * @returns {Promise<*>}
  */
 export async function editSaasInfo(data) {
-  return post('/guard-web/a/org/editSaasInfo', data)
+  return post('/guard-web/a/sys/office/systemInformationName', data)
 }
-// /api/user/modifyPsw

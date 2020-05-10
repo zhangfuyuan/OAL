@@ -117,7 +117,6 @@ class Visitor extends Component {
         title: formatMessage({ id: 'oal.common.fullName' }),
         key: 'name',
         dataIndex: 'name',
-        ellipsis: true,
         key: 'name',
         // sorter: (a, b) => a.name - b.name,
         // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,

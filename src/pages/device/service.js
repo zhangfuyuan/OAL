@@ -1,12 +1,30 @@
 import { post, get } from '@/utils/ajax';
 
 /**
- * 查询设备
- * @param query
+ * （设备1）获取/搜索设备列表
+ * @param data
  * @returns {Promise<*>}
  */
 export async function getDeviceList(data) {
-    return get(`/api/device/list/${data.verity}`);
+    return post(`/guard-web/a/device/fetchList`, data);
+}
+
+/**
+ * （设备2）设置设备信息
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxSetDeviceInfo(data) {
+  return post(`/guard-web/a/device/setDeviceInfo`, data);
+}
+
+/**
+ * （设备3）删除设备
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxDeviceDelete(data) {
+  return post(`/guard-web/a/device/deviceDelete`, data);
 }
 
 /**

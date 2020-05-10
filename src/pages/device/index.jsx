@@ -49,6 +49,8 @@ const status = ['oal.device.offline', 'oal.device.online'];
   device,
   loginUser: user,
   deviceListLoading: loading.effects['device/fetch'],
+  renameLoading: loading.effects['device/rename'],
+  deleteLoading: loading.effects['device/delete'],
 }))
 class Device extends Component {
   state = {
@@ -142,18 +144,22 @@ class Device extends Component {
 
   renameDevice = (params, callback) => {
     const { dispatch } = this.props;
-    // 8126TODO 接口需增加参数
-    console.log(8126, '设置信息：', params);
+
     dispatch({
       type: 'device/rename',
       payload: params,
     }).then(res => {
       if (res && res.res > 0) {
-        message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+        message.success(formatMessage({ id: 'oal.common.setSuccessfully' }));
         this.closeRenameModal();
         this.loadData();
         callback();
+      } else {
+        message.success(formatMessage({ id: 'oal.common.setFailed' }));
       }
+    }).catch(err => {
+      console.log(err);
+      message.success(formatMessage({ id: 'oal.common.setFailed' }));
     });
   };
 
@@ -167,20 +173,23 @@ class Device extends Component {
 
   submitDelete = bean => {
     const { dispatch } = this.props;
-    // 8126TODO 兼容单个删除和批量删除
-    message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
-    this.loadData();
-    this.closeDelModal();
-    return console.log(8126, '删除设备ID集合：', bean && bean.map(item => item._id).join(',') || '');
+
     dispatch({
       type: 'device/delete',
-      payload: { deviceId: bean._id },
+      payload: {
+        deviceId: bean && bean.map(item => item._id).join(',') || ''
+      },
     }).then(res => {
       if (res && res.res > 0) {
         message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
         this.loadData();
         this.closeDelModal();
+      } else {
+        message.success(formatMessage({ id: 'oal.ajax.5004' }));
       }
+    }).catch(err => {
+      console.log(err);
+      message.success(formatMessage({ id: 'oal.ajax.5004' }));
     });
   };
 
@@ -264,7 +273,6 @@ class Device extends Component {
         dataIndex: 'deviceUuid',
         render: text => text || '--',
         key: 'deviceUuid',
-        ellipsis: true,
         // sorter: (a, b) => a.deviceVersion - b.deviceVersion,
         // sortOrder: this.state.sortedInfo.columnKey === 'deviceVersion' && this.state.sortedInfo.order,
       },
@@ -274,12 +282,12 @@ class Device extends Component {
         width: 200,
         render: (text, record) => (
           <Fragment>
-            <a href="#" onClick={() => this.openDetailModal(record)}><FormattedMessage id="oal.common.view" /></a>
+            <a key="view" onClick={() => this.openDetailModal(record)}><FormattedMessage id="oal.common.view" /></a>
             <Divider type="vertical" />
-            <a href="#" onClick={() => this.openRenameModal(record)} disabled={record.networkState !== 1}><FormattedMessage id="oal.common.set" /></a>
+            <a key="set" onClick={() => this.openRenameModal(record)}><FormattedMessage id="oal.common.set" /></a>
             <Divider type="vertical" />
             {/* <Popconfirm title={formatMessage({ id: 'oal.device.confirmDeleteDevice' })} okText={formatMessage({ id: 'oal.common.confirm' })} cancelText={formatMessage({ id: 'oal.common.cancel' })} onConfirm={() => this.modifyAndDelete('deletePass', record)}> */}
-            <a href="#" onClick={() => this.openDelModal([record])}><FormattedMessage id="oal.common.delete" /></a>
+            <a key="delete" onClick={() => this.openDelModal([record])}><FormattedMessage id="oal.common.delete" /></a>
             {/* </Popconfirm> */}
           </Fragment>
         ),
@@ -424,6 +432,8 @@ class Device extends Component {
       device: { deviceList },
       deviceListLoading,
       loginUser,
+      renameLoading,
+      deleteLoading,
     } = this.props;
     let deviceTableData = null;
     const { modalVisible, deviceBean, alertVisible, page, delBean, detailModalVisible, delModalVisible, selectedRows } = this.state;
@@ -495,12 +505,14 @@ class Device extends Component {
         <RenameModal
           visible={modalVisible}
           bean={deviceBean}
+          confirmLoading={renameLoading}
           handleCancel={this.closeRenameModal}
           handleSubmit={this.renameDevice}
         />
         <DeviceDelModal
           visible={delModalVisible}
           deviceBeanList={delBean}
+          confirmLoading={deleteLoading}
           handleCancel={this.closeDelModal}
           handleSubmit={this.submitDelete}
         />

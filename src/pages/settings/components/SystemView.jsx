@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { List, Button, Result, message, Popconfirm, Avatar, Upload, notification } from 'antd';
+import { List, Button, Result, message, Popconfirm, Avatar, Upload, notification, Spin } from 'antd';
 import logo from '@/assets/logo.svg';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import defaultSettings from '../../../../config/defaultSettings';
@@ -8,6 +8,10 @@ const { publicPath } = defaultSettings;
 
 class SystemView extends Component {
   uploader = null;
+
+  state = {
+    isUploading: false,
+  };
 
   setUrl = path => {
     if (!path) {
@@ -24,8 +28,7 @@ class SystemView extends Component {
   };
 
   handleModifyIcons = saasIconsUrl => {
-    const { updateSysIcons } = this.props;
-    updateSysIcons(saasIconsUrl);
+    this.props.updateSysIcons(saasIconsUrl);
   };
 
   beforeUpload = file => {
@@ -45,12 +48,15 @@ class SystemView extends Component {
       });
     }
     if (isJpgOrPng && isLt240KB) {
+      this.setState({
+        isUploading: true,
+      });
       this.wuInit(file);
     }
     return false;
   };
 
-  getData = (currentUser, version) => {
+  getData = (currentUser, version, isUploading) => {
     const orgInfo = (currentUser && currentUser.org) || {};
     const items = [
       {
@@ -90,13 +96,18 @@ class SystemView extends Component {
             name="saasIcons"
             accept="image/*"
             showUploadList={false}
-            action="/guard-web/a/org/editSaasIcons"
+            action="/guard-web/a/fileResource/upload"
             withCredentials
             beforeUpload={this.beforeUpload}
+            disabled={isUploading}
           >
-            <Button type="link">
-              <FormattedMessage id="oal.common.modify" />
-            </Button>
+            {
+              isUploading ?
+                <Spin /> :
+                (<a key="saasIcons" disabled={this.state.isUploading}>
+                  <FormattedMessage id="oal.common.modify" />
+                </a>)
+            }
           </Upload>,
         ],
       })
@@ -120,7 +131,7 @@ class SystemView extends Component {
 
     this.uploader = window.WebUploader.create({
       swf: (process.env === 'production' ? publicPath : '/') + 'lib/webuploader/Uploader.swf', // 请根据实际项目部署路径配置swf文件路径
-      server: '/guard-web/a/org/editSaasIcons', // 8126TODO 文件接收服务端
+      server: '/guard-web/a/fileResource/upload',
       thumb: false, // 不生成缩略图
       compress: false, // 如果此选项为false, 则图片在上传前不进行压缩
       prepareNextFile: true, // 是否允许在文件传输时提前把下一个文件准备好
@@ -158,14 +169,20 @@ class SystemView extends Component {
         message: formatMessage({ id: 'oal.face.failToUpload' }),
       });
       this.wuDestroy();
+      this.setState({
+        isUploading: false,
+      });
     });
 
     this.uploader.on('uploadSuccess', (file, response) => {
-      const { res, data, msg } = response;
+      const { res, data, msg, errcode } = response;
 
       if (res > 0 && data && data.saasIconsUrl) {
         this.handleModifyIcons(data.saasIconsUrl);
         this.wuDestroy();
+        this.setState({
+          isUploading: false,
+        });
       } else if (res === 0 || msg === 'upload_chunk' || errcode === 200) {
         // 分片文件上传成功时返回，啥也不做
       } else if (res < 0 || /false/i.test(msg) || errcode === 500) {
@@ -173,6 +190,9 @@ class SystemView extends Component {
           message: formatMessage({ id: 'oal.face.failToUpload' }),
         });
         this.wuDestroy();
+        this.setState({
+          isUploading: false,
+        });
       }
     });
 
@@ -185,6 +205,9 @@ class SystemView extends Component {
         message: formatMessage({ id: 'oal.face.failToUpload' }),
       });
       this.wuDestroy();
+      this.setState({
+        isUploading: false,
+      });
     });
 
     this.uploader.upload();
@@ -202,7 +225,8 @@ class SystemView extends Component {
 
   render() {
     const { currentUser, version } = this.props;
-    const data = this.getData(currentUser, version);
+    const { isUploading } = this.state;
+    const data = this.getData(currentUser, version, isUploading);
     return (
       <Fragment>
         <List

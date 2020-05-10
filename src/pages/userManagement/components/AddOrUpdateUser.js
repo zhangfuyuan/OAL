@@ -36,8 +36,8 @@ const AddOrUpdateUser = props => {
   };
 
   const checkMobile = (rule, value, callback) => {
-    const reg = /^[\d*#+]{0,14}$/;
-    if (value && !reg(value)) {
+    const reg = /^[\d\*\#\+]{1,14}$/;
+    if (value && !reg.test(value)) {
       callback(formatMessage({ id: 'oal.common.formatError' }));
     }
     callback();
@@ -79,7 +79,7 @@ const AddOrUpdateUser = props => {
               },
             ],
             initialValue: isEdit ? userBean.userName : '',
-          })(<Input placeholder={formatMessage({ id: 'oal.user-manage.accountName' })} disabled={isEdit ? currentUser.userName !== userBean.userName : false} />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.user-manage.accountName' })} disabled={isEdit} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.common.nickname' })}>
           {getFieldDecorator('nickName', {
@@ -97,7 +97,7 @@ const AddOrUpdateUser = props => {
               },
             ],
             initialValue: isEdit ? userBean.profile && userBean.profile.nickName : '',
-          })(<Input placeholder={formatMessage({ id: 'oal.common.nickname' })} disabled={isEdit ? currentUser.userName !== userBean.userName : false} />)}
+          })(<Input placeholder={formatMessage({ id: 'oal.common.nickname' })} disabled={isEdit} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.common.phoneNumber' })}>
           {getFieldDecorator('mobile', {

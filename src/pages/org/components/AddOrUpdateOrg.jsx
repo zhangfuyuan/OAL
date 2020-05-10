@@ -42,8 +42,8 @@ const AddOrUpdateOrg = props => {
   };
 
   const checkMobile = (rule, value, callback) => {
-    const reg = /^[\d*#+]{0,14}$/;
-    if (value && !reg(value)) {
+    const reg = /^[\d\*\#\+]{1,14}$/;
+    if (value && !reg.test(value)) {
       callback(formatMessage({ id: 'oal.common.formatError' }));
     }
     callback();
@@ -91,7 +91,7 @@ const AddOrUpdateOrg = props => {
                 validator: checkIllegalCharacter,
               },
             ],
-            initialValue: orgBean.name,
+            initialValue: orgBean && orgBean.name || '',
           })(<Input placeholder={formatMessage({ id: 'oal.org.orgName' })} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.settings.sysname' })}>
@@ -109,7 +109,7 @@ const AddOrUpdateOrg = props => {
                 validator: checkIllegalCharacter,
               },
             ],
-            initialValue: orgBean.saasName,
+            initialValue: orgBean && orgBean.saasName || '',
           })(<Input placeholder={formatMessage({ id: 'oal.settings.sysname' })} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.org.contacts' })}>
@@ -123,7 +123,7 @@ const AddOrUpdateOrg = props => {
                 validator: checkIllegalCharacter,
               },
             ],
-            initialValue: orgBean && orgBean.contact && orgBean.contact.nickName,
+            initialValue: orgBean && orgBean.contact && orgBean.contact.nickName || '',
           })(<Input placeholder={formatMessage({ id: 'oal.org.contactName' })} />)}
         </Form.Item>
         {/* <Form.Item label={formatMessage({ id: 'oal.common.emailAddress' })}>
@@ -144,7 +144,7 @@ const AddOrUpdateOrg = props => {
                 validator: checkMobile,
               },
             ],
-            initialValue: orgBean && orgBean.contact && orgBean.contact.mobile,
+            initialValue: orgBean && orgBean.contact && orgBean.contact.mobile || '',
           })(<Input placeholder={formatMessage({ id: 'oal.common.phoneNumber' })} />)}
         </Form.Item>
         <Form.Item
@@ -173,7 +173,7 @@ const AddOrUpdateOrg = props => {
                 validator: checkPath,
               }
             ],
-            initialValue: orgBean.path,
+            initialValue: orgBean && orgBean.path || '',
           })(<Input placeholder={formatMessage({ id: 'oal.org.orgPath' })} disabled={isEdit} />)}
         </Form.Item>
       </Form>

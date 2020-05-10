@@ -35,8 +35,10 @@ const { Option } = Select;
   currentUser,
   userManagement,
   userListLoading: loading.effects['userManagement/fetch'],
-  addOrUpdateLoading: loading.effects['userManagement/add'],
+  addLoading: loading.effects['userManagement/add'],
+  modifyLoading: loading.effects['userManagement/modify'],
   handleStateLoading: loading.effects['userManagement/handleState'],
+  resetPswLoading: loading.effects['userManagement/resetPsw'],
 }))
 class UserManagement extends Component {
   state = {
@@ -57,11 +59,9 @@ class UserManagement extends Component {
       title: formatMessage({ id: 'oal.common.account' }),
       dataIndex: 'userName',
       key: 'userName',
-      ellipsis: true,
     },
     {
       title: formatMessage({ id: 'oal.common.nickname' }),
-      ellipsis: true,
       key: 'nickname',
       dataIndex: 'nickname',
       render: (text, record) => (
@@ -72,7 +72,6 @@ class UserManagement extends Component {
     },
     {
       title: formatMessage({ id: 'oal.common.phoneNumber' }),
-      ellipsis: true,
       key: 'phoneNumber',
       dataIndex: 'phoneNumber',
       render: (text, record) => (
@@ -83,7 +82,6 @@ class UserManagement extends Component {
     },
     {
       title: formatMessage({ id: 'oal.common.email' }),
-      ellipsis: true,
       key: 'email',
       dataIndex: 'email',
       render: (text, record) => (
@@ -92,18 +90,18 @@ class UserManagement extends Component {
         </span>
       ),
     },
-    {
-      title: formatMessage({ id: 'oal.user-manage.orgNum' }),
-      key: 'orgNum',
-      dataIndex: 'orgNum',
-      width: 120,
-      render: (text, record) => (
-        <Fragment>
-          {/* <a onClick={() => this.openWin(record.orgNum)}>{record.orgNum}</a> */}
-          <Link to={`/org?creator=${record && record.profile && record.profile.nickName || ''}`}>{record.orgNum || 0}</Link>
-        </Fragment>
-      ),
-    },
+    // {
+    //   title: formatMessage({ id: 'oal.user-manage.orgNum' }),
+    //   key: 'orgNum',
+    //   dataIndex: 'orgNum',
+    //   width: 120,
+    //   render: (text, record) => (
+    //     <Fragment>
+    //       {/* <a onClick={() => this.openWin(record.orgNum)}>{record.orgNum}</a> */}
+    //       <Link to={`/org?creator=${record && record.profile && record.profile.nickName || ''}`}>{record.orgNum || 0}</Link>
+    //     </Fragment>
+    //   ),
+    // },
     {
       title: formatMessage({ id: 'oal.common.handle' }),
       width: 200,
@@ -141,8 +139,9 @@ class UserManagement extends Component {
         state,
       },
     }).then(res => {
-      if (res.res > 0) {
+      if (res && res.res > 0) {
         message.success(formatMessage({ id: _state ? 'oal.user-manage.beenEnabled' : 'oal.user-manage.beenDisabled' }));
+        this.closeDelModal();
         this.loadUserList();
       }
     })
@@ -301,7 +300,7 @@ class UserManagement extends Component {
   };
 
   renderSimpleForm = () => {
-    const { form, loading } = this.props;
+    const { form, userListLoading } = this.props;
     const { getFieldDecorator } = form;
     return (
       <Form layout="inline">
@@ -324,13 +323,14 @@ class UserManagement extends Component {
           </Col>
           <Col xxl={4} lg={4} md={4} sm={24}>
             <span className={styles.submitButtons}>
-              <Button onClick={this.handleSearch} type="primary" htmlType="submit" loading={loading}>
-                <FormattedMessage id="oal.common.query" />
+              <Button onClick={this.handleSearch} type="primary" htmlType="submit" loading={userListLoading}>
+                <FormattedMessage id="oal.face.search" />
               </Button>
               <Button
                 style={{
                   marginLeft: 8,
                 }}
+                loading={userListLoading}
                 onClick={this.handleFormReset}
               >
                 <FormattedMessage id="oal.common.reset" />
@@ -371,10 +371,12 @@ class UserManagement extends Component {
   render() {
     const {
       userManagement: { userList },
-      loading,
-      addOrUpdateLoading,
+      userListLoading,
+      addLoading,
+      modifyLoading,
       handleStateLoading,
       currentUser,
+      resetPswLoading,
     } = this.props;
     userList && userList.pagination && (userList.pagination.showTotal = this.user_showTotal);
     const { selectedRows, modalVisible, selectedUser, resetVisible, delVisible } = this.state;
@@ -385,7 +387,7 @@ class UserManagement extends Component {
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <div className={styles.tableListOperator}>
               <Button icon="plus" type="primary" onClick={() => this.toAdd()}>
-                <FormattedMessage id="oal.common.new" />
+                <FormattedMessage id="oal.face.add" />
               </Button>
             </div>
             <StandardTable
@@ -393,7 +395,7 @@ class UserManagement extends Component {
               rowKey={record => record._id}
               needRowSelection={false}
               selectedRows={selectedRows}
-              loading={loading}
+              loading={userListLoading}
               data={userList}
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
@@ -402,7 +404,7 @@ class UserManagement extends Component {
           </div>
         </Card>
         <AddOrUpdateUser
-          confirmLoading={addOrUpdateLoading}
+          confirmLoading={addLoading || modifyLoading}
           currentUser={currentUser}
           visible={modalVisible}
           userBean={selectedUser}
@@ -412,6 +414,7 @@ class UserManagement extends Component {
         <UserResetModal
           visible={resetVisible}
           userBean={selectedUser}
+          confirmLoading={resetPswLoading}
           handleCancel={this.closeResetModal}
           handleSubmit={this.resetPsw}
         />

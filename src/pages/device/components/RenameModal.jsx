@@ -1,6 +1,7 @@
-import { Modal, Form, Input, Radio, Button, Switch, Tooltip } from 'antd';
+import { Modal, Form, Input, Radio, Button, Switch, Tooltip, Icon, } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import { pswBase64Thrice, pswBase64ThriceRestore } from '@/utils/utils';
 
 const formItemLayout = {
   labelCol: {
@@ -14,8 +15,7 @@ const formItemLayout = {
 };
 const RenameModal = props => {
   const { form, bean, visible, handleSubmit, confirmLoading, handleCancel } = props;
-  const { getFieldDecorator } = form;
-  const [submitLoading, setSubmitLoading] = useState(false);
+  const { getFieldDecorator, getFieldError } = form;
   const [showAlarm, setShowAlarm] = useState(false);
   const [showWaitShutdownTime, setShowWaitShutdownTime] = useState(false);
 
@@ -32,12 +32,17 @@ const RenameModal = props => {
     form.validateFields((err, fieldsValue) => {
       //   console.log('---------fieldsValue----------', fieldsValue)
       if (err) return;
-      const params = fieldsValue;
+      const { pwd, alarmValue, waitShutdownTime } = fieldsValue;
+      const params = {
+        ...fieldsValue,
+        pwd: pswBase64Thrice(pwd),
+      };
+
+      alarmValue && (params.alarmValue = alarmValue.replace(/((℃)|(℉))$/, ''));
+      waitShutdownTime && (params.waitShutdownTime = waitShutdownTime.replace(/s$/, ''));
       params.deviceId = bean._id;
-      setSubmitLoading(true);
       handleSubmit(params, () => {
         form.resetFields();
-        setSubmitLoading(false);
       });
     });
   };
@@ -57,52 +62,103 @@ const RenameModal = props => {
     callback();
   };
 
-  const handleAlarmValueBlur = e => {
+  const handleTemperatureUnitChange = e => {
     const { value } = e.target;
+    const alarmValue = form.getFieldValue('alarmValue');
 
-    if (value) {
+    if (value && !checkAlarmValueIsError(alarmValue) && /((℃)|(℉))$/.test(alarmValue)) {
       form.setFieldsValue({
-        alarmValue: `${value}${/((℃)|(℉))$/.test(value) ? '' : (form.getFieldValue('temperatureUnit') === '1' ? '℉' : '℃')}`,
+        alarmValue: `${alarmValue.replace(/((℃)|(℉))$/, '')}${value === '1' ? '℉' : '℃'}`,
       });
     }
   };
 
-  const checkAlarmThresholdValue = (rule, value, callback) => {
+  const handleAlarmValueFocus = e => {
+    const { value } = e.target;
+
+    if (value && /((℃)|(℉))$/.test(value)) {
+      form.setFieldsValue({
+        alarmValue: value.replace(/((℃)|(℉))$/, ''),
+      });
+    }
+  };
+
+  const checkAlarmValueIsError = value => {
+    let isError = false;
+
     if (value) {
       if (/^[\d]{2,3}\.[\d]{1}$/.test(value.replace(/((℃)|(℉))$/, ''))) {
         let _val = parseFloat(value);
 
         if (_val < 34 || _val > 120) {
-          callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
+          isError = true;
         }
       } else {
-        callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
+        isError = true;
       }
+    }
+
+    return isError;
+  }
+
+  const handleAlarmValueBlur = e => {
+    const { value } = e.target;
+
+    if (value && !checkAlarmValueIsError(value)) {
+      form.setFieldsValue({
+        alarmValue: `${value.replace(/((℃)|(℉))$/, '')}${form.getFieldValue('temperatureUnit') === '1' ? '℉' : '℃'}`,
+      });
+    }
+  };
+
+  const checkAlarmValue = (rule, value, callback) => {
+    if (value && checkAlarmValueIsError(value)) {
+      callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
     }
     callback();
   };
 
-  const checkWaitShutdownTime = (rule, value, callback) => {
+  const checkWaitShutdownTimeIsError = value => {
+    let isError = false;
+
     if (value) {
       if (/^[\d]{2,3}$/.test(value.replace(/s$/, ''))) {
         let _val = parseFloat(value);
 
         if (_val < 10 || _val > 120) {
-          callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
+          isError = true;
         }
       } else {
-        callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
+        isError = true;
       }
+    }
+
+    return isError;
+  };
+
+  const checkWaitShutdownTime = (rule, value, callback) => {
+    if (value && checkWaitShutdownTimeIsError(value)) {
+      callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
     }
     callback();
   };
 
-  const handleWaitShutdownTime = e => {
+  const handleWaitShutdownTimeBlur = e => {
     const { value } = e.target;
 
-    if (value) {
+    if (value && !checkWaitShutdownTimeIsError(value)) {
       form.setFieldsValue({
-        alarmValue: `${value}${/s$/.test(value) ? '' : 's'}`,
+        waitShutdownTime: `${value.replace(/s$/, '')}s`,
+      });
+    }
+  };
+
+  const handleWaitShutdownTimeFocus = e => {
+    const { value } = e.target;
+
+    if (value && /s$/.test(value)) {
+      form.setFieldsValue({
+        waitShutdownTime: value.replace(/s$/, ''),
       });
     }
   };
@@ -114,6 +170,7 @@ const RenameModal = props => {
       visible={visible}
       onOk={handleOk}
       onCancel={handleCancel}
+      confirmLoading={confirmLoading}
       maskClosable={false}
     >
       <Form {...formItemLayout}>
@@ -150,14 +207,14 @@ const RenameModal = props => {
                 validator: checkSixNumber,
               },
             ],
-            initialValue: bean && bean.pwd || '',
+            initialValue: bean && bean.pwd && pswBase64ThriceRestore(bean.pwd) || '',
           })(<Input placeholder={formatMessage({ id: 'oal.device.devicePaswPlaceholder' })} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.device.temperatureUnit' })}>
           {getFieldDecorator('temperatureUnit', {
             initialValue: bean && bean.temperatureUnit || '0',
           })(
-            <Radio.Group>
+            <Radio.Group onChange={handleTemperatureUnitChange}>
               <Radio value="0"><FormattedMessage id="oal.device.centigradeDegree" /></Radio>
               <Radio value="1"><FormattedMessage id="oal.device.fahrenheitDegree" /></Radio>
             </Radio.Group>
@@ -183,11 +240,11 @@ const RenameModal = props => {
                     message: formatMessage({ id: 'oal.common.maxLength' }, { num: '6' }),
                   },
                   {
-                    validator: checkAlarmThresholdValue,
+                    validator: checkAlarmValue,
                   },
                 ],
                 initialValue: bean && bean.alarmValue ? `${bean.alarmValue}${bean && bean.temperatureUnit === '1' ? '℉' : '℃'}` : '',
-              })(<Input placeholder="34.0-120.0（℃/℉）" onBlur={handleAlarmValueBlur} />)}
+              })(<Input placeholder="34.0-120.0（℃/℉）" onFocus={handleAlarmValueFocus} onBlur={handleAlarmValueBlur} />)}
             </Form.Item>) : ''
         }
         <Form.Item label={formatMessage({ id: 'oal.device.relayOperationMode' })}>
@@ -215,7 +272,7 @@ const RenameModal = props => {
                   },
                 ],
                 initialValue: bean && bean.waitShutdownTime ? `${bean.waitShutdownTime}s` : '',
-              })(<Input placeholder="10-120（s）" onBlur={handleWaitShutdownTime} />)}
+              })(<Input placeholder="10-120（s）" onFocus={handleWaitShutdownTimeFocus} onBlur={handleWaitShutdownTimeBlur} />)}
             </Form.Item>) : ''
         }
         <Form.Item label={formatMessage({ id: 'oal.device.recognitionMode' })}>
@@ -225,9 +282,10 @@ const RenameModal = props => {
             <Radio.Group>
               <Radio value="1"><FormattedMessage id="oal.device.attendanceMode" /></Radio>
               <Radio value="2">
-                <FormattedMessage id="oal.device.maskMode" />&nbsp;
+                <FormattedMessage id="oal.device.maskMode" />
+                &nbsp;&nbsp;
                 <Tooltip title={formatMessage({ id: 'oal.device.maskModeTips' })}>
-                  <Icon type="info-circle" />
+                  <Icon type="info-circle" theme="twoTone" style={{ fontSize: '18px' }} />
                 </Tooltip>
               </Radio>
             </Radio.Group>

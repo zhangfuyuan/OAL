@@ -3,7 +3,7 @@ import React from 'react';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const UserResetModal = props => {
-  const { userBean, visible, handleSubmit, handleCancel } = props;
+  const { userBean, visible, handleSubmit, handleCancel, confirmLoading } = props;
 
   const title = formatMessage({ id: 'oal.user-manage.resetPassword' });
 
@@ -15,10 +15,11 @@ const UserResetModal = props => {
       onOk={() => handleSubmit(userBean)}
       onCancel={handleCancel}
       maskClosable={false}
+      confirmLoading={confirmLoading}
       okText={formatMessage({ id: 'oal.common.reset' })}
       cancelText={formatMessage({ id: 'oal.common.cancel' })}
     >
-        <p><FormattedMessage id="oal.user-manage.resetPasswordConfirm" values={{ account: userBean.userName }} /></p>
+      <p><FormattedMessage id="oal.user-manage.resetPasswordConfirm" values={{ account: userBean.userName }} /></p>
     </Modal>
   );
 };

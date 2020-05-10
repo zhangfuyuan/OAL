@@ -161,7 +161,6 @@ class Log extends Component {
         title: formatMessage({ id: 'oal.common.fullName' }),
         key: 'name',
         dataIndex: 'name',
-        ellipsis: true,
         // sorter: (a, b) => a.name - b.name,
         // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
       },

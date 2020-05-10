@@ -145,7 +145,6 @@ class logQuery extends Component {
         title: formatMessage({ id: 'oal.common.fullName' }),
         key: 'name',
         dataIndex: 'name',
-        // ellipsis: true,
         // sorter: (a, b) => a.name - b.name,
         // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
       },
@@ -179,7 +178,7 @@ class logQuery extends Component {
         dataIndex: 'animalHeat',
         sorter: (a, b) => a.animalHeat - b.animalHeat,
         sortOrder: this.state.sortedInfo.columnKey === 'animalHeat' && this.state.sortedInfo.order,
-        render: (text, record) => <span>{record.animalHeat ? (record.device && record.device.length > 0 && record.device[0].temperatureUnit === '1' ? temperatureC2F(record.animalHeat) + '℉' : record.animalHeat + '℃') : '-'}</span>,
+        render: (text, record) => <span>{record.animalHeat ? (listSelectedBean && listSelectedBean.temperatureUnit === '1' ? temperatureC2F(record.animalHeat) + '℉' : record.animalHeat + '℃') : '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.time' }),
