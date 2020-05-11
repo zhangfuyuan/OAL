@@ -129,6 +129,7 @@ class Log extends Component {
   table_loadData = () => {
     const { dispatch } = this.props;
     const { tablePage, sortedInfo, formValues, listSelectedBean } = this.state;
+
     dispatch({
       type: 'log/fetchLog',
       payload: {
@@ -136,6 +137,7 @@ class Log extends Component {
         ...sortedInfo,
         ...formValues,
         deviceId: listSelectedBean._id,
+        peopleType: formValues && formValues.peopleType || '',
       },
     });
   };
@@ -165,19 +167,19 @@ class Log extends Component {
         title: formatMessage({ id: 'oal.face.staffid' }),
         key: 'staffid',
         dataIndex: 'staffid',
-        render: (text, record) => <span>{record.staffid || '--'}</span>,
+        render: (text, record) => <span>{record.staffid || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.log-query.group' }),
         key: 'group',
         dataIndex: 'group',
-        render: (text, record) => <span>{record.group && record.group.length > 0 && record.group[0].name || '--'}</span>,
+        render: (text, record) => <span>{record.group && record.group.length > 0 && record.group[0].name || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.type' }),
         key: 'peopleType',
         dataIndex: 'peopleType',
-        render: (text, record) => <span>{peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] }) || '--'}</span>,
+        render: (text, record) => <span>{peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] }) || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.handle' }),

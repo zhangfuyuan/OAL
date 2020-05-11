@@ -526,4 +526,5 @@ export default {
   'oal.face-visitor.today': `Today`,
   'oal.face-visitor.thisWeek': `This week`,
   'oal.face-visitor.thisMonth': `This month`,
+  'oal.log-query.currentToTotal': `There are {total} records`,
 };

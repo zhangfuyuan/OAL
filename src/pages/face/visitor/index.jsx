@@ -126,7 +126,7 @@ class Visitor extends Component {
         title: formatMessage({ id: 'oal.face-visitor.visitorStaffid' }),
         key: 'staffid',
         dataIndex: 'staffid',
-        render: (text, record) => <span>{record.staffid || '--'}</span>,
+        render: (text, record) => <span>{record.staffid || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.phoneNumber' }),
@@ -137,7 +137,7 @@ class Visitor extends Component {
         title: formatMessage({ id: 'oal.face-visitor.validity' }),
         key: 'validity',
         dataIndex: 'validity',
-        render: (text, record) => <span>{record.startDate && record.endDate && `${record.startDate} ~ ${record.endDate}` || '--'}</span>,
+        render: (text, record) => <span>{record.startDate && record.endDate && `${record.startDate} ~ ${record.endDate}` || '-'}</span>,
         // sorter: (a, b) => a.validity - b.validity,
         // sortOrder: this.state.sortedInfo.columnKey === 'validity' && this.state.sortedInfo.order,
       },

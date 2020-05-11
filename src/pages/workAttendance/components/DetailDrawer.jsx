@@ -32,12 +32,12 @@ const DetailDrawer = props => {
         {
             title: formatMessage({ id: 'oal.common.type' }),
             key: 'accessType',
-            render: (text, record) => <span>{accessType[record.accessType - 1] && formatMessage({ id: accessType[record.accessType - 1] }) || '--'}</span>,
+            render: (text, record) => <span>{accessType[record.accessType - 1] && formatMessage({ id: accessType[record.accessType - 1] }) || '-'}</span>,
         },
         {
             title: formatMessage({ id: 'oal.work.temperature' }),
             key: 'temperature',
-            render: (text, record) => <span>{record.extendInfo && record.extendInfo.temperature || '--'}</span>,
+            render: (text, record) => <span>{record.extendInfo && record.extendInfo.temperature || '-'}</span>,
         },
     ];
 

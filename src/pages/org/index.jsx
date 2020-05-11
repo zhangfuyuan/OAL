@@ -99,7 +99,7 @@ class OrgList extends Component {
         dataIndex: 'state',
         key: 'state',
         render(val) {
-          return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
+          return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '-'} />;
         },
       },
       {
@@ -122,7 +122,7 @@ class OrgList extends Component {
         title: formatMessage({ id: 'oal.org.creator' }),
         dataIndex: 'creator',
         key: 'creator',
-        render: (text, record) => <span>{text || '--'}</span>,
+        render: (text, record) => <span>{text || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.handle' }),

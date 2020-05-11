@@ -60,7 +60,7 @@ const TreeModifyModal = props => {
                 validator: checkIllegalCharacter,
               },
             ],
-            initialValue: bean && bean.name || '--',
+            initialValue: bean && bean.name || '-',
           })(<Input placeholder={formatMessage({ id: 'oal.face.groupName' })} />)}
         </Form.Item>
       </Form>

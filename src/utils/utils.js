@@ -73,11 +73,11 @@ export function exportCSV(headers, data, fileName) {
       if (indexArr.length === 1) {
         if (indexArr[0] === 'date') {
           // eslint-disable-next-line no-underscore-dangle
-          valArr.push((d._id && d._id.deviceDate) ? moment(d._id && d._id.deviceDate).format('YYYY-MM-DD') : '--');
+          valArr.push((d._id && d._id.deviceDate) ? moment(d._id && d._id.deviceDate).format('YYYY-MM-DD') : '-');
         } else if (indexArr[0] === 'beginTime') {
-          valArr.push(d.min ? moment(d.min).format('HH:mm:ss') : '--');
+          valArr.push(d.min ? moment(d.min).format('HH:mm:ss') : '-');
         } else if (indexArr[0] === 'endTime') {
-          valArr.push(d.max ? moment(d.max).format('HH:mm:ss') : '--');
+          valArr.push(d.max ? moment(d.max).format('HH:mm:ss') : '-');
         } else if (indexArr[0] === 'inCount') {
           const inArr = (d.accessTypes && d.accessTypes.filter(a => a === 1)) || [];
           valArr.push(inArr.length);

@@ -233,7 +233,7 @@ class Device extends Component {
       {
         title: formatMessage({ id: 'oal.device.deviceName' }),
         dataIndex: 'name',
-        render: text => text || '--',
+        render: text => text || '-',
         key: 'name',
         // sorter: (a, b) => a.name - b.name,
         // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
@@ -242,7 +242,7 @@ class Device extends Component {
         title: formatMessage({ id: 'oal.common.status' }),
         dataIndex: 'networkState',
         render(val) {
-          return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
+          return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '-'} />;
         },
         key: 'networkState',
         // sorter: (a, b) => a.networkState - b.networkState,
@@ -252,26 +252,26 @@ class Device extends Component {
         title: formatMessage({ id: 'oal.device.mac' }),
         key: 'mac',
         dataIndex: 'mac',
-        render: text => text || '--',
+        render: text => text || '-',
       },
       {
         title: 'IP',
         key: 'ip',
         dataIndex: 'ip',
-        render: text => text || '--',
+        render: text => text || '-',
       },
       // {
       //   title: formatMessage({ id: 'oal.common.type' }),
       //   dataIndex: 'deviceType',
       //   render(val) {
       //     const bean = deviceType.find(item => item.value === val);
-      //     return <span>{bean.value === 2 ? bean.text : (bean.text && formatMessage({ id: bean.text }) || '--')}</span>;
+      //     return <span>{bean.value === 2 ? bean.text : (bean.text && formatMessage({ id: bean.text }) || '-')}</span>;
       //   },
       // },
       {
         title: 'ID',
         dataIndex: 'deviceUuid',
-        render: text => text || '--',
+        render: text => text || '-',
         key: 'deviceUuid',
         // sorter: (a, b) => a.deviceVersion - b.deviceVersion,
         // sortOrder: this.state.sortedInfo.columnKey === 'deviceVersion' && this.state.sortedInfo.order,
@@ -481,7 +481,7 @@ class Device extends Component {
           {/* <Tabs activeKey={type} onChange={this.changeTab}>
             {
               tabArray.map(item => (
-                <TabPane tab={item.name && formatMessage({ id: item.name }) || '--'} key={item.key}>
+                <TabPane tab={item.name && formatMessage({ id: item.name }) || '-'} key={item.key}>
                   <DeviceList
                     type={item.key}
                     data={deviceList}

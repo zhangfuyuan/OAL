@@ -2,9 +2,11 @@ import { post, get } from '@/utils/ajax';
 
 /**
  * （通行-授权1）获取设备列表
+ * @param data
+ * @returns {Promise<*>}
  */
-export async function ajaxDeviceList() {
-  return get(`/guard-web/a/device/fetchAll`);
+export async function ajaxDeviceList(data) {
+  return post(`/guard-web/a/device/fetchAll`, data);
 }
 
 /**

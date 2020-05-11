@@ -67,7 +67,7 @@ class Demo extends Component {
 
         this.setState({
           formValues: {
-            ruleName: ruleName || '--',
+            ruleName: ruleName || '-',
             workAttendanceTimes: workAttendanceTimes || [
               {
                 "workStartTime": "00:00",

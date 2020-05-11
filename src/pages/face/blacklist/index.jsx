@@ -282,7 +282,7 @@ class Demo extends Component {
         title: formatMessage({ id: 'oal.common.status' }),
         dataIndex: 'state',
         render(val) {
-          return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
+          return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '-'} />;
         },
       },
       {

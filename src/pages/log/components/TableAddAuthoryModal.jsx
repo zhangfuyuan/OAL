@@ -112,7 +112,7 @@ const TableAddAuthoryModal = props => {
                   actions={[<a key="list-loadmore-edit" onClick={e => removeUser(e, item)}><Icon type="close-circle" theme="filled" /></a>]}
                 >
                   <List.Item.Meta
-                    title={treeOriginalData[nodeIndex].name || '--'}
+                    title={treeOriginalData[nodeIndex].name || '-'}
                   />
                 </List.Item>) :
                 (<List.Item style={{ display: 'none' }} />);

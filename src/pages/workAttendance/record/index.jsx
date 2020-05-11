@@ -346,6 +346,7 @@ class AttendanceRecord extends Component {
                   [formatMessage({ id: 'oal.log-query.latestWeek' })]: [moment().subtract(1, 'weeks'), moment()],
                   [formatMessage({ id: 'oal.log-query.latestMonth' })]: [moment().subtract(1, 'months'), moment()],
                 }}
+                allowClear={false}
               />)}
             </FormItem>
           </Col>

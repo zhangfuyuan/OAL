@@ -342,7 +342,9 @@ const TableAddOrModifyModal = props => {
               [formatMessage({ id: 'oal.face-visitor.today' })]: [moment(), moment()],
               [formatMessage({ id: 'oal.face-visitor.thisWeek' })]: [moment().week(moment().week()).startOf('week'), moment().week(moment().week()).endOf('week')],
               [formatMessage({ id: 'oal.face-visitor.thisMonth' })]: [moment().week(moment().week()).startOf('month'), moment().week(moment().week()).endOf('month')],
-            }} />)}
+            }}
+            allowClear={false}
+          />)}
         </Form.Item>
         <div style={{ position: 'relative', width: 155, height: 155, margin: '0 0 24px 25%', }}>
           <img src={imageUrl || (isEdit ? bean.imgPath : imgNull)} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: 5, objectFit: 'contain', }} />

@@ -269,7 +269,7 @@ class Face extends Component {
         title: formatMessage({ id: 'oal.face.staffid' }),
         key: 'staffid',
         dataIndex: 'staffid',
-        render: (text, record) => <span>{record.staffid || '--'}</span>,
+        render: (text, record) => <span>{record.staffid || '-'}</span>,
       },
     ];
 

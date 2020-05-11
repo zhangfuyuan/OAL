@@ -66,7 +66,7 @@ class UserManagement extends Component {
       dataIndex: 'nickname',
       render: (text, record) => (
         <span>
-          {record && record.profile && record.profile.nickName ? record.profile.nickName : '--'}
+          {record && record.profile && record.profile.nickName ? record.profile.nickName : '-'}
         </span>
       ),
     },

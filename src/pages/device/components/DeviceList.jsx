@@ -44,25 +44,25 @@ class DeviceList extends Component {
             {
                 title: formatMessage({ id: 'oal.device.deviceName' }),
                 dataIndex: 'name',
-                render: text => text || '--',
+                render: text => text || '-',
             },
             {
                 title: formatMessage({ id: 'oal.device.ipAddress' }),
                 dataIndex: 'ip',
-                render: text => text || '--',
+                render: text => text || '-',
             },
             {
                 title: formatMessage({ id: 'oal.common.type' }),
                 dataIndex: 'deviceType',
                 render(val) {
                     const bean = deviceType.find(item => item.value === val);
-                    return <span>{bean.value===2 ? bean.text : (bean.text && formatMessage({ id: bean.text }) || '--')}</span>;
+                    return <span>{bean.value===2 ? bean.text : (bean.text && formatMessage({ id: bean.text }) || '-')}</span>;
                 },
             },
             {
                 title: formatMessage({ id: 'oal.device.softwareRelease' }),
                 dataIndex: 'deviceVersion',
-                render: text => text || '--',
+                render: text => text || '-',
             },
         ];
         if (type === 'pass') {
@@ -71,7 +71,7 @@ class DeviceList extends Component {
                     title: formatMessage({ id: 'oal.common.status' }),
                     dataIndex: 'networkState',
                     render(val) {
-                        return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '--'} />;
+                        return <Badge status={statusMap[val]} text={status[val] && formatMessage({ id: status[val] }) || '-'} />;
                     },
                 },
                 {
@@ -94,7 +94,7 @@ class DeviceList extends Component {
                 {
                     title: formatMessage({ id: 'oal.device.applicationTime' }),
                     dataIndex: 'createAt',
-                    render: text => moment(text).format('YYYY-MM-DD HH:mm:ss') || '--',
+                    render: text => moment(text).format('YYYY-MM-DD HH:mm:ss') || '-',
                 },
                 {
                     title: formatMessage({ id: 'oal.common.audit' }),
@@ -129,14 +129,14 @@ class DeviceList extends Component {
                     title: formatMessage({ id: 'oal.device.auditor' }),
                     dataIndex: 'verifyUser',
                     render: (text, record) => (
-                        <span>{record.verifyInfo && record.verifyInfo.auditor && record.verifyInfo.auditor.userName ? record.verifyInfo.auditor.userName : '--'}</span>
+                        <span>{record.verifyInfo && record.verifyInfo.auditor && record.verifyInfo.auditor.userName ? record.verifyInfo.auditor.userName : '-'}</span>
                     ),
                 },
                 {
                     title: formatMessage({ id: 'oal.device.auditTime' }),
                     dataIndex: 'verifyAt',
                     render: (text, record) => (
-                        <span>{record.verifyInfo && record.verifyInfo.at ? moment(record.verifyInfo.at).format('YYYY-MM-DD HH:mm:ss') : '--'}</span>
+                        <span>{record.verifyInfo && record.verifyInfo.at ? moment(record.verifyInfo.at).format('YYYY-MM-DD HH:mm:ss') : '-'}</span>
                     ),
                 },
                 {

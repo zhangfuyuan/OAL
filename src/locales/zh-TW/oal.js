@@ -526,4 +526,5 @@ export default {
   'oal.face-visitor.today': `今天`,
   'oal.face-visitor.thisWeek': `本週`,
   'oal.face-visitor.thisMonth': `本月`,
+  'oal.log-query.currentToTotal': `總共 {total} 條記錄`,
 };

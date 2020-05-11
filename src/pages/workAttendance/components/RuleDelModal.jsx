@@ -5,7 +5,7 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 const RuleDelModal = props => {
   const { bean, visible, handleSubmit, handleCancel } = props;
 
-  const title = `${formatMessage({ id: 'oal.common.delete' })}(${bean.name || '--'})`;
+  const title = `${formatMessage({ id: 'oal.common.delete' })}(${bean.name || '-'})`;
 
   return (
     <Modal

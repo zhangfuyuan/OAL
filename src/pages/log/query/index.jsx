@@ -114,6 +114,9 @@ class logQuery extends Component {
   table_loadData = () => {
     const { dispatch } = this.props;
     const { tablePage, sortedInfo, formValues, listSelectedBean } = this.state;
+    const { date = ['', ''], peopleType = '' } = formValues || {};
+    const [startDate, endDate] = date;
+
     dispatch({
       type: 'logQuery/fetchLogQuery',
       payload: {
@@ -121,6 +124,9 @@ class logQuery extends Component {
         ...sortedInfo,
         ...formValues,
         deviceId: listSelectedBean._id,
+        startDate,
+        endDate,
+        peopleType,
       },
     });
   };
@@ -132,6 +138,8 @@ class logQuery extends Component {
   };
 
   table_columns = () => {
+    const { listSelectedBean } = this.state;
+
     const cl = [
       {
         title: formatMessage({ id: 'oal.common.photo' }),
@@ -150,19 +158,19 @@ class logQuery extends Component {
         title: formatMessage({ id: 'oal.face.staffid' }),
         key: 'staffid',
         dataIndex: 'staffid',
-        render: (text, record) => <span>{record.staffid || '--'}</span>,
+        render: (text, record) => <span>{record.staffid || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.log-query.group' }),
         key: 'group',
         dataIndex: 'group',
-        render: (text, record) => <span>{record.group && record.group.length > 0 && record.group[0].name || '--'}</span>,
+        render: (text, record) => <span>{record.peopleType === '2' ? formatMessage({ id: 'oal.common.visitor' }) : (record.group && record.group.length > 0 && record.group[0].name || '-')}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.type' }),
         key: 'peopleType',
         dataIndex: 'peopleType',
-        render: (text, record) => <span>{peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] }) || '--'}</span>,
+        render: (text, record) => <span>{peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] }) || '-'}</span>,
       },
       // {
       //   title: formatMessage({ id: 'oal.log-query.device' }),
@@ -238,7 +246,7 @@ class logQuery extends Component {
   };
 
   table_renderSimpleForm = () => {
-    const { form, logQueryListLoading } = this.props;
+    const { form, logQueryListLoading, deviceListLoading } = this.props;
     const { getFieldDecorator } = form;
     const { formValues } = this.state;
     const { date } = formValues;
@@ -251,7 +259,7 @@ class logQuery extends Component {
             xl: 24,
           }}
         >
-          <Col xxl={6} xl={6} lg={8} md={8} sm={24}>
+          <Col xxl={6} xl={6} lg={6} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.type' })}>
               {getFieldDecorator('peopleType', {
                 initialValue: '',
@@ -284,7 +292,7 @@ class logQuery extends Component {
               {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
             </FormItem>
           </Col>
-          <Col xxl={8} xl={8} lg={12} md={12} sm={24}>
+          <Col xxl={7} xl={8} lg={9} md={10} sm={24}>
             <FormItem label="">
               {getFieldDecorator('date', {
                 initialValue: [moment(date[0], 'YYYY-MM-DD'), moment(date[1], 'YYYY-MM-DD')],
@@ -294,18 +302,21 @@ class logQuery extends Component {
                   [formatMessage({ id: 'oal.log-query.latestWeek' })]: [moment().subtract(1, 'weeks'), moment()],
                   [formatMessage({ id: 'oal.log-query.latestMonth' })]: [moment().subtract(1, 'months'), moment()],
                 }}
+                disabledDate={this.handleDisabledDate}
+                allowClear={false}
               />)}
             </FormItem>
           </Col>
           <Col xxl={4} lg={6} md={6} sm={24}>
             <span className={styles.submitButtons}>
-              <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={logQueryListLoading}>
+              <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={logQueryListLoading || deviceListLoading}>
                 <FormattedMessage id="oal.face.search" />
               </Button>
               <Button
                 style={{
                   marginLeft: 8,
                 }}
+                loading={logQueryListLoading || deviceListLoading}
                 onClick={this.table_handleFormReset}
               >
                 <FormattedMessage id="oal.common.reset" />
@@ -316,6 +327,8 @@ class logQuery extends Component {
       </Form>
     );
   };
+
+  handleDisabledDate = current => current && current >= moment().endOf('day');
 
   // handleTypeChange = value => {
   //   const { formValues } = this.state;
@@ -384,7 +397,7 @@ class logQuery extends Component {
     const { peopleType, name, date } = formValues;
 
     logQueryList && logQueryList.pagination && (logQueryList.pagination.showTotal = (total, range) => (formatMessage({
-      id: 'oal.log.currentToTotal',
+      id: 'oal.log-query.currentToTotal',
     }, {
       total,
     })));
@@ -419,18 +432,19 @@ class logQuery extends Component {
               <div className={styles.tableListOperator}>
                 <Button
                   type="primary"
+                  loading={logQueryListLoading || deviceListLoading}
                   onClick={this.handleExport}
                 >
                   <FormattedMessage id="oal.common.export" />
                 </Button>
-                <a ref={el => { this.ref_download = el }} href={`/guard-web/a/record/export?deviceId${listSelectedBean && listSelectedBean._id || ''}&startDate=${date && date[0] || ''}&endDate=${date && date[1] || ''}&peopleType=${peopleType || ''}&faceName=${name || ''}`} />
+                <a ref={el => { this.ref_download = el }} href={`/guard-web/a/record/export?deviceId=${listSelectedBean && listSelectedBean._id || ''}&startDate=${date && date[0] || ''}&endDate=${date && date[1] || ''}&peopleType=${peopleType || ''}&faceName=${name || ''}`} />
               </div>
               <StandardTable
                 // eslint-disable-next-line no-underscore-dangle
                 rowKey={record => record._id}
                 needRowSelection={false}
                 selectedRows={tableSelectedRows}
-                loading={logQueryListLoading}
+                loading={logQueryListLoading || deviceListLoading}
                 data={logQueryList}
                 columns={this.table_columns()}
                 onSelectRow={this.table_handleSelectRows}

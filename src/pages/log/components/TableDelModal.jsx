@@ -8,7 +8,7 @@ const TableDelModal = props => {
   let title = formatMessage({ id: 'oal.common.delete' });
   if (bean && bean.length > 0) {
     if (bean.length === 1) {
-      title = `${formatMessage({ id: 'oal.common.delete' })}(${bean && bean[0] && bean[0].name || '--'})`;
+      title = `${formatMessage({ id: 'oal.common.delete' })}(${bean && bean[0] && bean[0].name || '-'})`;
     } else {
       title = formatMessage({ id: 'oal.device.deleteDeviceTitle' }, { num: bean.length });
     }
