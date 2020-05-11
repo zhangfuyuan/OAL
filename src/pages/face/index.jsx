@@ -244,6 +244,7 @@ class Face extends Component {
         // columnKey,
         // order,
         name: tableSearchName.trim(),
+        peopleType: '0',
       },
     });
   };
@@ -524,6 +525,7 @@ class Face extends Component {
       payload: {
         groupId: param,
         faceId: tableSelectedBean && tableSelectedBean._id || tableSelectedRows.map(item => item._id).join(','),
+        peopleType: '0',
       },
     }).then(res => {
       if (res && res.res > 0) {
@@ -562,6 +564,7 @@ class Face extends Component {
       payload: {
         faceId: bean && bean._id || '',
         state: _state,
+        peopleType: '0',
       },
     }).then(res => {
       if (res && res.res > 0) {

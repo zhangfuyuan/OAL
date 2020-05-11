@@ -123,6 +123,7 @@ const TableBatchAddModal = props => {
       type: 'face/getBatchAddTaskId',
       payload: {
         groupId,
+        peopleType: '0',
       },
     }).then(res => {
       if (!visible || !myUploadLoading) return;
@@ -155,6 +156,7 @@ const TableBatchAddModal = props => {
       type: 'face/getBatchAddTaskProgress',
       payload: {
         taskId,
+        peopleType: '0',
       },
     }).then(res => {
       if (!visible || !myUploadLoading) return;
@@ -188,6 +190,7 @@ const TableBatchAddModal = props => {
       type: 'face/cancelBatchAddTask',
       payload: {
         taskId,
+        peopleType: '0',
       },
     }).then(res => {
       if (!visible || !myUploadLoading) return;
@@ -241,6 +244,7 @@ const TableBatchAddModal = props => {
       if (!visible || !myUploadLoading) return;
       data.md5 = block.file.md5;
       data.taskId = block.file.taskId;
+      data.peopleType = '0';
     });
 
     // uploader.on('uploadProgress', (file, percentage) => {

@@ -30,7 +30,7 @@ import { SYSTEM_PATH } from '@/utils/constants';
 import styles from './style.less';
 import TableAddOrModifyModal from './components/TableAddOrModifyModal';
 import TableDelModal from './components/TableDelModal';
-import TableRelateDeviceModal from './components/TableRelateDeviceModal';
+// import TableRelateDeviceModal from './components/TableRelateDeviceModal';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -40,6 +40,7 @@ const { Option } = Select;
   faceVisitor,
   listLoading: loading.effects['faceVisitor/fetchList'],
   deviceList: faceVisitor.deviceList,
+  delVisitorLoading: loading.effects['faceVisitor/delVisitor'],
 }))
 class Visitor extends Component {
 
@@ -67,7 +68,7 @@ class Visitor extends Component {
 
   componentDidMount() {
     this.table_loadData();
-    this.loadDeviceList();
+    // this.loadDeviceList();
   }
 
   componentWillUnmount() {
@@ -84,20 +85,21 @@ class Visitor extends Component {
         ...tablePage,
         ...sortedInfo,
         ...formValues,
-        featureState: 'all',
+        // featureState: 'all',
+        peopleType: '2',
       },
     });
   };
 
-  loadDeviceList = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'faceVisitor/getDeviceList',
-      payload: {
-        verity: 1,
-      },
-    });
-  };
+  // loadDeviceList = () => {
+  //   const { dispatch } = this.props;
+  //   dispatch({
+  //     type: 'faceVisitor/getDeviceList',
+  //     payload: {
+  //       verity: 1,
+  //     },
+  //   });
+  // };
 
   table_handleSelectRows = rows => {
     this.setState({
@@ -117,12 +119,11 @@ class Visitor extends Component {
         title: formatMessage({ id: 'oal.common.fullName' }),
         key: 'name',
         dataIndex: 'name',
-        key: 'name',
         // sorter: (a, b) => a.name - b.name,
         // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
       },
       {
-        title: formatMessage({ id: 'oal.face.staffid' }),
+        title: formatMessage({ id: 'oal.face-visitor.visitorStaffid' }),
         key: 'staffid',
         dataIndex: 'staffid',
         render: (text, record) => <span>{record.staffid || '--'}</span>,
@@ -136,6 +137,7 @@ class Visitor extends Component {
         title: formatMessage({ id: 'oal.face-visitor.validity' }),
         key: 'validity',
         dataIndex: 'validity',
+        render: (text, record) => <span>{record.startDate && record.endDate && `${record.startDate} ~ ${record.endDate}` || '--'}</span>,
         // sorter: (a, b) => a.validity - b.validity,
         // sortOrder: this.state.sortedInfo.columnKey === 'validity' && this.state.sortedInfo.order,
       },
@@ -146,8 +148,8 @@ class Visitor extends Component {
           <Fragment>
             <a key="edit" onClick={() => this.table_showTableAddOrModifyModal(record)}><FormattedMessage id="oal.common.edit" /></a>
             <Divider type="vertical" />
-            <a key="relate" onClick={(e) => this.table_showRelateModal(e, record)}><FormattedMessage id="oal.work-rule.relateDevice" /></a>
-            <Divider type="vertical" />
+            {/* <a key="relate" onClick={(e) => this.table_showRelateModal(e, record)}><FormattedMessage id="oal.work-rule.relateDevice" /></a>
+            <Divider type="vertical" /> */}
             {/* <Popconfirm placement="topLeft" title={formatMessage({ id: 'oal.face.confirmDeleteFace' })} onConfirm={() => this.deleteFace(record)} okText={formatMessage({ id: 'oal.common.delete' })} cancelText={formatMessage({ id: 'oal.common.cancel' })}> */}
             <a key="remove" onClick={(e) => this.table_showTableDelModal(e, record)}><FormattedMessage id="oal.common.delete" /></a>
           </Fragment>
@@ -199,7 +201,7 @@ class Visitor extends Component {
   };
 
   table_renderSimpleForm = () => {
-    const { form, loading } = this.props;
+    const { form, listLoading } = this.props;
     const { getFieldDecorator } = form;
     return (
       <Form layout="inline">
@@ -211,19 +213,20 @@ class Visitor extends Component {
           }}
         >
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
-            <FormItem label={formatMessage({ id: 'oal.face.search' })}>
+            <FormItem label={formatMessage({ id: 'oal.common.fullName' })}>
               {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
             </FormItem>
           </Col>
           <Col xxl={4} lg={4} md={4} sm={12}>
             <span className={styles.submitButtons}>
-              <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={loading}>
-                <FormattedMessage id="oal.common.query" />
+              <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={listLoading}>
+                <FormattedMessage id="oal.face.search" />
               </Button>
               <Button
                 style={{
                   marginLeft: 8,
                 }}
+                loading={listLoading}
                 onClick={this.table_handleFormReset}
               >
                 <FormattedMessage id="oal.common.reset" />
@@ -272,7 +275,6 @@ class Visitor extends Component {
 
   // 单个/批量删除（人脸信息）
   table_showTableDelModal = (e, bean) => {
-    console.log(8126, '单个/批量删除', bean || this.state.tableSelectedRows);
     this.setState({
       tableDelVisible: true,
       tableSelectedBean: bean || {},
@@ -292,7 +294,8 @@ class Visitor extends Component {
     dispatch({
       type: 'faceVisitor/delVisitor',
       payload: {
-        visitorId: tableSelectedBean && tableSelectedBean._id || tableSelectedRows.map(item => item._id).join(','),
+        faceId: tableSelectedBean && tableSelectedBean._id || tableSelectedRows.map(item => item._id).join(','),
+        peopleType: '2',
       },
     }).then(res => {
       if (res && res.res > 0) {
@@ -309,32 +312,32 @@ class Visitor extends Component {
   };
 
   // 单个/批量关联设备
-  table_showRelateModal = (e, bean) => {
-    this.setState({ relateVisible: true, tableSelectedBean: bean || {} });
-  };
+  // table_showRelateModal = (e, bean) => {
+  //   this.setState({ relateVisible: true, tableSelectedBean: bean || {} });
+  // };
 
-  table_closeRelateModal = () => {
-    this.setState({ relateVisible: false, tableSelectedBean: {} });
-  };
+  // table_closeRelateModal = () => {
+  //   this.setState({ relateVisible: false, tableSelectedBean: {} });
+  // };
 
-  table_submitRelateModal = (visitorId, deviceId) => {
-    const { dispatch } = this.props;
-    // 8126TODO 需对接
-    dispatch({
-      type: 'faceVisitor/relateDevice',
-      payload: {
-        // eslint-disable-next-line no-underscore-dangle
-        visitorId,
-        deviceId,
-      },
-    }).then(res => {
-      if (res && res.res > 0) {
-        message.success(formatMessage({ id: 'oal.work-rule.relateSuccessfully' }));
-        this.table_closeRelateModal();
-        this.table_loadData();
-      }
-    });
-  };
+  // table_submitRelateModal = (faceId, deviceId) => {
+  //   const { dispatch } = this.props;
+  //   // 8126TODO 需对接
+  //   dispatch({
+  //     type: 'faceVisitor/relateDevice',
+  //     payload: {
+  //       // eslint-disable-next-line no-underscore-dangle
+  //       faceId,
+  //       deviceId,
+  //     },
+  //   }).then(res => {
+  //     if (res && res.res > 0) {
+  //       message.success(formatMessage({ id: 'oal.work-rule.relateSuccessfully' }));
+  //       this.table_closeRelateModal();
+  //       this.table_loadData();
+  //     }
+  //   });
+  // };
 
   // 放大查看（人脸图片）
   table_openViewModal = bean => {
@@ -353,6 +356,7 @@ class Visitor extends Component {
       listLoading,
       dispatch,
       deviceList,
+      delVisitorLoading,
     } = this.props;
     const {
       tableSelectedRows,
@@ -384,13 +388,13 @@ class Visitor extends Component {
                 >
                   <FormattedMessage id="oal.common.delete" />
                 </Button>
-                <Button
+                {/* <Button
                   type="primary"
                   disabled={!tableSelectedRows || tableSelectedRows.length === 0}
                   onClick={this.table_showRelateModal}
                 >
                   <FormattedMessage id="oal.work-rule.relateDevice" />
-                </Button>
+                </Button> */}
               </div>
               <StandardTable
                 // eslint-disable-next-line no-underscore-dangle
@@ -424,16 +428,17 @@ class Visitor extends Component {
         />
         <TableDelModal
           visible={tableDelVisible}
+          confirmLoading={delVisitorLoading}
           bean={tableSelectedBean && tableSelectedBean._id ? [tableSelectedBean] : tableSelectedRows}
           handleCancel={this.table_closeTableDelModal}
           handleSubmit={this.table_submitTableDelModal}
         />
-        <TableRelateDeviceModal
+        {/* <TableRelateDeviceModal
           visible={relateVisible}
           bean={{ selectedBean: (tableSelectedBean && tableSelectedBean._id ? [tableSelectedBean] : tableSelectedRows), deviceList }}
           handleCancel={this.table_closeRelateModal}
           handleSubmit={this.table_submitRelateModal}
-        />
+        /> */}
       </PageHeaderWrapper>
     );
   }

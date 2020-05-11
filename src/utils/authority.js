@@ -150,16 +150,16 @@ export function getPermissionRoutes(userType, orgType) {
               },
             ],
           },
-          {
-            path: '/workAttendance/statistics',
-            name: 'workAttendanceStatistics',
-            locale: 'menu.workAttendance.workAttendanceStatistics',
-          },
-          {
-            path: '/workAttendance/record',
-            name: 'workAttendanceRecord',
-            locale: 'menu.workAttendance.workAttendanceRecord',
-          },
+          // {
+          //   path: '/workAttendance/statistics',
+          //   name: 'workAttendanceStatistics',
+          //   locale: 'menu.workAttendance.workAttendanceStatistics',
+          // },
+          // {
+          //   path: '/workAttendance/record',
+          //   name: 'workAttendanceRecord',
+          //   locale: 'menu.workAttendance.workAttendanceRecord',
+          // },
         ],
       },
     ],

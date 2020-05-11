@@ -148,16 +148,16 @@ const routers = [
                   },
                 ],
               },
-              {
-                path: '/workAttendance/statistics',
-                name: 'workAttendanceStatistics',
-                component: './workAttendance/statistics',
-              },
-              {
-                path: '/workAttendance/record',
-                name: 'workAttendanceRecord',
-                component: './workAttendance/record',
-              },
+              // {
+              //   path: '/workAttendance/statistics',
+              //   name: 'workAttendanceStatistics',
+              //   component: './workAttendance/statistics',
+              // },
+              // {
+              //   path: '/workAttendance/record',
+              //   name: 'workAttendanceRecord',
+              //   component: './workAttendance/record',
+              // },
               {
                 component: './404',
               },

@@ -38,8 +38,6 @@ app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/
 app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/workAttendance/model.js').default) });
 app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/workAttendance/rule/add/model.js').default) });
 app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/workAttendance/rule/edit/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/workAttendance/statistics/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/workAttendance/record/model.js').default) });
   return app;
 }
 

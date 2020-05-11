@@ -49,6 +49,7 @@ const peopleTypeMap = {
   logList: log.logList,
   logListLoading: loading.effects['log/fetchLog'],
   treeLoading: loading.effects['log/fetchGroupTree'],
+  delAuthoryLoading: loading.effects['log/delAuthory'],
 }))
 class Log extends Component {
 
@@ -103,9 +104,7 @@ class Log extends Component {
     const { dispatch } = this.props;
     dispatch({
       type: 'log/getDeviceList',
-      payload: {
-        verity: 1,
-      },
+      payload: {},
     }).then(res => {
       if (res && res.res > 0 && res.data.length > 0) {
         this.list_handleClickItem(null, res.data[0]);
@@ -118,7 +117,6 @@ class Log extends Component {
   };
 
   list_handleClickItem = (e, bean) => {
-    console.log(8126, '点击设备', bean);
     this.setState({
       listSelectedBean: bean,
     }, () => {
@@ -137,7 +135,6 @@ class Log extends Component {
         ...tablePage,
         ...sortedInfo,
         ...formValues,
-        featureState: 'all',
         deviceId: listSelectedBean._id,
       },
     });
@@ -171,23 +168,24 @@ class Log extends Component {
         render: (text, record) => <span>{record.staffid || '--'}</span>,
       },
       {
-        title: formatMessage({ id: 'oal.log.sourceGroup' }),
+        title: formatMessage({ id: 'oal.log-query.group' }),
         key: 'group',
         dataIndex: 'group',
-        render: (text, record) => <span>{record.group && record.group.length > 0 && record.group[0].name || ''}</span>,
+        render: (text, record) => <span>{record.group && record.group.length > 0 && record.group[0].name || '--'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.type' }),
         key: 'peopleType',
         dataIndex: 'peopleType',
-        render: (text, record) => <span>{peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] }) || '-'}</span>,
+        render: (text, record) => <span>{peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] }) || '--'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.handle' }),
         width: 150,
+        key: 'handle',
         render: (text, record) => (
           <Fragment>
-            <a key="remove" onClick={(e) => this.table_showTableDelModal(e, record)}><FormattedMessage id="oal.log.remove" /></a>
+            <a key="delete" onClick={(e) => this.table_showTableDelModal(e, record)}><FormattedMessage id="oal.common.delete" /></a>
           </Fragment>
         ),
       },
@@ -237,7 +235,7 @@ class Log extends Component {
   };
 
   table_renderSimpleForm = () => {
-    const { form, logListLoading, treeLoading } = this.props;
+    const { form, deviceListLoading, logListLoading/*, treeLoading*/ } = this.props;
     const { getFieldDecorator } = form;
     return (
       <Form layout="inline">
@@ -267,27 +265,28 @@ class Log extends Component {
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} xl={6} lg={6} md={6} sm={24}>
+          <Col xxl={8} xl={8} lg={8} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.fullName' })}>
               {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={6} md={6} sm={12}>
             <span className={styles.submitButtons}>
-              <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={logListLoading}>
-                <FormattedMessage id="oal.common.query" />
+              <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={logListLoading || deviceListLoading}>
+                <FormattedMessage id="oal.face.search" />
               </Button>
               <Button
                 style={{
                   marginLeft: 8,
                 }}
+                loading={logListLoading || deviceListLoading}
                 onClick={this.table_handleFormReset}
               >
                 <FormattedMessage id="oal.common.reset" />
               </Button>
             </span>
           </Col>
-          <Col xxl={6} xl={6} lg={6} md={6} sm={12}>
+          {/* <Col xxl={6} xl={6} lg={6} md={6} sm={12}>
             <div style={{ textAlign: 'right', }}>
               <Button
                 type="primary"
@@ -298,7 +297,7 @@ class Log extends Component {
                 <FormattedMessage id="oal.face.add" />
               </Button>
             </div>
-          </Col>
+          </Col> */}
         </Row>
       </Form>
     );
@@ -317,14 +316,15 @@ class Log extends Component {
     });
   };
 
-  table_submitTableAddAuthoryModal = (userId, callback) => {
+  table_submitTableAddAuthoryModal = (faceId, callback) => {
     const { dispatch } = this.props;
     const { listSelectedBean } = this.state;
+
     dispatch({
       type: 'log/addAuthory',
       payload: {
         deviceId: listSelectedBean._id,
-        userId: userId,
+        faceId,
       },
     }).then(res => {
       if (res && res.res > 0) {
@@ -342,7 +342,6 @@ class Log extends Component {
 
   // 移除授权
   table_showTableDelModal = (e, bean) => {
-    console.log(8126, '移除授权', bean || this.state.tableSelectedRows);
     this.setState({
       tableDelVisible: true,
       tableSelectedBean: bean || {},
@@ -358,15 +357,17 @@ class Log extends Component {
 
   table_submitTableDelModal = (params, callback) => {
     const { dispatch } = this.props;
-    const { tableSelectedBean, tableSelectedRows } = this.state;
+    const { listSelectedBean, tableSelectedBean, tableSelectedRows } = this.state;
+
     dispatch({
       type: 'log/delAuthory',
       payload: {
-        faceId: tableSelectedBean && tableSelectedBean._id || tableSelectedRows.map(item => item._id).join(','),
+        deviceId: listSelectedBean._id,
+        removeFaceId: tableSelectedBean && tableSelectedBean._id || tableSelectedRows.map(item => item._id).join(','),
       },
     }).then(res => {
       if (res && res.res > 0) {
-        message.success(formatMessage({ id: 'oal.log.removeSuccessfully' }));
+        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
         this.table_closeTableDelModal();
         this.table_loadData();
         callback && callback();
@@ -395,6 +396,8 @@ class Log extends Component {
       deviceListLoading,
       logList,
       logListLoading,
+      treeLoading,
+      delAuthoryLoading,
     } = this.props;
     const {
       tableSelectedRows,
@@ -424,7 +427,7 @@ class Log extends Component {
                   (<List
                     itemLayout="horizontal"
                     split={false}
-                    dataSource={[...deviceList, ...deviceList, ...deviceList]}
+                    dataSource={deviceList}
                     renderItem={(item, index) => (
                       <List.Item>
                         <List.Item.Meta
@@ -442,11 +445,20 @@ class Log extends Component {
               <div className={styles.tableListForm}>{this.table_renderSimpleForm()}</div>
               <div className={styles.tableListOperator}>
                 <Button
+                  type="primary"
+                  icon="plus"
+                  loading={treeLoading}
+                  style={{ marginRight: '8px', }}
+                  onClick={this.table_showTableAddAuthoryModal}
+                >
+                  <FormattedMessage id="oal.face.add" />
+                </Button>
+                <Button
                   type="danger"
                   disabled={!tableSelectedRows || tableSelectedRows.length === 0}
                   onClick={this.table_showTableDelModal}
                 >
-                  <FormattedMessage id="oal.log.remove" />
+                  <FormattedMessage id="oal.common.delete" />
                 </Button>
               </div>
               <StandardTable
@@ -454,7 +466,7 @@ class Log extends Component {
                 rowKey={record => record._id}
                 needRowSelection
                 selectedRows={tableSelectedRows}
-                loading={logListLoading}
+                loading={logListLoading || deviceListLoading}
                 data={logList}
                 columns={this.table_columns()}
                 onSelectRow={this.table_handleSelectRows}
@@ -474,6 +486,7 @@ class Log extends Component {
         </Modal>
         <TableDelModal
           visible={tableDelVisible}
+          confirmLoading={delAuthoryLoading}
           bean={tableSelectedBean && tableSelectedBean._id ? [tableSelectedBean] : tableSelectedRows}
           handleCancel={this.table_closeTableDelModal}
           handleSubmit={this.table_submitTableDelModal}

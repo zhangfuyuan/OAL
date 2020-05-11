@@ -1,12 +1,12 @@
 import { Modal, Tree, message, List, Icon, } from 'antd';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import { findIndex } from 'lodash';
 
 const { TreeNode } = Tree;
 
 const getPidFn = (pid, list, res = []) => {
-  const index = findIndex(list, item => item.id === pid);
+  const index = findIndex(list, item => item._id === pid);
 
   if (index > -1) {
     return getPidFn(list[index].pid, list, res.concat(pid));
@@ -19,6 +19,15 @@ const TableAddAuthoryModal = props => {
   const { treeData, treeOriginalData, visible, handleSubmit, handleCancel, curDeviceId } = props;
   const [checkedKeys, setCheckedKeys] = useState([]);
 
+  // 建议：每次 Modal 关闭时重置
+  useEffect(() => {
+    if (visible === false) {
+      resetAllVar();
+    } else {
+      setCheckedKeys(treeOriginalData && treeOriginalData.filter(node => node.isPeople && node.relateDevice && node.relateDevice.indexOf(curDeviceId) > -1).map(node => node._id) || []);
+    }
+  }, [visible]);
+
   const resetAllVar = () => {
     // 重置 state
     setCheckedKeys([]);
@@ -30,7 +39,7 @@ const TableAddAuthoryModal = props => {
 
   const handleOk = () => {
     if (checkedKeys && checkedKeys.length > 0) {
-      handleSubmit(treeOriginalData.filter(node => checkedKeys.indexOf(node.id) > -1 && !node.num).map(node => node.id).join(','), () => {
+      handleSubmit(treeOriginalData.filter(node => node.isPeople && checkedKeys.indexOf(node._id) > -1).map(node => node._id).join(','), () => {
         resetAllVar();
       });
     } else {
@@ -44,8 +53,8 @@ const TableAddAuthoryModal = props => {
       if (item.children && item.children.length > 0) {
         return (
           <TreeNode
-            key={item.id}
-            title={item.name}
+            key={item._id}
+            title={item._id === treeData[0]._id ? `${item.name}(${item.num})` : item.name}
             dataRef={item}
           >
             {renderNodes(item.children)}
@@ -53,17 +62,16 @@ const TableAddAuthoryModal = props => {
         );
       }
       return <TreeNode
-        key={item.id}
+        key={item._id}
         title={item.name}
-        disableCheckbox={item.relateDevice && item.relateDevice.map(device => device.id).indexOf(curDeviceId) > -1 || false}
+        disableCheckbox={item.isPeople && item.relateDevice && item.relateDevice.indexOf(curDeviceId) > -1 || false}
         {...item}
         dataRef={item} />;
     });
 
   const removeUser = (e, item) => {
-    const nodeIndex = findIndex(treeOriginalData, node => node.id === item);
-    const pids = getPidFn(treeOriginalData[nodeIndex].pid, treeOriginalData)
-    console.log(8126, '节点路径：', [item, ...pids]);
+    const nodeIndex = findIndex(treeOriginalData, node => node._id === item);
+    const pids = getPidFn(treeOriginalData[nodeIndex].pid, treeOriginalData);
     setCheckedKeys(checkedKeys.filter(key => !~[item, ...pids].indexOf(key)));
   };
 
@@ -71,7 +79,7 @@ const TableAddAuthoryModal = props => {
     <Modal
       width="60%"
       destroyOnClose
-      title={formatMessage({ id: 'oal.log.addAuthoryTitle' }, { num: treeOriginalData.filter(node => checkedKeys.indexOf(node.id) > -1 && !node.num).length })} // 8126TODO 需判断是否为用户
+      title={formatMessage({ id: 'oal.log.addAuthoryTitle' }, { num: treeOriginalData.filter(node => node.isPeople && checkedKeys.indexOf(node._id) > -1).length })} // 8126TODO 需判断是否为用户
       visible={visible}
       onOk={handleOk}
       onCancel={handleCancel}
@@ -82,7 +90,7 @@ const TableAddAuthoryModal = props => {
         <div style={{ height: '50vh', overflow: 'auto', flex: 7, }}>
           <Tree
             checkable
-            defaultExpandAll
+            defaultExpandedKeys={[treeData && treeData.length > 0 && treeData[0]._id || '0']}
             checkedKeys={checkedKeys}
             onCheck={handleCheck}
           >
@@ -96,8 +104,7 @@ const TableAddAuthoryModal = props => {
             dataSource={checkedKeys}
             split={false}
             renderItem={item => {
-              // 8126TODO 需判断是否为用户
-              const nodeIndex = findIndex(treeOriginalData, node => node.id === item && !node.num);
+              const nodeIndex = findIndex(treeOriginalData, node => node._id === item && node.isPeople && (!node.relateDevice || !~node.relateDevice.indexOf(curDeviceId)));
 
               return nodeIndex > -1 && treeOriginalData[nodeIndex] ?
                 (<List.Item

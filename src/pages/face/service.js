@@ -42,7 +42,7 @@ export async function ajaxDelGroupNode(data) {
  * @returns {Promise<*>}
  */
 export async function fetchList(data) {
-  return post('/guard-web/a/sys/face/fetchList', data);
+  return post('/guard-web/a/face/fetchList', data);
 }
 
 /**
@@ -51,7 +51,7 @@ export async function fetchList(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxSetFaceState(data) {
-  return post('/guard-web/a/sys/face/setState', data);
+  return post('/guard-web/a/face/setState', data);
 }
 
 /**
@@ -96,7 +96,7 @@ export async function ajaxCancelBatchAddTask(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxMoveFace(data) {
-  return post('/guard-web/a/sys/face/moveFace', data);
+  return post('/guard-web/a/face/moveFace', data);
 }
 
 

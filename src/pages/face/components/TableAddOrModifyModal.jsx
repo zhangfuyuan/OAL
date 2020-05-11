@@ -126,6 +126,7 @@ const TableAddOrModifyModal = props => {
         staffid,
         groupId,
         isEdit,
+        peopleType: '0',
       }
 
       isEdit && (params.faceId = bean._id);
@@ -218,6 +219,7 @@ const TableAddOrModifyModal = props => {
       data.groupId = groupId;
       data.isEdit = isEdit;
       isEdit && (data.faceId = _id);
+      data.peopleType = '0';
     });
 
     uploader.on('uploadProgress', (file, percentage) => {

@@ -3,7 +3,7 @@ import React from 'react';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 const TableDelModal = props => {
-  const { bean, visible, handleSubmit, handleCancel } = props;
+  const { bean, visible, handleSubmit, handleCancel, confirmLoading } = props;
 
   let title = formatMessage({ id: 'oal.common.delete' });
   if (bean && bean.length > 0) {
@@ -22,6 +22,7 @@ const TableDelModal = props => {
       onOk={() => handleSubmit()}
       onCancel={handleCancel}
       maskClosable={false}
+      confirmLoading={confirmLoading}
       okText={formatMessage({ id: 'oal.common.delete' })}
       okType="danger"
     >

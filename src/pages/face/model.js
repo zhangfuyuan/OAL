@@ -134,7 +134,6 @@ const Model = {
     *fetchGroupTree({ payload }, { call, put, select }) {
       const response = yield call(fetchGroup, payload);
 
-
       if (response && response.res > 0) {
         return Promise.resolve(response);
       } else {

@@ -218,18 +218,6 @@ const routes = [
                 ],
               },
               {
-                path: '/workAttendance/statistics',
-                name: 'workAttendanceStatistics',
-                component: require('../workAttendance/statistics').default,
-                exact: true,
-              },
-              {
-                path: '/workAttendance/record',
-                name: 'workAttendanceRecord',
-                component: require('../workAttendance/record').default,
-                exact: true,
-              },
-              {
                 component: require('../404').default,
                 exact: true,
               },

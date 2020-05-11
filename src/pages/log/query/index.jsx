@@ -88,7 +88,7 @@ class logQuery extends Component {
     dispatch({
       type: 'logQuery/getDeviceList',
       payload: {
-        verity: 1,
+        temperatureFlag: true,
       },
     }).then(res => {
       if (res && res.res > 0 && res.data.length > 0) {
@@ -102,7 +102,6 @@ class logQuery extends Component {
   };
 
   list_handleClickItem = (e, bean) => {
-    console.log(8126, '点击设备', bean);
     this.setState({
       listSelectedBean: bean,
     }, () => {
@@ -121,7 +120,6 @@ class logQuery extends Component {
         ...tablePage,
         ...sortedInfo,
         ...formValues,
-        featureState: 'all',
         deviceId: listSelectedBean._id,
       },
     });
@@ -158,13 +156,13 @@ class logQuery extends Component {
         title: formatMessage({ id: 'oal.log-query.group' }),
         key: 'group',
         dataIndex: 'group',
-        render: (text, record) => <span>{record.group && record.group.length > 0 && record.group[0].name || '-'}</span>,
+        render: (text, record) => <span>{record.group && record.group.length > 0 && record.group[0].name || '--'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.type' }),
         key: 'peopleType',
         dataIndex: 'peopleType',
-        render: (text, record) => <span>{peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] }) || '-'}</span>,
+        render: (text, record) => <span>{peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] }) || '--'}</span>,
       },
       // {
       //   title: formatMessage({ id: 'oal.log-query.device' }),
@@ -217,7 +215,7 @@ class logQuery extends Component {
       this.setState({
         formValues: {
           ...fieldsValue,
-          date: date[0] && [date[0].format('YYYY-MM-DD'), date[1].format('YYYY-MM-DD')] || [],
+          date: date[0] && date[1] && [date[0].format('YYYY-MM-DD'), date[1].format('YYYY-MM-DD')] || [],
         },
         tableSelectedRows: [],
       }, () => {
@@ -302,7 +300,7 @@ class logQuery extends Component {
           <Col xxl={4} lg={6} md={6} sm={24}>
             <span className={styles.submitButtons}>
               <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={logQueryListLoading}>
-                <FormattedMessage id="oal.common.query" />
+                <FormattedMessage id="oal.face.search" />
               </Button>
               <Button
                 style={{
@@ -331,30 +329,31 @@ class logQuery extends Component {
   // };
 
   handleExport = () => {
-    const { dispatch } = this.props;
-    const { sortedInfo, formValues, listSelectedBean } = this.state;
+    this.ref_download && this.ref_download.click();
+    // const { dispatch } = this.props;
+    // const { sortedInfo, formValues, listSelectedBean } = this.state;
 
-    // 8126TODO 需对接
-    dispatch({
-      type: 'logQuery/export',
-      payload: {
-        ...sortedInfo,
-        ...formValues,
-        featureState: 'all',
-        deviceId: listSelectedBean._id,
-      },
-    }).then(res => {
-      if (res && res.res > 0) {
-        if (this.ref_download) {
-          this.ref_download.href = res.data.length > 0 ? res.data : `http://lango-tech.com/XBH/lango19/data/users.zip`;
-          this.ref_download.click();
-        }
-      } else {
-        console.log(res);
-      }
-    }).catch(err => {
-      console.log(err);
-    });
+    // // 8126TODO 需对接
+    // dispatch({
+    //   type: 'logQuery/export',
+    //   payload: {
+    //     ...sortedInfo,
+    //     ...formValues,
+    //     featureState: 'all',
+    //     deviceId: listSelectedBean._id,
+    //   },
+    // }).then(res => {
+    //   if (res && res.res > 0) {
+    //     if (this.ref_download) {
+    //       this.ref_download.href = res.data.length > 0 ? res.data : `http://lango-tech.com/XBH/lango19/data/users.zip`;
+    //       this.ref_download.click();
+    //     }
+    //   } else {
+    //     console.log(res);
+    //   }
+    // }).catch(err => {
+    //   console.log(err);
+    // });
   };
 
   // 放大查看（人脸图片）
@@ -380,7 +379,9 @@ class logQuery extends Component {
       listSelectedBean,
       tableSelectedBean,
       viewVisible,
+      formValues,
     } = this.state;
+    const { peopleType, name, date } = formValues;
 
     logQueryList && logQueryList.pagination && (logQueryList.pagination.showTotal = (total, range) => (formatMessage({
       id: 'oal.log.currentToTotal',
@@ -399,7 +400,7 @@ class logQuery extends Component {
                   (<List
                     itemLayout="horizontal"
                     split={false}
-                    dataSource={[...deviceList, ...deviceList, ...deviceList]}
+                    dataSource={deviceList}
                     renderItem={(item, index) => (
                       <List.Item>
                         <List.Item.Meta
@@ -422,7 +423,7 @@ class logQuery extends Component {
                 >
                   <FormattedMessage id="oal.common.export" />
                 </Button>
-                <a ref={el => { this.ref_download = el }} href="" />
+                <a ref={el => { this.ref_download = el }} href={`/guard-web/a/record/export?deviceId${listSelectedBean && listSelectedBean._id || ''}&startDate=${date && date[0] || ''}&endDate=${date && date[1] || ''}&peopleType=${peopleType || ''}&faceName=${name || ''}`} />
               </div>
               <StandardTable
                 // eslint-disable-next-line no-underscore-dangle
