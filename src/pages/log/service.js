@@ -19,15 +19,7 @@ export async function ajaxLog(data) {
 }
 
 /**
- * （通行-授权3）获取用户分组树（含访客）
- * @returns {Promise<*>}
- */
-export async function ajaxGroupTree() {
-  return get('/guard-web/a/sys/logAuthory/fetchGroupTree');
-}
-
-/**
- * （通行-授权4）添加/删除授权人员
+ * （通行-授权3）添加/删除授权人员
  * @param data
  * @returns {Promise<*>}
  */
@@ -36,12 +28,30 @@ export async function ajaxAddAuthory(data) {
 }
 
 /**
- * （通行-授权4）添加/删除授权人员
+ * （通行-授权3）添加/删除授权人员
  * @param data
  * @returns {Promise<*>}
  */
 export async function ajaxDelAuthory(data) {
   return post('/guard-web/a/device/saveAssociation', data);
+}
+
+/**
+ * （通行-授权4）懒加载人员及分组树
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxGroupTree(data) {
+  return post('/guard-web/a/sys/logAuthory/fetchGroupTree', data);
+}
+
+/**
+ * （通行-授权5）根据分组ID获取所有人员/访客信息
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxPeopleByGroupId(data) {
+  return post('/guard-web/a/sys/logAuthory/fetchPeopleByGroupId', data);
 }
 
 /**

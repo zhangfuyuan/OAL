@@ -1,7 +1,8 @@
-import { Modal, Tree, message, List, Icon, } from 'antd';
+import { Modal, Tree, message, List, Icon, Spin, } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import { findIndex } from 'lodash';
+import { toTree } from '@/utils/utils';
 
 const { TreeNode } = Tree;
 
@@ -15,31 +16,141 @@ const getPidFn = (pid, list, res = []) => {
   }
 };
 
+let myTreeOriginalData = [];
+let mySelectedPeopleIds = [];
+
 const TableAddAuthoryModal = props => {
-  const { treeData, treeOriginalData, visible, handleSubmit, handleCancel, curDeviceId } = props;
+  const { visible, handleSubmit, handleCancel, curDeviceId, dispatch } = props;
+  const [treeData, setTreeData] = useState([]);
   const [checkedKeys, setCheckedKeys] = useState([]);
+  const [selectedPeople, setSelectedPeople] = useState([]);
+  const [initTreeLoading, setInitTreeLoading] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
 
   // 建议：每次 Modal 关闭时重置
   useEffect(() => {
     if (visible === false) {
       resetAllVar();
     } else {
-      setCheckedKeys(treeOriginalData && treeOriginalData.filter(node => node.isPeople && node.relateDevice && node.relateDevice.indexOf(curDeviceId) > -1).map(node => node._id) || []);
+      setInitTreeLoading(true);
+      dispatch({
+        type: 'log/fetchGroupTree',
+        payload: {
+          groupId: '',
+          deviceId: curDeviceId,
+        },
+      }).then(res => {
+        if (!visible) return;
+
+        if (res && res.res > 0 && res.data) {
+          const _data = res.data.filter((node, index) => index < 4);
+          myTreeOriginalData.push(..._data);
+          setTreeData(toTree(_data) || []);
+        } else {
+          console.log(res);
+        }
+
+        setInitTreeLoading(false);
+      }).catch(err => {
+        console.log(err);
+        setInitTreeLoading(false);
+      });
     }
   }, [visible]);
 
   const resetAllVar = () => {
-    // 重置 state
+    setTreeData([]);
     setCheckedKeys([]);
+    setSelectedPeople([]);
+    setInitTreeLoading(false);
+    setModalLoading(false);
+    myTreeOriginalData = [];
+    mySelectedPeopleIds = [];
   };
 
-  const handleCheck = (checkedKeys, info) => {
-    setCheckedKeys(checkedKeys);
+  const handleCheck = (_checkedKeys, info) => {
+    setCheckedKeys(_checkedKeys);
+
+    const {
+      node: {
+        props: {
+          dataRef: _curDataRef,
+        }
+      },
+      checked: _curIsChecked,
+      checkedNodes
+    } = info;
+    const { _id: _curId, isPeople: _curIsPeople } = _curDataRef;
+
+    if (_curIsPeople) {
+      const _curIndex = findIndex(selectedPeople, people => people._id === _curId);
+
+      if (_curIsChecked) {
+        if (!~_curIndex) setSelectedPeople(selectedPeople.concat(_curDataRef));
+      } else {
+        if (_curIndex > -1) setSelectedPeople(selectedPeople.filter(people => people._id !== _curId));
+      }
+    } else {
+      let _checkedGroupIdList = [];
+      let _checkedPeopleIdList = [];
+      let _checkedPeopleInfoList = [];
+
+      checkedNodes.forEach(node => {
+        const {
+          props: {
+            dataRef,
+          }
+        } = node;
+        const { _id, isPeople, isRelateDevice } = dataRef;
+
+        if (!isPeople) {
+          _checkedGroupIdList.push(_id);
+        } else if (!isRelateDevice) {
+          _checkedPeopleIdList.push(_id);
+          _checkedPeopleInfoList.push(dataRef);
+        }
+      });
+
+      setModalLoading(true);
+      dispatch({
+        type: 'log/fetchPeopleByGroupId',
+        payload: {
+          groupId: _checkedGroupIdList.join(','),
+          deviceId: curDeviceId,
+        },
+      }).then(res => {
+        if (!visible) return;
+
+        if (res && res.res > 0 && res.data) {
+          let _data = [];
+
+          res.data.forEach(item => {
+            if (!~_checkedPeopleIdList.indexOf(item._id) && !item.isRelateDevice) _data.push(item);
+          });
+
+          setSelectedPeople([..._data, ..._checkedPeopleInfoList]);
+          _data = null;
+        } else {
+          console.log(res);
+        }
+
+        _checkedGroupIdList = null;
+        _checkedPeopleIdList = null;
+        _checkedPeopleInfoList = null;
+        setModalLoading(false);
+      }).catch(err => {
+        console.log(err);
+        _checkedGroupIdList = null;
+        _checkedPeopleIdList = null;
+        _checkedPeopleInfoList = null;
+        setModalLoading(false);
+      });
+    }
   };
 
   const handleOk = () => {
-    if (checkedKeys && checkedKeys.length > 0) {
-      handleSubmit(treeOriginalData.filter(node => node.isPeople && checkedKeys.indexOf(node._id) > -1).map(node => node._id).join(','), () => {
+    if (selectedPeople && selectedPeople.length > 0) {
+      handleSubmit(selectedPeople.map(people => people._id).join(','), () => {
         resetAllVar();
       });
     } else {
@@ -47,14 +158,74 @@ const TableAddAuthoryModal = props => {
     }
   };
 
+  const onLoadData = treeNode => new Promise((resolve, reject) => {
+    const {
+      props: {
+        dataRef: {
+          _id: _curId,
+        },
+        children,
+        checked: _curIsChecked,
+      }
+    } = treeNode;
+
+    if (children) {
+      resolve();
+      return;
+    }
+
+    dispatch({
+      type: 'log/fetchGroupTree',
+      payload: {
+        groupId: _curId,
+        deviceId: curDeviceId,
+      },
+    }).then(res => {
+      if (!visible) {
+        resolve();
+        return;
+      }
+
+      if (res && res.res > 0 && res.data) {
+        let _data = [];
+
+        if (_curId === '125') {
+          _data = res.data.filter((node, index) => index >= 4 && index < 7);
+        } else if (_curId === '127') {
+          _data = res.data.filter((node, index) => index >= 7 && index < 9);
+        } else if (_curId === '126') {
+          _data = res.data.filter((node, index) => index >= 9);
+        }
+
+        myTreeOriginalData.push(..._data);
+        treeNode.props.dataRef.children = _data;
+        setTreeData([...treeData]);
+
+        if (_curIsChecked) {
+          setCheckedKeys(checkedKeys.concat(_data.filter(node => node.isPeople && node.pIds.indexOf(_curId) > -1).map(node => node._id)));
+        } else {
+          setCheckedKeys(checkedKeys.concat(_data.filter(node => node.isPeople && node.isRelateDevice).map(node => node._id)));
+        }
+
+        resolve();
+      } else {
+        console.log(res);
+        reject();
+      }
+    }).catch(err => {
+      console.log(err);
+      reject();
+    });
+  });
+
+
   const renderNodes = data =>
-    // 8126TODO 已关联设备的节点要禁用
     data.map(item => {
       if (item.children && item.children.length > 0) {
         return (
           <TreeNode
             key={item._id}
-            title={item._id === treeData[0]._id ? `${item.name}(${item.num})` : item.name}
+            title={treeData[0] && item._id === treeData[0]._id ? `${item.name}(${item.num})` : item.name}
             dataRef={item}
           >
             {renderNodes(item.children)}
@@ -64,61 +235,72 @@ const TableAddAuthoryModal = props => {
       return <TreeNode
         key={item._id}
         title={item.name}
-        disableCheckbox={item.isPeople && item.relateDevice && item.relateDevice.indexOf(curDeviceId) > -1 || false}
+        disableCheckbox={item.isPeople && item.isRelateDevice || false}
         {...item}
         dataRef={item} />;
     });
 
   const removeUser = (e, item) => {
-    const nodeIndex = findIndex(treeOriginalData, node => node._id === item);
-    const pids = getPidFn(treeOriginalData[nodeIndex].pid, treeOriginalData);
-    setCheckedKeys(checkedKeys.filter(key => !~[item, ...pids].indexOf(key)));
+    const { _id: _curId, pIds: _curPIds, } = item;
+    const _relateIdList = [_curId, ...(_curPIds && _curPIds.split(',') || [])];
+    console.log(8126.1, _curId, _curPIds);
+    console.log(8126.2, checkedKeys);
+    console.log(8126.3, selectedPeople);
+    setCheckedKeys(checkedKeys.filter(key => !~_relateIdList.indexOf(key)));
+    setSelectedPeople(selectedPeople.filter(people => people._id !== _curId));
   };
 
   return (
     <Modal
-      width="60%"
+      width="50%"
       destroyOnClose
-      title={formatMessage({ id: 'oal.log.addAuthoryTitle' }, { num: treeOriginalData.filter(node => node.isPeople && checkedKeys.indexOf(node._id) > -1).length })} // 8126TODO 需判断是否为用户
+      title={formatMessage({ id: 'oal.log.addAuthoryTitle' }, { num: selectedPeople && selectedPeople.length || 0 })}
       visible={visible}
       onOk={handleOk}
       onCancel={handleCancel}
       maskClosable={false}
       okText={formatMessage({ id: 'oal.common.save' })}
     >
-      <div style={{ display: 'flex' }}>
-        <div style={{ height: '50vh', overflow: 'auto', flex: 7, }}>
-          <Tree
-            checkable
-            defaultExpandedKeys={[treeData && treeData.length > 0 && treeData[0]._id || '0']}
-            checkedKeys={checkedKeys}
-            onCheck={handleCheck}
-          >
-            {renderNodes(treeData)}
-          </Tree>
+      <div style={{ display: 'flex', position: 'relative', }}>
+        <div style={{ height: '50vh', overflow: 'auto', flex: 2, }}>
+          {
+            !initTreeLoading ?
+              (<Tree
+                checkable
+                loadData={onLoadData}
+                defaultExpandedKeys={[treeData && treeData.length > 0 && treeData[0]._id || '0']}
+                checkedKeys={checkedKeys}
+                onCheck={handleCheck}
+              >
+                {renderNodes(treeData)}
+              </Tree>) :
+              <Spin />
+          }
         </div>
 
-        <div className="oal-user-list" style={{ height: '50vh', overflow: 'auto', flex: 3, paddingLeft: '24px' }}>
+        <div className="oal-user-list" style={{ height: '50vh', overflow: 'auto', flex: 1, paddingLeft: '24px' }}>
           <List
             itemLayout="horizontal"
-            dataSource={checkedKeys}
+            dataSource={selectedPeople}
             split={false}
-            renderItem={item => {
-              const nodeIndex = findIndex(treeOriginalData, node => node._id === item && node.isPeople && (!node.relateDevice || !~node.relateDevice.indexOf(curDeviceId)));
-
-              return nodeIndex > -1 && treeOriginalData[nodeIndex] ?
-                (<List.Item
-                  style={{ padding: '5px 0' }}
-                  actions={[<a key="list-loadmore-edit" onClick={e => removeUser(e, item)}><Icon type="close-circle" theme="filled" /></a>]}
-                >
-                  <List.Item.Meta
-                    title={treeOriginalData[nodeIndex].name || '-'}
-                  />
-                </List.Item>) :
-                (<List.Item style={{ display: 'none' }} />);
-            }}
+            renderItem={item =>
+              (<List.Item
+                key={item._id}
+                style={{ padding: '5px 0' }}
+                actions={[<a key="list-loadmore-edit" onClick={e => removeUser(e, item)}><Icon type="close-circle" theme="filled" /></a>]}
+              >
+                <List.Item.Meta
+                  title={item.name || '-'}
+                />
+              </List.Item>)}
           />
         </div>
+        {
+          modalLoading ?
+            (<div style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.5)', }}>
+              <Spin size="large" />
+            </div>) : ''
+        }
       </div>
     </Modal>
   );

@@ -1,4 +1,12 @@
-import { ajaxTest, ajaxLog, ajaxDeviceList, ajaxGroupTree, ajaxAddAuthory, ajaxDelAuthory } from './service';
+import {
+  ajaxTest,
+  ajaxLog,
+  ajaxDeviceList,
+  ajaxGroupTree,
+  ajaxAddAuthory,
+  ajaxDelAuthory,
+  ajaxPeopleByGroupId,
+} from './service';
 
 const Model = {
   namespace: 'log',
@@ -131,49 +139,90 @@ const Model = {
         return Promise.resolve({
           res: 1,
           data: [
-            { _id: '0', pid: '-1', name: '朗国电子科技', num: '149', isLeaf: false, isPeople: false }, // 必有
-            { _id: '1', pid: '0', name: '长沙研发', num: '25', isLeaf: false, isPeople: false },
-            { _id: '2', pid: '1', name: '长沙研发子部门', num: '10', isLeaf: true, isPeople: false },
-            { _id: '3', pid: '0', name: '上海研发', num: '15', isLeaf: false, isPeople: false },
-            { _id: '4', pid: '3', name: '上海研发子部门', num: '10', isLeaf: true, isPeople: false },
-            { _id: '5', pid: '0', name: '广州总部', num: '109', isLeaf: false, isPeople: false },
-            { _id: '6', pid: '5', name: '营销中心', num: '10', isLeaf: false, isPeople: false },
-            { _id: '7', pid: '6', name: '营销中心子部门', num: '5', isLeaf: true, isPeople: false },
-            { _id: '7-0', pid: '7', name: '销售工程师', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea95333333333333330f50c' },
-            { _id: '7-1', pid: '7', name: '销售工程师', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea95333333333333330f50c' },
-            { _id: '7-2', pid: '7', name: '销售工程师', isPeople: true, relateDevice: '5ea956a43f6da70130b0f50c,5ea95333333333333330f50c' },
-            { _id: '7-3', pid: '7', name: '销售工程师', isPeople: true, relateDevice: '5ea956a43f6da70130b0f50c,5ea95333333333333330f50c' },
-            { _id: '7-4', pid: '7', name: '销售工程师', isPeople: true, relateDevice: '5ea956a43f6da70130b0f50c,5ea95333333333333330f50c' },
-            { _id: '8', pid: '5', name: '运营中心', num: '21', isLeaf: false, isPeople: false },
-            { _id: '9', pid: '8', name: '运营中心子部门', num: '5', isLeaf: true, isPeople: false },
-            { _id: '10', pid: '5', name: '研发中心', num: '78', isLeaf: false, isPeople: false },
-            { _id: '11', pid: '10', name: '软件一部', num: '40', isLeaf: true, isPeople: false },
-            { _id: '11-0', pid: '11', name: '软件工程师', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea956a43f6da70130b0f50c' },
-            { _id: '11-1', pid: '11', name: '软件工程师1', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea956a43f6da70130b0f50c' },
-            { _id: '11-2', pid: '11', name: '软件工程师2', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea956a43f6da70130b0f50c' },
-            { _id: '11-3', pid: '11', name: '软件工程师3', isPeople: true, relateDevice: '5ea94444444444444f50c' },
-            { _id: '11-4', pid: '11', name: '软件工程师4', isPeople: true, relateDevice: '5ea94444444444444f50c' },
-            { _id: '11-5', pid: '11', name: '软件工程师5', isPeople: true, relateDevice: '5ea94444444444444f50c' },
-            { _id: '11-6', pid: '11', name: '软件工程师6', isPeople: true, relateDevice: '5ea94444444444444f50c,5ea952222222222222220f50c' },
-            { _id: '11-7', pid: '11', name: '软件工程师7', isPeople: true, relateDevice: '5ea94444444444444f50c' },
-            { _id: '11-8', pid: '11', name: '软件工程师8', isPeople: true, relateDevice: '5ea94444444444444f50c,5ea952222222222222220f50c' },
-            { _id: '11-9', pid: '11', name: '软件工程师9', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea956a43f6da70130b0f50c' },
-            { _id: '11-10', pid: '11', name: '软件工程师10', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea956a43f6da70130b0f50c' },
-            { _id: '11-11', pid: '11', name: '软件工程师11', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea956a43f6da70130b0f50c' },
-            { _id: '11-12', pid: '11', name: '软件工程师12', isPeople: true, relateDevice: '5ea94444444444444f50c' },
-            { _id: '11-13', pid: '11', name: '软件工程师13', isPeople: true, relateDevice: '5ea94444444444444f50c' },
-            { _id: '11-14', pid: '11', name: '软件工程师14', isPeople: true, relateDevice: '5ea94444444444444f50c' },
-            { _id: '11-15', pid: '11', name: '软件工程师15', isPeople: true, relateDevice: '5ea94444444444444f50c,5ea952222222222222220f50c' },
-            { _id: '11-16', pid: '11', name: '软件工程师16', isPeople: true, relateDevice: '5ea94444444444444f50c' },
-            { _id: '11-17', pid: '11', name: '软件工程师17', isPeople: true, relateDevice: '5ea94444444444444f50c,5ea952222222222222220f50c' },
-            { _id: '12', pid: '10', name: '软件二部', num: '38', isLeaf: true, isPeople: false },
-            { _id: '13', pid: '12', name: '软件二二部', num: '40', isLeaf: true, isPeople: false },
-            { _id: '14', pid: '13', name: '软件二二二部', num: '38', isLeaf: true, isPeople: false },
-            { _id: '15', pid: '0', name: '黑名单', num: '25', isPeople: false },
-            { _id: '16', pid: '0', name: '访客', num: '25', isPeople: false },  // 必有
-            { _id: '16-0', pid: '16', name: '访客1', isPeople: true, relateDevice: '5ea94444444444444f50c,5ea956a000000000080f50c' },
-            { _id: '16-1', pid: '16', name: '访客2', isPeople: true, relateDevice: '5ea94444444444444f50c,5ea956a000000000080f50c' },
-            { _id: '16-2', pid: '16', name: '访客3', isPeople: true, relateDevice: '5ea94444444444444f50c' },
+            // 根节点及其下一级节点
+            { _id: '123', pid: '-1', name: '朗国电子科技', num: '149', isLeaf: false, isPeople: false, pIds: '-1', isRelateDevice: false }, // 必有
+            { _id: '124', pid: '123', name: '长沙研发', num: '25', isLeaf: true, isPeople: false, pIds: '123', isRelateDevice: false },
+            { _id: '125', pid: '123', name: '广州总部', num: '109', isLeaf: false, isPeople: false, pIds: '123', isRelateDevice: false },
+            { _id: '126', pid: '123', name: '访客', num: '25', isPeople: false, isPeople: false, pIds: '123', isRelateDevice: false },  // 必有
+
+            // 广州总部下一级节点
+            { _id: '127', pid: '125', name: '软件一部', num: '40', isLeaf: false, isPeople: false, pIds: '123,125', isRelateDevice: false },
+            { _id: '128', pid: '125', name: '软件二部', num: '38', isLeaf: true, isPeople: false, pIds: '123,125', isRelateDevice: false },
+            { _id: '129', pid: '125', name: 'CTO', isLeaf: true, isPeople: true, pIds: '123,125', isRelateDevice: true },
+
+            // 软件一部分组下的人员
+            { _id: '130', pid: '127', name: '软件工程师3', isLeaf: true, isPeople: true, pIds: '123,125,127', isRelateDevice: false },
+            { _id: '131', pid: '127', name: '软件工程师4', isLeaf: true, isPeople: true, pIds: '123,125,127', isRelateDevice: true },
+
+            // 访客分组下的人员
+            { _id: '132', pid: '126', name: '访客1', isLeaf: true, isPeople: true, pIds: '123,126', isRelateDevice: false },
+            { _id: '133', pid: '126', name: '访客2', isLeaf: true, isPeople: true, pIds: '123,126', isRelateDevice: true },
+            { _id: '134', pid: '126', name: '访客3', isLeaf: true, isPeople: true, pIds: '123,126', isRelateDevice: false },
+
+            // { _id: '0', pid: '-1', name: '朗国电子科技', num: '149', isLeaf: false, isPeople: false }, // 必有
+            // { _id: '1', pid: '0', name: '长沙研发', num: '25', isLeaf: false, isPeople: false },
+            // { _id: '2', pid: '1', name: '长沙研发子部门', num: '10', isLeaf: true, isPeople: false },
+            // { _id: '3', pid: '0', name: '上海研发', num: '15', isLeaf: false, isPeople: false },
+            // { _id: '4', pid: '3', name: '上海研发子部门', num: '10', isLeaf: true, isPeople: false },
+            // { _id: '5', pid: '0', name: '广州总部', num: '109', isLeaf: false, isPeople: false },
+            // { _id: '6', pid: '5', name: '营销中心', num: '10', isLeaf: false, isPeople: false },
+            // { _id: '7', pid: '6', name: '营销中心子部门', num: '5', isLeaf: true, isPeople: false },
+            // { _id: '7-0', pid: '7', name: '销售工程师', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea95333333333333330f50c' },
+            // { _id: '7-1', pid: '7', name: '销售工程师', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea95333333333333330f50c' },
+            // { _id: '7-2', pid: '7', name: '销售工程师', isPeople: true, relateDevice: '5ea956a43f6da70130b0f50c,5ea95333333333333330f50c' },
+            // { _id: '7-3', pid: '7', name: '销售工程师', isPeople: true, relateDevice: '5ea956a43f6da70130b0f50c,5ea95333333333333330f50c' },
+            // { _id: '7-4', pid: '7', name: '销售工程师', isPeople: true, relateDevice: '5ea956a43f6da70130b0f50c,5ea95333333333333330f50c' },
+            // { _id: '8', pid: '5', name: '运营中心', num: '21', isLeaf: false, isPeople: false },
+            // { _id: '9', pid: '8', name: '运营中心子部门', num: '5', isLeaf: true, isPeople: false },
+            // { _id: '10', pid: '5', name: '研发中心', num: '78', isLeaf: false, isPeople: false },
+            // { _id: '11', pid: '10', name: '软件一部', num: '40', isLeaf: true, isPeople: false },
+            // { _id: '11-0', pid: '11', name: '软件工程师', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea956a43f6da70130b0f50c' },
+            // { _id: '11-1', pid: '11', name: '软件工程师1', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea956a43f6da70130b0f50c' },
+            // { _id: '11-2', pid: '11', name: '软件工程师2', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea956a43f6da70130b0f50c' },
+            // { _id: '11-3', pid: '11', name: '软件工程师3', isPeople: true, relateDevice: '5ea94444444444444f50c' },
+            // { _id: '11-4', pid: '11', name: '软件工程师4', isPeople: true, relateDevice: '5ea94444444444444f50c' },
+            // { _id: '11-5', pid: '11', name: '软件工程师5', isPeople: true, relateDevice: '5ea94444444444444f50c' },
+            // { _id: '11-6', pid: '11', name: '软件工程师6', isPeople: true, relateDevice: '5ea94444444444444f50c,5ea952222222222222220f50c' },
+            // { _id: '11-7', pid: '11', name: '软件工程师7', isPeople: true, relateDevice: '5ea94444444444444f50c' },
+            // { _id: '11-8', pid: '11', name: '软件工程师8', isPeople: true, relateDevice: '5ea94444444444444f50c,5ea952222222222222220f50c' },
+            // { _id: '11-9', pid: '11', name: '软件工程师9', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea956a43f6da70130b0f50c' },
+            // { _id: '11-10', pid: '11', name: '软件工程师10', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea956a43f6da70130b0f50c' },
+            // { _id: '11-11', pid: '11', name: '软件工程师11', isPeople: true, relateDevice: '5ea956a00111111111111111f50c,5ea956a43f6da70130b0f50c' },
+            // { _id: '11-12', pid: '11', name: '软件工程师12', isPeople: true, relateDevice: '5ea94444444444444f50c' },
+            // { _id: '11-13', pid: '11', name: '软件工程师13', isPeople: true, relateDevice: '5ea94444444444444f50c' },
+            // { _id: '11-14', pid: '11', name: '软件工程师14', isPeople: true, relateDevice: '5ea94444444444444f50c' },
+            // { _id: '11-15', pid: '11', name: '软件工程师15', isPeople: true, relateDevice: '5ea94444444444444f50c,5ea952222222222222220f50c' },
+            // { _id: '11-16', pid: '11', name: '软件工程师16', isPeople: true, relateDevice: '5ea94444444444444f50c' },
+            // { _id: '11-17', pid: '11', name: '软件工程师17', isPeople: true, relateDevice: '5ea94444444444444f50c,5ea952222222222222220f50c' },
+            // { _id: '12', pid: '10', name: '软件二部', num: '38', isLeaf: true, isPeople: false },
+            // { _id: '13', pid: '12', name: '软件二二部', num: '40', isLeaf: true, isPeople: false },
+            // { _id: '14', pid: '13', name: '软件二二二部', num: '38', isLeaf: true, isPeople: false },
+            // { _id: '15', pid: '0', name: '黑名单', num: '25', isPeople: false },
+            // { _id: '16', pid: '0', name: '访客', num: '25', isPeople: false },  // 必有
+            // { _id: '16-0', pid: '16', name: '访客1', isPeople: true, relateDevice: '5ea94444444444444f50c,5ea956a000000000080f50c' },
+            // { _id: '16-1', pid: '16', name: '访客2', isPeople: true, relateDevice: '5ea94444444444444f50c,5ea956a000000000080f50c' },
+            // { _id: '16-2', pid: '16', name: '访客3', isPeople: true, relateDevice: '5ea94444444444444f50c' },
+          ]
+        });
+      }
+    },
+    // 根据分组ID获取所有人员/访客信息
+    *fetchPeopleByGroupId({ payload }, { call, put, select }) {
+      const response = yield call(ajaxPeopleByGroupId, payload);
+
+      if (response && response.res > 0) {
+        return Promise.resolve(response);
+      } else {
+        // 8126TODO 测试数据
+        return Promise.resolve({
+          res: 1,
+          data: [
+            { _id: '129', pid: '125', name: 'CTO', pIds: '123,125', isRelateDevice: true },
+            { _id: '130', pid: '127', name: '软件工程师3', pIds: '123,125,127', isRelateDevice: false },
+            { _id: '131', pid: '127', name: '软件工程师4', pIds: '123,125,127', isRelateDevice: true },
+            { _id: '132', pid: '126', name: '访客1', pIds: '123,126', isRelateDevice: false },
+            { _id: '133', pid: '126', name: '访客2', pIds: '123,126', isRelateDevice: true },
+            { _id: '134', pid: '126', name: '访客3', pIds: '123,126', isRelateDevice: false },
           ]
         });
       }

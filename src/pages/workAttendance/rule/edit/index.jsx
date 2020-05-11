@@ -32,12 +32,16 @@ const formItemLayout = {
   },
 };
 
+const Hours = Array.from(Array(24), (v, k) => k);
+const Minutes = Array.from(Array(60), (v, k) => k);
+// const Seconds = Array.from(Array(60), (v, k) => k);
+
 @connect(({ workAttendanceRuleEdit, loading }) => ({
   workAttendanceRuleEdit,
   detailsLoading: loading.effects['workAttendanceRuleEdit/getDetails'],
   editLoading: loading.effects['workAttendanceRuleEdit/edit'],
 }))
-class Demo extends Component {
+class WorkAttendanceRuleEdit extends Component {
 
   // constructor(props) {
   //   super(props);
@@ -54,7 +58,7 @@ class Demo extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     const { formValues } = this.state;
-    // 8126TODO 需对接
+
     dispatch({
       type: 'workAttendanceRuleEdit/getDetails',
       payload: {
@@ -63,11 +67,11 @@ class Demo extends Component {
       },
     }).then(res => {
       if (res && res.res > 0) {
-        const { ruleName, workAttendanceTimes } = res.data;
+        const { name, workAttendanceTimes } = res.data;
 
         this.setState({
           formValues: {
-            ruleName: ruleName || '-',
+            ruleName: name || '-',
             workAttendanceTimes: workAttendanceTimes || [
               {
                 "workStartTime": "00:00",
@@ -148,11 +152,13 @@ class Demo extends Component {
 
         if (!hasError) {
           const { dispatch } = this.props;
-          // 8126TODO 需对接
+          const { formValues } = this.state;
+
           dispatch({
             type: 'workAttendanceRuleEdit/edit',
             payload: {
               // eslint-disable-next-line no-underscore-dangle
+              ruleId: formValues.ruleId,
               ruleName,
               workAttendanceTimes,
             },
@@ -223,9 +229,305 @@ class Demo extends Component {
   //   callback();
   // };
 
+  checkIllegalCharacter = (rule, value, callback) => {
+    const errReg = /[<>|*?/:\s]/;
+    if (value && errReg.test(value)) {
+      callback(formatMessage({ id: 'oal.common.illegalCharacterTips' }));
+    }
+    callback();
+  };
+
+
+  // 开始考勤时间限制-hour
+  disAttendanceStartHouse = k => {
+    const { getFieldValue } = this.props.form;
+    const attendanceStartTime = getFieldValue(`times[${k + '-1'}]`);
+    const startTime = getFieldValue(`times[${k + '-0'}]`);
+    const endTime = getFieldValue(`times[${k + '-2'}]`);
+    const attendanceEndTime = getFieldValue(`times[${k + '-3'}]`);
+    let eH = -1;
+    let eM = attendanceStartTime && attendanceStartTime.minute() || 0;
+    let oM = -1;
+    let startSliceIndex = 0;
+    let endSliceIndex = 24;
+
+    if (startTime) {
+      eH = startTime.hour();
+      eM = startTime.minute();
+    } else if (endTime) {
+      eH = endTime.hour();
+      eM = endTime.minute();
+    } else if (attendanceEndTime) {
+      eH = attendanceEndTime.hour();
+      eM = attendanceEndTime.minute();
+    }
+
+    if (eH > -1 && eM > -1) {
+      endSliceIndex = oM > eM ? eH : eH + 1;
+    }
+
+    return [...Hours.slice(0, startSliceIndex), ...Hours.slice(endSliceIndex, 24)];
+  };
+
+  // 开始考勤时间限制-minute
+  disAttendanceStartMinute = (k, h) => {
+    const { getFieldValue } = this.props.form;
+    const attendanceStartTime = getFieldValue(`times[${k + '-1'}]`);
+    const startTime = getFieldValue(`times[${k + '-0'}]`);
+    const endTime = getFieldValue(`times[${k + '-2'}]`);
+    const attendanceEndTime = getFieldValue(`times[${k + '-3'}]`);
+    // let sM = -1;
+    let eM = -1;
+    let startSliceIndex = 0;
+    let endSliceIndex = 60;
+
+    if (startTime) {
+      if (h >= startTime.hour()) {
+        eM = startTime.minute();
+      }
+    } else if (endTime) {
+      if (h >= endTime.hour()) {
+        eM = endTime.minute();
+      }
+    } else if (attendanceEndTime) {
+      if (h >= attendanceEndTime.hour()) {
+        eM = attendanceEndTime.minute();
+      }
+    }
+
+    if (eM > -1) {
+      endSliceIndex = eM;
+    }
+
+    return [...Minutes.slice(0, startSliceIndex), ...Minutes.slice(endSliceIndex, 60)];
+  };
+
+  // 上班时间限制-hour
+  disStartHouse = k => {
+    const { getFieldValue } = this.props.form;
+    const attendanceStartTime = getFieldValue(`times[${k + '-1'}]`);
+    const startTime = getFieldValue(`times[${k + '-0'}]`);
+    const endTime = getFieldValue(`times[${k + '-2'}]`);
+    const attendanceEndTime = getFieldValue(`times[${k + '-3'}]`);
+    let sH = -1;
+    let sM = -1;
+    let oM = startTime && startTime.minute() || 0;
+    let eH = -1;
+    let eM = -1;
+    let startSliceIndex = 0;
+    let endSliceIndex = 24;
+
+    if (attendanceStartTime) {
+      sH = attendanceStartTime.hour();
+      sM = attendanceStartTime.minute();
+    }
+
+    if (sH > -1 && sM > -1) {
+      startSliceIndex = oM > sM ? sH : sH + 1;
+    }
+
+    if (endTime) {
+      eH = endTime.hour();
+      eM = endTime.minute();
+    } else if (attendanceEndTime) {
+      eH = attendanceEndTime.hour();
+      eM = attendanceEndTime.minute();
+    }
+
+    if (eH > -1 && eM > -1) {
+      endSliceIndex = oM < eM ? eH + 1 : eH;
+    }
+
+    return [...Hours.slice(0, startSliceIndex), ...Hours.slice(endSliceIndex, 24)];
+  };
+
+  // 上班时间限制-minute
+  disStartMinute = (k, h) => {
+    const { getFieldValue } = this.props.form;
+    const attendanceStartTime = getFieldValue(`times[${k + '-1'}]`);
+    const startTime = getFieldValue(`times[${k + '-0'}]`);
+    const endTime = getFieldValue(`times[${k + '-2'}]`);
+    const attendanceEndTime = getFieldValue(`times[${k + '-3'}]`);
+    let sM = -1;
+    let eM = -1;
+    let startSliceIndex = 0;
+    let endSliceIndex = 60;
+
+    if (attendanceStartTime) {
+      if (h <= attendanceStartTime.hour()) {
+        sM = attendanceStartTime.minute();
+      }
+    }
+
+    if (sM > -1) {
+      startSliceIndex = sM + 1;
+    }
+
+    if (endTime) {
+      if (h >= endTime.hour()) {
+        eM = endTime.minute();
+      }
+    } else if (attendanceEndTime) {
+      if (h >= attendanceEndTime.hour()) {
+        eM = attendanceEndTime.minute();
+      }
+    }
+
+    if (eM > -1) {
+      endSliceIndex = eM;
+    }
+
+    return [...Minutes.slice(0, startSliceIndex), ...Minutes.slice(endSliceIndex, 60)];
+  };
+
+  // 下班时间限制-hour
+  disEndHouse = k => {
+    const { getFieldValue } = this.props.form;
+    const attendanceStartTime = getFieldValue(`times[${k + '-1'}]`);
+    const startTime = getFieldValue(`times[${k + '-0'}]`);
+    const endTime = getFieldValue(`times[${k + '-2'}]`);
+    const attendanceEndTime = getFieldValue(`times[${k + '-3'}]`);
+    let sH = -1;
+    let sM = -1;
+    let oM = endTime && endTime.minute() || 0;
+    let eH = -1;
+    let eM = -1;
+    let startSliceIndex = 0;
+    let endSliceIndex = 24;
+
+    if (startTime) {
+      sH = startTime.hour();
+      sM = startTime.minute();
+    } else if (attendanceStartTime) {
+      sH = attendanceStartTime.hour();
+      sM = attendanceStartTime.minute();
+    }
+
+    if (sH > -1 && sM > -1) {
+      startSliceIndex = oM > sM ? sH : sH + 1;
+    }
+
+    if (attendanceEndTime) {
+      eH = attendanceEndTime.hour();
+      eM = attendanceEndTime.minute();
+    }
+
+    if (eH > -1 && eM > -1) {
+      endSliceIndex = oM < eM ? eH + 1 : eH;
+    }
+
+    return [...Hours.slice(0, startSliceIndex), ...Hours.slice(endSliceIndex, 24)];
+  };
+
+  // 下班时间限制-minute
+  disEndMinute = (k, h) => {
+    const { getFieldValue } = this.props.form;
+    const attendanceStartTime = getFieldValue(`times[${k + '-1'}]`);
+    const startTime = getFieldValue(`times[${k + '-0'}]`);
+    const endTime = getFieldValue(`times[${k + '-2'}]`);
+    const attendanceEndTime = getFieldValue(`times[${k + '-3'}]`);
+    let sM = -1;
+    let eM = -1;
+    let startSliceIndex = 0;
+    let endSliceIndex = 60;
+
+    if (startTime) {
+      if (h <= startTime.hour()) {
+        sM = startTime.minute();
+      }
+    } else if (attendanceStartTime) {
+      if (h <= attendanceStartTime.hour()) {
+        sM = attendanceStartTime.minute();
+      }
+    }
+
+    if (sM > -1) {
+      startSliceIndex = sM + 1;
+    }
+
+    if (attendanceEndTime) {
+      if (h >= attendanceEndTime.hour()) {
+        eM = attendanceEndTime.minute();
+      }
+    }
+
+    if (eM > -1) {
+      endSliceIndex = eM;
+    }
+
+    return [...Minutes.slice(0, startSliceIndex), ...Minutes.slice(endSliceIndex, 60)];
+  };
+
+  // 结束考勤时间限制-hour
+  disAttendanceEndHouse = k => {
+    const { getFieldValue } = this.props.form;
+    const attendanceStartTime = getFieldValue(`times[${k + '-1'}]`);
+    const startTime = getFieldValue(`times[${k + '-0'}]`);
+    const endTime = getFieldValue(`times[${k + '-2'}]`);
+    const attendanceEndTime = getFieldValue(`times[${k + '-3'}]`);
+    let sH = -1;
+    let sM = -1;
+    let oM = attendanceEndTime && attendanceEndTime.minute() || 0;
+    let eH = -1;
+    let eM = -1;
+    let startSliceIndex = 0;
+    let endSliceIndex = 24;
+
+    if (endTime) {
+      sH = endTime.hour();
+      sM = endTime.minute();
+    } else if (startTime) {
+      sH = startTime.hour();
+      sM = startTime.minute();
+    } else if (attendanceStartTime) {
+      sH = attendanceStartTime.hour();
+      sM = attendanceStartTime.minute();
+    }
+
+    if (sH > -1 && sM > -1) {
+      startSliceIndex = oM > sM ? sH : sH + 1;
+    }
+
+    return [...Hours.slice(0, startSliceIndex), ...Hours.slice(endSliceIndex, 24)];
+  };
+
+  // 结束考勤时间限制-minute
+  disAttendanceEndMinute = (k, h) => {
+    const { getFieldValue } = this.props.form;
+    const attendanceStartTime = getFieldValue(`times[${k + '-1'}]`);
+    const startTime = getFieldValue(`times[${k + '-0'}]`);
+    const endTime = getFieldValue(`times[${k + '-2'}]`);
+    const attendanceEndTime = getFieldValue(`times[${k + '-3'}]`);
+    let sM = -1;
+    // let eM = -1;
+    let startSliceIndex = 0;
+    let endSliceIndex = 60;
+
+    if (endTime) {
+      if (h <= endTime.hour()) {
+        sM = endTime.minute();
+      }
+    } else if (startTime) {
+      if (h <= startTime.hour()) {
+        sM = startTime.minute();
+      }
+    } else if (attendanceStartTime) {
+      if (h <= attendanceStartTime.hour()) {
+        sM = attendanceStartTime.minute();
+      }
+    }
+
+    if (sM > -1) {
+      startSliceIndex = sM + 1;
+    }
+
+    return [...Minutes.slice(0, startSliceIndex), ...Minutes.slice(endSliceIndex, 60)];
+  };
+
   render() {
     const {
       detailsLoading,
+      editLoading,
       form: {
         getFieldDecorator,
         getFieldValue,
@@ -254,6 +556,7 @@ class Demo extends Component {
         </h3>
 
         <div className={styles.timeItemLine}>
+          {/* k-0 上班时间 */}
           <Form.Item
             className={styles.timeItemLineLeft}
             label={formatMessage({ id: 'oal.work-rule.workStartTime' })}
@@ -263,16 +566,21 @@ class Demo extends Component {
               rules: [
                 {
                   required: true,
-                  message: formatMessage({ id: 'oal.work-rule.enterWorkStartTimeTips' })
+                  message: formatMessage({ id: 'oal.common.pleaseSelect' })
                 },
                 // {
                 //   validator: this.checkWorkStartTime,
                 // },
               ],
               initialValue: moment(workAttendanceTimes[k].workStartTime, 'HH:mm'),
-            })(<TimePicker format={'HH:mm'} />)}
+            })(<TimePicker
+              format={'HH:mm'}
+              disabledHours={() => this.disStartHouse(k, null)}
+              disabledMinutes={h => this.disStartMinute(k, h)}
+            />)}
           </Form.Item>
 
+          {/* k-1 开始考勤时间 */}
           <Form.Item
             className={styles.timeItemLineRight}
             label={formatMessage({ id: 'oal.work-rule.attendanceStartTime' })}
@@ -282,18 +590,23 @@ class Demo extends Component {
               rules: [
                 {
                   required: true,
-                  message: formatMessage({ id: 'oal.work-rule.enterWorkStartTimeTips' })
+                  message: formatMessage({ id: 'oal.common.pleaseSelect' })
                 },
                 // {
                 //   validator: this.checkAttendanceStartTime,
                 // },
               ],
               initialValue: moment(workAttendanceTimes[k].workAttendanceStartTime, 'HH:mm'),
-            })(<TimePicker format={'HH:mm'} />)}
+            })(<TimePicker
+              format={'HH:mm'}
+              disabledHours={() => this.disAttendanceStartHouse(k, null)}
+              disabledMinutes={h => this.disAttendanceStartMinute(k, h)}
+            />)}
           </Form.Item>
         </div>
 
         <div className={styles.timeItemLine}>
+          {/* k-2 下班时间 */}
           <Form.Item
             className={styles.timeItemLineLeft}
             label={formatMessage({ id: 'oal.work-rule.workEndTime' })}
@@ -303,16 +616,21 @@ class Demo extends Component {
               rules: [
                 {
                   required: true,
-                  message: formatMessage({ id: 'oal.work-rule.enterAttendanceStartTimeTips' })
+                  message: formatMessage({ id: 'oal.common.pleaseSelect' })
                 },
                 // {
                 //   validator: this.checkWorkEndTime,
                 // },
               ],
               initialValue: moment(workAttendanceTimes[k].workEndTime, 'HH:mm'),
-            })(<TimePicker format={'HH:mm'} />)}
+            })(<TimePicker
+              format={'HH:mm'}
+              disabledHours={() => this.disEndHouse(k, null)}
+              disabledMinutes={h => this.disEndMinute(k, h)}
+            />)}
           </Form.Item>
 
+          {/* k-3 结束考勤时间 */}
           <Form.Item
             className={styles.timeItemLineRight}
             label={formatMessage({ id: 'oal.work-rule.attendanceEndTime' })}
@@ -322,14 +640,18 @@ class Demo extends Component {
               rules: [
                 {
                   required: true,
-                  message: formatMessage({ id: 'oal.work-rule.enterAttendanceEndTimeTips' })
+                  message: formatMessage({ id: 'oal.common.pleaseSelect' })
                 },
                 // {
                 //   validator: this.checkAttendanceEndTime,
                 // },
               ],
               initialValue: moment(workAttendanceTimes[k].workAttendanceEndTime, 'HH:mm'),
-            })(<TimePicker format={'HH:mm'} />)}
+            })(<TimePicker
+              format={'HH:mm'}
+              disabledHours={() => this.disAttendanceEndHouse(k, null)}
+              disabledMinutes={h => this.disAttendanceEndMinute(k, h)}
+            />)}
           </Form.Item>
         </div>
       </div>
@@ -351,7 +673,14 @@ class Demo extends Component {
                       {
                         required: true,
                         whitespace: true,
-                        message: formatMessage({ id: 'oal.work-rule.enterRuleNameTips' }),
+                        message: formatMessage({ id: 'oal.common.pleaseEnter' }),
+                      },
+                      {
+                        max: 20,
+                        message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
+                      },
+                      {
+                        validator: this.checkIllegalCharacter,
                       },
                     ],
                     initialValue: ruleName,
@@ -369,7 +698,7 @@ class Demo extends Component {
               <Divider />
 
               <Form.Item style={{ textAlign: 'center' }}>
-                <Button type="primary" htmlType="submit" loading={detailsLoading}>
+                <Button type="primary" htmlType="submit" loading={detailsLoading || editLoading}>
                   <FormattedMessage id="oal.common.save" />
                 </Button>
               </Form.Item>
@@ -381,4 +710,4 @@ class Demo extends Component {
   }
 }
 
-export default Form.create()(Demo);
+export default Form.create()(WorkAttendanceRuleEdit);

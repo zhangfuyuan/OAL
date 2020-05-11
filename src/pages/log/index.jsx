@@ -31,7 +31,6 @@ import { SYSTEM_PATH } from '@/utils/constants';
 import styles from './style.less';
 import TableDelModal from './components/TableDelModal';
 import TableAddAuthoryModal from './components/TableAddAuthoryModal';
-import { toTree } from '@/utils/utils';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -48,7 +47,6 @@ const peopleTypeMap = {
   deviceListLoading: loading.effects['log/getDeviceList'],
   logList: log.logList,
   logListLoading: loading.effects['log/fetchLog'],
-  treeLoading: loading.effects['log/fetchGroupTree'],
   delAuthoryLoading: loading.effects['log/delAuthory'],
 }))
 class Log extends Component {
@@ -73,26 +71,10 @@ class Log extends Component {
     viewVisible: false,
     tableDelVisible: false,
     tableAddAuthoryVisible: false,
-    treeData: [],
-    treeOriginalData: [],
   };
 
   componentDidMount() {
     this.list_loadData();
-    this.props.dispatch({
-      type: 'log/fetchGroupTree',
-    }).then(res => {
-      if (res && res.res > 0) {
-        this.setState({
-          treeData: toTree(res.data) || [],
-          treeOriginalData: res.data,
-        });
-      } else {
-        console.log(res);
-      }
-    }).catch(err => {
-      console.log(err);
-    });
   }
 
   componentWillUnmount() {
@@ -237,7 +219,7 @@ class Log extends Component {
   };
 
   table_renderSimpleForm = () => {
-    const { form, deviceListLoading, logListLoading/*, treeLoading*/ } = this.props;
+    const { form, deviceListLoading, logListLoading } = this.props;
     const { getFieldDecorator } = form;
     return (
       <Form layout="inline">
@@ -293,7 +275,6 @@ class Log extends Component {
               <Button
                 type="primary"
                 icon="plus"
-                loading={treeLoading}
                 onClick={this.table_showTableAddAuthoryModal}
               >
                 <FormattedMessage id="oal.face.add" />
@@ -398,8 +379,8 @@ class Log extends Component {
       deviceListLoading,
       logList,
       logListLoading,
-      treeLoading,
       delAuthoryLoading,
+      dispatch,
     } = this.props;
     const {
       tableSelectedRows,
@@ -408,8 +389,6 @@ class Log extends Component {
       tableSelectedBean,
       viewVisible,
       tableAddAuthoryVisible,
-      treeData,
-      treeOriginalData,
     } = this.state;
 
     logList && logList.pagination && (logList.pagination.showTotal = (total, range) => (formatMessage({
@@ -449,7 +428,6 @@ class Log extends Component {
                 <Button
                   type="primary"
                   icon="plus"
-                  loading={treeLoading}
                   style={{ marginRight: '8px', }}
                   onClick={this.table_showTableAddAuthoryModal}
                 >
@@ -495,9 +473,8 @@ class Log extends Component {
         />
         <TableAddAuthoryModal
           visible={tableAddAuthoryVisible}
-          treeData={treeData}
-          treeOriginalData={treeOriginalData}
           curDeviceId={listSelectedBean._id}
+          dispatch={dispatch}
           handleCancel={this.table_closeTableAddAuthoryModal}
           handleSubmit={this.table_submitTableAddAuthoryModal}
         />

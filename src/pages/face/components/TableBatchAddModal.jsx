@@ -124,6 +124,7 @@ const TableBatchAddModal = props => {
       payload: {
         groupId,
         peopleType: '0',
+        total: imgListLen,
       },
     }).then(res => {
       if (!visible || !myUploadLoading) return;
@@ -218,7 +219,7 @@ const TableBatchAddModal = props => {
       thumb: false, // 不生成缩略图
       compress: false, // 如果此选项为false, 则图片在上传前不进行压缩
       prepareNextFile: true, // 是否允许在文件传输时提前把下一个文件准备好
-      chunked: true // 分片上传
+      chunked: false // 分片上传
     });
 
     newFileList.forEach((item, index) => {
