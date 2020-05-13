@@ -8,7 +8,6 @@ const Model = {
   effects: {
     // 获取统计列表
     *fetchList({ payload }, { call, put, select }) {
-      console.log(8126, '获取统计列表', payload);
       const response = yield call(demoAjax2, payload);
 
       if (response.res > 0) {
@@ -22,8 +21,8 @@ const Model = {
     },
     // 获取考勤规则选项
     *fetchAttendanceRuleList({ payload }, { call, put, select }) {
-      console.log(8126, '获取考勤规则选项', payload);
       const response = yield call(demoAjax1, payload);
+
       return Promise.resolve({
         ...response,
         data: [
@@ -44,8 +43,8 @@ const Model = {
     },
     // 导出
     *export({ payload }, { call, put, select }) {
-      console.log(8126, '导出', payload);
       const response = yield call(demoAjax1, payload);
+
       return Promise.resolve(response);
     },
   },

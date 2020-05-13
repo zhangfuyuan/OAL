@@ -59,21 +59,21 @@ class AvatarDropdown extends React.Component {
       <HeaderDropdown overlay={menuHeaderDropdown}>
         <span className={`${styles.action} ${styles.account}`}>
           {/* <Avatar size="small" className={styles.avatar} src={currentUser.avatar} alt="avatar" /> */}
-          <Avatar size="small" className={styles.avatar} src={require('@/assets/avatar.jpg')} alt="avatar" />
+          {/* <Avatar size="small" className={styles.avatar} src={require('@/assets/avatar.jpg')} alt="avatar" /> */}
           <span className={styles.name}>
             {(currentUser.profile && currentUser.profile.nickName) || currentUser.userName}
           </span>
         </span>
       </HeaderDropdown>
     ) : (
-      <Spin
-        size="small"
-        style={{
-          marginLeft: 8,
-          marginRight: 8,
-        }}
-      />
-    );
+        <Spin
+          size="small"
+          style={{
+            marginLeft: 8,
+            marginRight: 8,
+          }}
+        />
+      );
   }
 }
 

@@ -394,7 +394,7 @@ export default {
   'oal.face.addFailed': `添加失敗`,
   'oal.face.staffidRepeat': `工號重複`,
   'oal.face.staffidRepeatTips': `工號已存在，請修改後重試`,
-  'oal.face.userNumLimit': `用戶數已超出20000限制`,
+  'oal.face.userNumLimit': `人員數量已超出20000`,
   'oal.face.draggerTips': `點擊或將文件夾拖拽到這裏上傳`,
   'oal.face.importTemplate': `導入模板`,
   'oal.face.importTemplateTips1': `點擊下載`,

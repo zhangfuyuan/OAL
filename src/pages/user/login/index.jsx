@@ -1,16 +1,15 @@
 import { Alert, Checkbox, Icon, Result, Button, Spin, notification } from 'antd';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import React, { Component } from 'react';
-import CryptoJS from 'crypto-js';
+// import CryptoJS from 'crypto-js';
 import { SYSTEM_PATH } from '@/utils/constants';
 import Link from 'umi/link';
 import { connect } from 'dva';
 import LoginComponents from './components/Login';
 import styles from './style.less';
 import { pswBase64Thrice, pswBase64ThriceRestore } from '@/utils/utils';
-import defaultSettings from '../../../../config/defaultSettings';
+import router from 'umi/router';
 
-const { isAjaxOAL } = defaultSettings;
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;
 
 @connect(({ login, global: { systemVersion }, loading }) => ({
@@ -30,8 +29,21 @@ class Login extends Component {
   // eslint-disable-next-line react/sort-comp
   UNSAFE_componentWillMount() {
     const { org } = this.props.match.params;
-    // console.log('login page org:', org);
     const { dispatch } = this.props;
+
+    dispatch({
+      type: 'login/getLoginStateInServer',
+    }).then(res => {
+      if (res && res.res > 0 && res.data && res.data.isLogin) {
+        console.log(org, '后台已登录');
+        dispatch({
+          type: 'login/login',
+          payload: {},
+        });
+      } else {
+        console.log(org, '后台未登录');
+      }
+    });
     dispatch({
       type: 'global/getSystemVersion',
     });
@@ -55,26 +67,46 @@ class Login extends Component {
   };
 
   handleSubmit = (err, values) => {
-    const { org } = this.props.match.params;
-    const { pwd } = values;
-
-    isAjaxOAL && (values.password = CryptoJS.MD5(pwd).toString());
-    values.pwd = pswBase64Thrice(pwd);
-
     if (!err) {
+      const { org } = this.props.match.params;
+      const { pwd } = values;
+      // values.password = CryptoJS.MD5(pwd).toString();
+      values.pwd = pswBase64Thrice(pwd);
       localStorage.setItem(SYSTEM_PATH, org);
       const { dispatch } = this.props;
       const params = { ...values, path: org };
 
       dispatch({
         type: 'login/login',
-        payload: params,
+        payload: {
+          ...params,
+          errorHandler: (err) => {
+            console.log(err);
+
+            if (err &&
+              err.toString &&
+              err.toString() === 'TypeError: Failed to fetch' &&
+              document.cookie.indexOf('loginTryAgain=1') > -1) {
+              // 重定向处理
+              console.log('自动登录两次╮(╯▽╰)╭');
+              this.handleSubmit(null, {
+                ...params,
+                pwd,
+              });
+            } else {
+              notification.error({
+                message: formatMessage({ id: 'oal.ajax.401-message' }),
+                description: formatMessage({ id: 'oal.ajax.401-description' }),
+              });
+            }
+          }
+        },
       }).then(res => {
         if (res && res.res === 0) {
           console.log('自动登录两次╮(╯▽╰)╭');
           this.handleSubmit(null, {
             ...params,
-            pwd: pswBase64ThriceRestore(params.pwd),
+            pwd,
           });
         }
       }).catch(err => {

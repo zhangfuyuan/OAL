@@ -394,7 +394,7 @@ export default {
   'oal.face.addFailed': `Add failed`,
   'oal.face.staffidRepeat': `Staffid repeat`,
   'oal.face.staffidRepeatTips': `Staffid repeat already exists, please revise it and try again`,
-  'oal.face.userNumLimit': `The number of users has exceeded the 20,000 limit`,
+  'oal.face.userNumLimit': `The number of personnel has exceeded 20,000`,
   'oal.face.draggerTips': `Click or drag the folder to upload`,
   'oal.face.importTemplate': `Import the template`,
   'oal.face.importTemplateTips1': `Click to download`,

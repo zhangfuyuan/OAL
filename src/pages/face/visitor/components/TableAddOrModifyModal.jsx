@@ -379,7 +379,7 @@ const TableAddOrModifyModal = props => {
               beforeUpload={beforeUpload}
             >
               <Button>
-                <Icon type="upload" /> <FormattedMessage id="oal.common.upload" />
+                <Icon type="upload" /> <FormattedMessage id="oal.face.uploadPhoto" />
               </Button>
             </Upload>,
           )}

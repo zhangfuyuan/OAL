@@ -96,6 +96,7 @@ class Face extends Component {
     this.setState({ treeData: [] });
     dispatch({
       type: 'face/fetchGroupTree',
+      payload: {},
     }).then(res => {
       if (res && res.res > 0) {
         const treeData = toTree(res.data) || [];
@@ -115,12 +116,12 @@ class Face extends Component {
     data.map(item => {
       if (item.children && item.children.length > 0) {
         return (
-          <TreeNode key={item._id} title={`${item.name} (${item.num})`} dataRef={item}>
+          <TreeNode key={item._id} title={`${item.name} (${item.num || 0})`} dataRef={item}>
             {this.tree_renderNodes(item.children)}
           </TreeNode>
         );
       }
-      return <TreeNode key={item._id} title={`${item.name} (${item.num})`} {...item} dataRef={item} />;
+      return <TreeNode key={item._id} title={`${item.name} (${item.num || 0})`} {...item} dataRef={item} />;
     });
 
   tree_onMouseEnter = (e) => {
@@ -251,12 +252,14 @@ class Face extends Component {
 
   table_columns = () => {
     const { user, faceKeyList } = this.props;
+    const _t = Date.now();
+
     const cl = [
       {
         title: formatMessage({ id: 'oal.common.photo' }),
         key: 'avatar',
         width: 100,
-        render: (text, record) => <Avatar src={`${record.imgPath}.jpg?height=64&width=64&mode=fit`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
+        render: (text, record) => <Avatar src={`${record.imgPath}?t=${_t}`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
       },
       {
         title: formatMessage({ id: 'oal.common.fullName' }),

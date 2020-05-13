@@ -20,7 +20,7 @@ let myTreeOriginalData = [];
 let mySelectedPeopleIds = [];
 
 const TableAddAuthoryModal = props => {
-  const { visible, handleSubmit, handleCancel, curDeviceId, dispatch } = props;
+  const { visible, handleSubmit, handleCancel, curDeviceId, dispatch, confirmLoading } = props;
   const [treeData, setTreeData] = useState([]);
   const [checkedKeys, setCheckedKeys] = useState([]);
   const [selectedPeople, setSelectedPeople] = useState([]);
@@ -43,7 +43,7 @@ const TableAddAuthoryModal = props => {
         if (!visible) return;
 
         if (res && res.res > 0 && res.data) {
-          const _data = res.data.filter((node, index) => index < 4);
+          const _data = res.data;
           myTreeOriginalData.push(..._data);
           setTreeData(toTree(_data) || []);
         } else {
@@ -187,15 +187,7 @@ const TableAddAuthoryModal = props => {
       }
 
       if (res && res.res > 0 && res.data) {
-        let _data = [];
-
-        if (_curId === '125') {
-          _data = res.data.filter((node, index) => index >= 4 && index < 7);
-        } else if (_curId === '127') {
-          _data = res.data.filter((node, index) => index >= 7 && index < 9);
-        } else if (_curId === '126') {
-          _data = res.data.filter((node, index) => index >= 9);
-        }
+        let _data = res.data;
 
         myTreeOriginalData.push(..._data);
         treeNode.props.dataRef.children = _data;
@@ -243,9 +235,7 @@ const TableAddAuthoryModal = props => {
   const removeUser = (e, item) => {
     const { _id: _curId, pIds: _curPIds, } = item;
     const _relateIdList = [_curId, ...(_curPIds && _curPIds.split(',') || [])];
-    console.log(8126.1, _curId, _curPIds);
-    console.log(8126.2, checkedKeys);
-    console.log(8126.3, selectedPeople);
+
     setCheckedKeys(checkedKeys.filter(key => !~_relateIdList.indexOf(key)));
     setSelectedPeople(selectedPeople.filter(people => people._id !== _curId));
   };
@@ -259,49 +249,52 @@ const TableAddAuthoryModal = props => {
       onOk={handleOk}
       onCancel={handleCancel}
       maskClosable={false}
+      confirmLoading={confirmLoading}
       okText={formatMessage({ id: 'oal.common.save' })}
     >
-      <div style={{ display: 'flex', position: 'relative', }}>
-        <div style={{ height: '50vh', overflow: 'auto', flex: 2, }}>
-          {
-            !initTreeLoading ?
-              (<Tree
-                checkable
-                loadData={onLoadData}
-                defaultExpandedKeys={[treeData && treeData.length > 0 && treeData[0]._id || '0']}
-                checkedKeys={checkedKeys}
-                onCheck={handleCheck}
-              >
-                {renderNodes(treeData)}
-              </Tree>) :
-              <Spin />
-          }
-        </div>
+      <Spin spinning={modalLoading} size="large">
+        <div style={{ display: 'flex', position: 'relative', }}>
+          <div style={{ height: '50vh', overflow: 'auto', flex: 2, }}>
+            {
+              !initTreeLoading ?
+                (<Tree
+                  checkable
+                  loadData={onLoadData}
+                  defaultExpandedKeys={[treeData && treeData.length > 0 && treeData[0]._id || '0']}
+                  checkedKeys={checkedKeys}
+                  onCheck={handleCheck}
+                >
+                  {renderNodes(treeData)}
+                </Tree>) :
+                <Spin />
+            }
+          </div>
 
-        <div className="oal-user-list" style={{ height: '50vh', overflow: 'auto', flex: 1, paddingLeft: '24px' }}>
-          <List
-            itemLayout="horizontal"
-            dataSource={selectedPeople}
-            split={false}
-            renderItem={item =>
-              (<List.Item
-                key={item._id}
-                style={{ padding: '5px 0' }}
-                actions={[<a key="list-loadmore-edit" onClick={e => removeUser(e, item)}><Icon type="close-circle" theme="filled" /></a>]}
-              >
-                <List.Item.Meta
-                  title={item.name || '-'}
-                />
-              </List.Item>)}
-          />
+          <div className="oal-user-list" style={{ height: '50vh', overflow: 'auto', flex: 1, paddingLeft: '24px' }}>
+            <List
+              itemLayout="horizontal"
+              dataSource={selectedPeople}
+              split={false}
+              renderItem={item =>
+                (<List.Item
+                  key={item._id}
+                  style={{ padding: '5px 0' }}
+                  actions={[<a key="list-loadmore-edit" onClick={e => removeUser(e, item)}><Icon type="close-circle" theme="filled" /></a>]}
+                >
+                  <List.Item.Meta
+                    title={item.name || '-'}
+                  />
+                </List.Item>)}
+            />
+          </div>
+          {/* {
+            modalLoading ?
+              (<div style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.5)', }}>
+                <Spin size="large" />
+              </div>) : ''
+          } */}
         </div>
-        {
-          modalLoading ?
-            (<div style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.5)', }}>
-              <Spin size="large" />
-            </div>) : ''
-        }
-      </div>
+      </Spin>
     </Modal>
   );
 };

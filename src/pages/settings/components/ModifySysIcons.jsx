@@ -72,9 +72,6 @@ const ModifySysIcons = props => {
       setUploadLoading(false);
     }
     if (isJpgOrPng && isLt2M) {
-      // const newFileList = [...fileList, file];
-      // 8126TODO 不显示上传列表可不用
-      // setFileList(newFileList);
       const newFileList = [file];
 
       getBase64(file, imageUrl => {
@@ -156,7 +153,7 @@ const ModifySysIcons = props => {
 
     uploader.on('uploadSuccess', (file, response) => {
       // const { res, data, msg } = response;
-      // 8126TODO 上传成功返回数据
+      // TODO 上传成功返回数据
 
       if (response.status === 'done' && response.url) {
         message.success('uploadSuccess');

@@ -6,9 +6,6 @@ import { extend } from 'umi-request';
 import { notification } from 'antd';
 import { AUTH_TOKEN } from './constants';
 import { formatMessage } from 'umi-plugin-react/locale';
-import defaultSettings from '../../config/defaultSettings';
-
-const { isAjaxOAL } = defaultSettings;
 
 const codeMessage = {
   200: 'oal.ajax.200',
@@ -58,7 +55,7 @@ const request = extend({
   errorHandler,
   // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
-  timeout: 1000, // 8126TODO 超时设置
+  timeout: 100000, // 超时设置
 });
 
 /**
@@ -69,12 +66,10 @@ request.interceptors.request.use((url, options) => {
   options.headers = {
     ...options.headers,
   };
-  if (isAjaxOAL) {
-    const authToken = sessionStorage.getItem(AUTH_TOKEN) || localStorage.getItem(AUTH_TOKEN);
-    if (authToken) {
-      options.headers.Authorization = `Bearer ${authToken}`
-    }
-  }
+  // const authToken = sessionStorage.getItem(AUTH_TOKEN) || localStorage.getItem(AUTH_TOKEN);
+  // if (authToken) {
+  //   options.headers.Authorization = `Bearer ${authToken}`
+  // }
   return (
     {
       url,

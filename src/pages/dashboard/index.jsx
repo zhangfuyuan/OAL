@@ -297,7 +297,7 @@ class Demo extends Component {
       {
         title: formatMessage({ id: 'oal.org.contacts' }),
         dataIndex: 'contactName',
-        render: (text, record) => <span>{(record && record.contact && record.contact.nickName) || formatMessage({ id: 'oal.org.notFill' })}</span>,
+        render: (text, record) => <span>{(record && record.contact && record.contact.nickName) || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.handle' }),

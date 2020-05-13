@@ -55,7 +55,7 @@ export function getPermissionRoutes(userType, orgType) {
         icon: 'user',
       },
     ],
-    other: [
+    user: [
       // {
       //   path: '/dashboard',
       //   name: 'dashboard2',
@@ -173,41 +173,41 @@ export function getPermissionRoutes(userType, orgType) {
     ],
   };
 
-  if (process.env.NODE_ENV === 'production') {
-    if (orgType === 0) {
-      // admin 组织
-      redirect = '/org';
-      menuList = menuMap.admin.concat(menuMap.common);
-
-      // if (userType === 0) {
-      //   // admin 用户
-      // } else {
-      //   // 其他用户
-      //   menuList = [
-      //     {
-      //       path: '/org',
-      //       name: 'orgManger',
-      //       locale: 'menu.orgManger',
-      //       icon: 'apartment',
-      //     },
-      //     {
-      //       path: '/settings',
-      //       name: 'settings',
-      //       locale: 'menu.settings',
-      //       icon: 'setting',
-      //     }
-      //   ];
-      // }
-    } else {
-      // 其他组织
-      redirect = '/device';
-      menuList = menuMap.other.concat(menuMap.common);
-    }
-  } else {
-    // 开发时所有菜单均显示
+  // if (process.env.NODE_ENV === 'production') {
+  if (orgType === 0) {
+    // admin 组织
     redirect = '/org';
-    menuList = menuMap.admin.concat(menuMap.other, menuMap.common);
+    menuList = menuMap.admin.concat(menuMap.common);
+
+    // if (userType === 0) {
+    //   // admin 用户
+    // } else {
+    //   // 其他用户
+    //   menuList = [
+    //     {
+    //       path: '/org',
+    //       name: 'orgManger',
+    //       locale: 'menu.orgManger',
+    //       icon: 'apartment',
+    //     },
+    //     {
+    //       path: '/settings',
+    //       name: 'settings',
+    //       locale: 'menu.settings',
+    //       icon: 'setting',
+    //     }
+    //   ];
+    // }
+  } else {
+    // 其他组织
+    redirect = '/device';
+    menuList = menuMap.user.concat(menuMap.common);
   }
+  // } else {
+  //   // 开发时所有菜单均显示
+  //   redirect = '/org';
+  //   menuList = menuMap.admin.concat(menuMap.user, menuMap.common);
+  // }
 
   return { redirect, menuList };
 }

@@ -38,12 +38,14 @@ const errorCode = {
   6005: 'oal.ajax.6005',
   6006: 'oal.ajax.6006',
   6007: 'oal.face.staffidRepeatTips',
+  6008: 'oal.face.userNumLimit',
 };
 
 const errorMsg = {
   3004: 'oal.user-login.loginFailed',
   3007: 'oal.user-login.loginFailed',
   6007: 'oal.face.staffidRepeat',
+  6008: 'oal.face.addFailed',
 };
 
 /**
@@ -51,6 +53,7 @@ const errorMsg = {
  */
 request.interceptors.response.use(async (response, options) => {
   // console.log('response-->', response);
+
   if (response.status !== 200) {
     if (response.status === 401) {
       // 鉴权失败，跳转到登录
@@ -77,9 +80,10 @@ request.interceptors.response.use(async (response, options) => {
   return response;
 });
 
-const post = (path, params) => request(path, {
+const post = (path, params, extend = {}) => request(path, {
   method: 'post',
   data: { ...params },
+  ...extend,
 });
 const get = path => request(path, {
   method: 'get',

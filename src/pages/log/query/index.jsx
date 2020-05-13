@@ -39,6 +39,7 @@ const peopleTypeMap = {
   '0': 'oal.common.certifiedPeople',
   '1': 'oal.common.blacklist',
   '2': 'oal.common.visitor',
+  '3': 'oal.log-query.stranger',
 }
 
 @connect(({ logQuery, loading }) => ({
@@ -139,13 +140,14 @@ class logQuery extends Component {
 
   table_columns = () => {
     const { listSelectedBean } = this.state;
+    const _t = Date.now();
 
     const cl = [
       {
         title: formatMessage({ id: 'oal.common.photo' }),
         key: 'avatar',
         width: 100,
-        render: (text, record) => <Avatar src={`${record.imgPath}.jpg?height=64&width=64&mode=fit`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
+        render: (text, record) => <Avatar src={`${record.imgPath}?t=${_t}`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
       },
       {
         title: formatMessage({ id: 'oal.common.fullName' }),
@@ -164,7 +166,7 @@ class logQuery extends Component {
         title: formatMessage({ id: 'oal.log-query.group' }),
         key: 'group',
         dataIndex: 'group',
-        render: (text, record) => <span>{record.peopleType === '2' ? formatMessage({ id: 'oal.common.visitor' }) : (record.group && record.group.length > 0 && record.group[0].name || '-')}</span>,
+        render: (text, record) => <span>{(record.group && record.group.length > 0 && record.group[0].name) || (peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] })) || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.type' }),
@@ -275,6 +277,7 @@ class logQuery extends Component {
                   <Option value="0"><FormattedMessage id={peopleTypeMap['0']} /></Option>
                   {/* <Option value="1"><FormattedMessage id={peopleTypeMap['1']} /></Option> */}
                   <Option value="2"><FormattedMessage id={peopleTypeMap['2']} /></Option>
+                  <Option value="3"><FormattedMessage id={peopleTypeMap['3']} /></Option>
                 </Select>,
               )}
             </FormItem>
@@ -343,10 +346,10 @@ class logQuery extends Component {
 
   handleExport = () => {
     this.ref_download && this.ref_download.click();
+
     // const { dispatch } = this.props;
     // const { sortedInfo, formValues, listSelectedBean } = this.state;
 
-    // // 8126TODO 需对接
     // dispatch({
     //   type: 'logQuery/export',
     //   payload: {

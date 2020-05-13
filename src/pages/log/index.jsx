@@ -39,6 +39,7 @@ const peopleTypeMap = {
   '0': 'oal.common.certifiedPeople',
   '1': 'oal.common.blacklist',
   '2': 'oal.common.visitor',
+  '3': 'oal.log-query.stranger',
 }
 
 @connect(({ log, loading }) => ({
@@ -48,6 +49,7 @@ const peopleTypeMap = {
   logList: log.logList,
   logListLoading: loading.effects['log/fetchLog'],
   delAuthoryLoading: loading.effects['log/delAuthory'],
+  addAuthoryLoading: loading.effects['log/addAuthory'],
 }))
 class Log extends Component {
 
@@ -131,12 +133,14 @@ class Log extends Component {
   };
 
   table_columns = () => {
+    const _t = Date.now();
+
     const cl = [
       {
         title: formatMessage({ id: 'oal.common.photo' }),
         key: 'avatar',
         width: 100,
-        render: (text, record) => <Avatar src={`${record.imgPath}.jpg?height=64&width=64&mode=fit`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
+        render: (text, record) => <Avatar src={`${record.imgPath}?t=${_t}`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
       },
       {
         title: formatMessage({ id: 'oal.common.fullName' }),
@@ -155,7 +159,7 @@ class Log extends Component {
         title: formatMessage({ id: 'oal.log-query.group' }),
         key: 'group',
         dataIndex: 'group',
-        render: (text, record) => <span>{record.group && record.group.length > 0 && record.group[0].name || '-'}</span>,
+        render: (text, record) => <span>{(record.group && record.group.length > 0 && record.group[0].name) || (peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] })) || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.type' }),
@@ -245,6 +249,7 @@ class Log extends Component {
                   <Option value="0"><FormattedMessage id={peopleTypeMap['0']} /></Option>
                   {/* <Option value="1"><FormattedMessage id={peopleTypeMap['1']} /></Option> */}
                   <Option value="2"><FormattedMessage id={peopleTypeMap['2']} /></Option>
+                  <Option value="3"><FormattedMessage id={peopleTypeMap['3']} /></Option>
                 </Select>,
               )}
             </FormItem>
@@ -381,6 +386,7 @@ class Log extends Component {
       logListLoading,
       delAuthoryLoading,
       dispatch,
+      addAuthoryLoading,
     } = this.props;
     const {
       tableSelectedRows,
@@ -404,7 +410,7 @@ class Log extends Component {
             <div className={styles.left}>
               {
                 deviceListLoading ?
-                  <Spin spinning={deviceListLoading} /> :
+                  <Spin /> :
                   (<List
                     itemLayout="horizontal"
                     split={false}
@@ -429,6 +435,7 @@ class Log extends Component {
                   type="primary"
                   icon="plus"
                   style={{ marginRight: '8px', }}
+                  loading={logListLoading || deviceListLoading}
                   onClick={this.table_showTableAddAuthoryModal}
                 >
                   <FormattedMessage id="oal.face.add" />
@@ -475,6 +482,7 @@ class Log extends Component {
           visible={tableAddAuthoryVisible}
           curDeviceId={listSelectedBean._id}
           dispatch={dispatch}
+          confirmLoading={addAuthoryLoading}
           handleCancel={this.table_closeTableAddAuthoryModal}
           handleSubmit={this.table_submitTableAddAuthoryModal}
         />

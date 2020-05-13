@@ -11,7 +11,6 @@ import styles from './UserLayout.less';
 const UserLayout = props => {
   const {
     systemVersion,
-    logo: saasIconsUrl,
     route = {
       routes: [],
     },
@@ -63,7 +62,7 @@ const UserLayout = props => {
           <div className={styles.top}>
             <div className={styles.header}>
               <Link to="/">
-                <img alt="logo" className={styles.logo} src={saasIconsUrl || logo} />
+                <img alt="logo" className={styles.logo} src={login.org && login.org.saasIconsUrl || logo} />
                 <span className={styles.title}>{oemName}</span>
               </Link>
             </div>

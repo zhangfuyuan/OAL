@@ -11,11 +11,12 @@ let myImgList = [];
 let myUploadAllSuccessNum = 0;
 let taskId = '';
 let myUploadLoading = false;
+let myImgTotal = 0; // 含文件格式不正确
 
 const userImportTemplateLinkMap = {
-  'zh-CN': 'http://lango-tech.com/XBH/lango19/data/users.zip',
-  'zh-TW': 'http://lango-tech.com/XBH/lango19/data/zh-TW/users.zip',
-  'en-US': 'http://lango-tech.com/XBH/lango19/data/en/users.zip',
+  'zh-CN': '/guardFile/model/users-cn-rZH/users.xls',
+  'zh-TW': '/guardFile/model/users-cn-rTW/users.xls',
+  'en-US': '/guardFile/model/users-en/users.xls',
 };
 
 const TableBatchAddModal = props => {
@@ -25,6 +26,7 @@ const TableBatchAddModal = props => {
   const [xlsFile, setXlsFile] = useState(null);
   const [imgListLen, setImgListLen] = useState(0);
   const [isUnderAnalysis, setIsUnderAnalysis] = useState(false);
+  const [imgTotal, setImgTotal] = useState(0);
 
   const selectedLang = getLocale();
 
@@ -44,6 +46,7 @@ const TableBatchAddModal = props => {
     setXlsFile(null);
     setImgListLen(0);
     setIsUnderAnalysis(false);
+    setImgTotal(0);
 
     // 重置 全局变量
     if (uploader) wuDestroy();
@@ -51,6 +54,7 @@ const TableBatchAddModal = props => {
     myUploadAllSuccessNum = 0;
     taskId = '';
     myUploadLoading = false;
+    myImgTotal = 0;
   };
 
   const handleUploadAbort = (unNotification) => {
@@ -88,6 +92,8 @@ const TableBatchAddModal = props => {
       message.error(formatMessage({ id: 'oal.face.IncorrectFileFormat' }));
     }
 
+    myImgTotal++;
+    setImgTotal(myImgTotal);
     return false;
   };
 
@@ -141,14 +147,14 @@ const TableBatchAddModal = props => {
     });
   };
 
-  // 上传第2步：批量上传人员照片
+  // 上传第2步：（人员-认证-列表4-2）批量上传人员照片
   const submit2_batchAddFace = taskId => {
-    wuInit(myImgList, '/guard-web/a/sys/face/batchAddFace', taskId);
+    wuInit(myImgList, '/guard-web/a/face/uploadFace', taskId);
   };
 
-  // 上传第3步：上传人员数据xls文件
+  // 上传第3步：（人员-认证-列表4-3）上传人员数据xls文件
   const submit3_batchAddInfo = taskId => {
-    wuInit([xlsFile], '/guard-web/a/sys/face/batchAddInfo', taskId);
+    wuInit([xlsFile], '/guard-web/a/face/import', taskId);
   };
 
   // 上传第4步：轮询后台的解析数据进度
@@ -168,14 +174,14 @@ const TableBatchAddModal = props => {
         if (taskProgress >= 100) {
           handleSubmit(successNum);
         } else {
-          setUploadProgress(taskProgress || 1);
-
           setTimeout(() => {
             if (!visible || !myUploadLoading) return;
 
             submit4_getBatchAddTaskProgress(taskId);
           }, 2000);
         }
+
+        setUploadProgress(taskProgress > 100 ? 100 : (taskProgress || 1));
       } else {
         handleUploadAbort();
       }
@@ -261,7 +267,7 @@ const TableBatchAddModal = props => {
 
     uploader.on('uploadSuccess', (file, response) => {
       if (!visible || !myUploadLoading) return;
-      const { res, errcode, msg } = response;
+      const { res, errcode, msg } = response || {};
 
       if (res > 0) {
         myUploadAllSuccessNum++;
@@ -270,6 +276,8 @@ const TableBatchAddModal = props => {
       } else if (res === 0) {
         // 分片文件上传成功时返回，啥也不做
       } else if (res < 0 || errcode === 500 || /false/i.test(msg)) {
+        handleUploadAbort();
+      } else {
         handleUploadAbort();
       }
     });
@@ -307,6 +315,8 @@ const TableBatchAddModal = props => {
 
     myImgList = [];
     setImgListLen(0);
+    myImgTotal = 0;
+    setImgTotal(0);
   };
 
   return (
@@ -322,7 +332,7 @@ const TableBatchAddModal = props => {
       <div>
         <Dragger
           accept=".xls, .xlsx, .csv"
-          action="/guard-web/a/sys/face/batchAddInfo"
+          action="/guard-web/a/face/import"
           withCredentials
           showUploadList={false}
           beforeUpload={beforeUploadXls}
@@ -345,7 +355,7 @@ const TableBatchAddModal = props => {
         <Dragger
           accept=".png, .jpg, .jpeg"
           multiple
-          action="/guard-web/a/sys/face/batchAddFace"
+          action="/guard-web/a/face/uploadFace"
           withCredentials
           showUploadList={false}
           beforeUpload={beforeUploadImg}
@@ -397,7 +407,7 @@ const TableBatchAddModal = props => {
               </div>) : ''
           }
           {
-            imgListLen > 0 ?
+            imgTotal > 0 ?
               (<div>
                 <span>
                   <div className="ant-upload-list-item ant-upload-list-item-undefined ant-upload-list-item-list-type-text">
@@ -406,9 +416,9 @@ const TableBatchAddModal = props => {
                         <Icon type="paper-clip" />
                         <span
                           className="ant-upload-list-item-name ant-upload-list-item-name-icon-count-1"
-                          title={formatMessage({ id: 'oal.face.personnelPhotosNum' }, { num1: imgListLen, num2: imgListLen })}
+                          title={formatMessage({ id: 'oal.face.personnelPhotosNum' }, { num1: imgListLen, num2: imgTotal })}
                         >
-                          <FormattedMessage id="oal.face.personnelPhotosNum" values={{ num1: imgListLen, num2: imgListLen }} />
+                          <FormattedMessage id="oal.face.personnelPhotosNum" values={{ num1: imgListLen, num2: imgTotal }} />
                         </span>
                         {
                           !uploadLoading ?

@@ -249,12 +249,12 @@ const RenameModal = props => {
         }
         <Form.Item label={formatMessage({ id: 'oal.device.relayOperationMode' })}>
           {getFieldDecorator('relayOperationMode', {
-            initialValue: bean && bean.relayOperationMode || '2',
+            initialValue: bean && bean.relayOperationMode || '1',
           })(
-            <Radio.Group onChange={e => setShowWaitShutdownTime(e.target.value === '2')} >
-              <Radio value="2"><FormattedMessage id="oal.device.identifyControl" /></Radio>
-              <Radio value="1"><FormattedMessage id="oal.device.normallyOpen" /></Radio>
-              <Radio value="0"><FormattedMessage id="oal.device.normallyClose" /></Radio>
+            <Radio.Group onChange={e => setShowWaitShutdownTime(e.target.value === '1')} >
+              <Radio value="1"><FormattedMessage id="oal.device.identifyControl" /></Radio>
+              <Radio value="2"><FormattedMessage id="oal.device.normallyOpen" /></Radio>
+              <Radio value="3"><FormattedMessage id="oal.device.normallyClose" /></Radio>
             </Radio.Group>
           )}
         </Form.Item>

@@ -33,7 +33,7 @@ const initFormValues = {
   date: [moment().subtract(1, 'days').format('YYYY-MM-DD'), moment().subtract(1, 'days').format('YYYY-MM-DD')],
 };
 
-// 8126TODO 需要对接
+// TODO 需要对接
 const getWorkStatus = bean => {
   const { workRule, record } = bean;
   const {
@@ -95,7 +95,7 @@ class AttendanceRecord extends Component {
       } else {
         res = { ...initFormValues };
       }
-      console.log(8126, res);
+
       return res;
     })(),
     tablePage: {
@@ -381,7 +381,7 @@ class AttendanceRecord extends Component {
     const { dispatch } = this.props;
     const { sortedInfo, formValues, listSelectedBean } = this.state;
 
-    // 8126TODO 需对接
+    // TODO 需对接
     dispatch({
       type: 'attendanceRecord/export',
       payload: {

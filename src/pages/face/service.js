@@ -3,10 +3,11 @@ import { async } from 'q';
 
 /**
  * （人员-认证-分组1）获取用户分组树
+ * @param data
  * @returns {Promise<*>}
  */
-export async function fetchGroup() {
-  return get('/guard-web/a/sys/face/fetchGroupTree');
+export async function fetchGroup(data) {
+  return post('/guard-web/a/group/fetchGroupAllTree', data);
 }
 
 /**
@@ -15,7 +16,7 @@ export async function fetchGroup() {
  * @returns {Promise<*>}
  */
 export async function ajaxAddGroupNode(data) {
-  return post('/guard-web/a/sys/face/addGroupNode', data);
+  return post('/guard-web/a/group/saveGroup', data);
 }
 
 /**
@@ -24,7 +25,7 @@ export async function ajaxAddGroupNode(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxModifyGroupNode(data) {
-  return post('/guard-web/a/sys/face/modifyGroupNode', data);
+  return post('/guard-web/a/group/saveGroup', data);
 }
 
 /**
@@ -33,7 +34,7 @@ export async function ajaxModifyGroupNode(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxDelGroupNode(data) {
-  return post('/guard-web/a/sys/face/delGroupNode', data);
+  return post('/guard-web/a/group/deleteGroup', data);
 }
 
 /**
@@ -60,7 +61,7 @@ export async function ajaxSetFaceState(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxAddOrEditInfo(data) {
-  return post('/guard-web/a/sys/face/addOrEditInfo', data);
+  return post('/guard-web/a/face/saveFaceInfo', data);
 }
 
 /**
@@ -69,7 +70,7 @@ export async function ajaxAddOrEditInfo(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxGetBatchAddTaskId(data) {
-  return post('/guard-web/a/sys/face/getBatchAddTaskId', data);
+  return post('/guard-web/a/system/createTask', data);
 }
 
 /**
@@ -78,7 +79,7 @@ export async function ajaxGetBatchAddTaskId(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxGetBatchAddTaskProgress(data) {
-  return post('/guard-web/a/sys/face/getBatchAddTaskProgress', data);
+  return post('/guard-web/a/system/taskProgress', data);
 }
 
 /**
@@ -87,7 +88,7 @@ export async function ajaxGetBatchAddTaskProgress(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxCancelBatchAddTask(data) {
-  return post('/guard-web/a/sys/face/cancelBatchAddTask', data);
+  return post('/guard-web/a/system/removeTask', data);
 }
 
 /**
@@ -98,8 +99,6 @@ export async function ajaxCancelBatchAddTask(data) {
 export async function ajaxMoveFace(data) {
   return post('/guard-web/a/face/moveFace', data);
 }
-
-
 
 /**
  * 删除人脸

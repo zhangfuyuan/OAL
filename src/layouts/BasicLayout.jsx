@@ -75,18 +75,27 @@ const BasicLayout = props => {
   };
   const setSaasInfo = payload => {
     // eslint-disable-next-line no-underscore-dangle
+    const saasName = payload.saasName;
     payload.orgId = user.org._id;
+
     if (dispatch) {
       dispatch({
         type: 'user/modifySaasInfo',
         payload,
-      });
+      }).then(res => {
+        if (res && res.res > 0) {
+          dispatch({
+            type: 'settings/changeSettingInfo',
+            payload: { title: res.data && res.data.org && res.data.org.saasName || saasName },
+          });
+        }
+      })
     }
   };
-  if (user.passwordVersion === 0) {
+  if (user && user.passwordVersion === 0) {
     return <SettingPassword onSubmit={setPsw} loading={modifyPwdLoading} />
   }
-  if (user.type === 0 && user.org.type === 0 && !user.org.saasName) {
+  if (user && user.type === 0 && user.org.type === 0 && !user.org.saasName) {
     return <SettingSaasInfo onSubmit={setSaasInfo} loading={modifyPwdLoading} />
   }
   return (

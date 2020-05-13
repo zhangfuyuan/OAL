@@ -202,7 +202,7 @@ class AttendanceList extends Component {
 
   // deleteRule = (bean, isDeleteRecord) => {
   //   const { dispatch } = this.props;
-  //   // 8126TODO 需对接
+  //   // TODO 需对接
   //   dispatch({
   //     type: 'report/deleteRule',
   //     payload: {

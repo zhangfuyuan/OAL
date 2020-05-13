@@ -15,7 +15,7 @@ export async function ajaxDeviceList(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxLog(data) {
-  return post('/guard-web/a/sys/logAuthory/fetchLogList', data);
+  return post('/guard-web/a/face/fetchList', data);
 }
 
 /**
@@ -42,7 +42,7 @@ export async function ajaxDelAuthory(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxGroupTree(data) {
-  return post('/guard-web/a/sys/logAuthory/fetchGroupTree', data);
+  return post('/guard-web/a/group/fetchGroupTree', data);
 }
 
 /**
@@ -51,7 +51,7 @@ export async function ajaxGroupTree(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxPeopleByGroupId(data) {
-  return post('/guard-web/a/sys/logAuthory/fetchPeopleByGroupId', data);
+  return post('/guard-web/a/group/fetchFaceTree', data);
 }
 
 /**

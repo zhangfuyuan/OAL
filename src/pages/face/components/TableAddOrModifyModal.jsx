@@ -157,13 +157,6 @@ const TableAddOrModifyModal = props => {
             description: formatMessage({ id: 'oal.face.staffidRepeatTips' }),
           });
           setUploadLoading(false);
-          // } else if (res && res.res === 10002) {
-          //   // 8126TODO 异常情况2：用户数已超出
-          //   notification.error({
-          //     message: formatMessage({ id: 'oal.face.addFailed' }),
-          //     description: formatMessage({ id: 'oal.face.userNumLimit' }),
-          //   });
-          //   setUploadLoading(false);
         } else {
           console.log(res);
           setUploadLoading(false);
@@ -183,7 +176,7 @@ const TableAddOrModifyModal = props => {
 
     uploader = window.WebUploader.create({
       swf: (process.env === 'production' ? publicPath : '/') + 'lib/webuploader/Uploader.swf', // 请根据实际项目部署路径配置swf文件路径
-      server: '/guard-web/a/sys/face/addOrEditFace',
+      server: '/guard-web/a/face/uploadFace', // （人员-认证-列表3-2）上传人员的头像
       thumb: false, // 不生成缩略图
       compress: false, // 如果此选项为false, 则图片在上传前不进行压缩
       prepareNextFile: true, // 是否允许在文件传输时提前把下一个文件准备好
@@ -373,7 +366,7 @@ const TableAddOrModifyModal = props => {
               beforeUpload={beforeUpload}
             >
               <Button>
-                <Icon type="upload" /> <FormattedMessage id="oal.common.upload" />
+                <Icon type="upload" /> <FormattedMessage id="oal.face.uploadPhoto" />
               </Button>
             </Upload>,
           )}

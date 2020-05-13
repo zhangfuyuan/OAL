@@ -64,12 +64,12 @@ class Settings extends Component {
     });
   };
 
-  loadFaceKeyList = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'faceKey/getFaceKeyList',
-    });
-  };
+  // loadFaceKeyList = () => {
+  //   const { dispatch } = this.props;
+  //   dispatch({
+  //     type: 'faceKey/getFaceKeyList',
+  //   });
+  // };
 
   loadSysConfig = () => {
     const { dispatch } = this.props;
@@ -229,55 +229,55 @@ class Settings extends Component {
     })
   };
 
-  setFaceKeyModal = flag => {
-    this.setState({ faceKeyVisible: !!flag });
-  };
+  // setFaceKeyModal = flag => {
+  //   this.setState({ faceKeyVisible: !!flag });
+  // };
 
-  submitFaceKey = (values, callback) => {
-    const { dispatch } = this.props;
-    // eslint-disable-next-line no-underscore-dangle
-    if (values._id) {
-      dispatch({
-        type: 'faceKey/updateFaceKey',
-        payload: values,
-      }).then(res => {
-        if (res && res.res > 0) {
-          message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
-          this.setFaceKeyModal(false);
-          this.loadFaceKeyList();
-          callback();
-        }
-      });
-    } else {
-      dispatch({
-        type: 'faceKey/addFaceKey',
-        payload: values,
-      }).then(res => {
-        if (res && res.res > 0) {
-          message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
-          this.setFaceKeyModal(false);
-          this.loadFaceKeyList();
-          callback();
-        }
-      });
-    }
-  };
+  // submitFaceKey = (values, callback) => {
+  //   const { dispatch } = this.props;
+  //   // eslint-disable-next-line no-underscore-dangle
+  //   if (values._id) {
+  //     dispatch({
+  //       type: 'faceKey/updateFaceKey',
+  //       payload: values,
+  //     }).then(res => {
+  //       if (res && res.res > 0) {
+  //         message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+  //         this.setFaceKeyModal(false);
+  //         this.loadFaceKeyList();
+  //         callback();
+  //       }
+  //     });
+  //   } else {
+  //     dispatch({
+  //       type: 'faceKey/addFaceKey',
+  //       payload: values,
+  //     }).then(res => {
+  //       if (res && res.res > 0) {
+  //         message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
+  //         this.setFaceKeyModal(false);
+  //         this.loadFaceKeyList();
+  //         callback();
+  //       }
+  //     });
+  //   }
+  // };
 
-  deleteFaceKey = faceKey => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'faceKey/deleteFaceKey',
-      payload: {
-        // eslint-disable-next-line no-underscore-dangle
-        attributeId: faceKey._id,
-      },
-    }).then(res => {
-      if (res && res.res > 0) {
-        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
-        this.loadFaceKeyList();
-      }
-    });
-  };
+  // deleteFaceKey = faceKey => {
+  //   const { dispatch } = this.props;
+  //   dispatch({
+  //     type: 'faceKey/deleteFaceKey',
+  //     payload: {
+  //       // eslint-disable-next-line no-underscore-dangle
+  //       attributeId: faceKey._id,
+  //     },
+  //   }).then(res => {
+  //     if (res && res.res > 0) {
+  //       message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+  //       this.loadFaceKeyList();
+  //     }
+  //   });
+  // };
 
   toEditFaceKey = faceKey => {
     this.setFaceKeyModal(true);
@@ -332,26 +332,26 @@ class Settings extends Component {
           updateSysIcons={this.submitSysIcons}
         // openUploadModal={this.openModifySysIcons}
         />;
-      case 'developer':
-        return <DeveloperView
-          devInfo={devInfo}
-          loading={devInfoLoading}
-          toApply={this.applyDevAccount}
-          toReset={this.resetSecret}
-        />;
-      case 'faceKey':
-        return <FaceKey
-          data={faceKeyList}
-          loading={faceKeyListLoading}
-          toAdd={() => { this.setFaceKeyModal(true); this.setState({ selectedFaceKey: {} }) }}
-          toDelete={this.deleteFaceKey}
-          toEdit={this.toEditFaceKey}
-        />
-      case 'faceLibrary':
-        return <FaceLibrary
-          data={sysConfigs}
-          toEdit={this.toEditConfigs}
-        />
+      // case 'developer':
+      //   return <DeveloperView
+      //     devInfo={devInfo}
+      //     loading={devInfoLoading}
+      //     toApply={this.applyDevAccount}
+      //     toReset={this.resetSecret}
+      //   />;
+      // case 'faceKey':
+      //   return <FaceKey
+      //     data={faceKeyList}
+      //     loading={faceKeyListLoading}
+      //     toAdd={() => { this.setFaceKeyModal(true); this.setState({ selectedFaceKey: {} }) }}
+      //     toDelete={this.deleteFaceKey}
+      //     toEdit={this.toEditFaceKey}
+      //   />
+      // case 'faceLibrary':
+      //   return <FaceLibrary
+      //     data={sysConfigs}
+      //     toEdit={this.toEditConfigs}
+      //   />
       default:
         break;
     }
@@ -427,14 +427,14 @@ class Settings extends Component {
           handleCancel={this.closeModifySysIcons}
           handleSubmit={this.submitSysIcons}
         /> */}
-        <FaceKeyModal
+        {/* <FaceKeyModal
           visible={faceKeyVisible}
           handleSubmit={this.submitFaceKey}
           handleCancel={() => this.setFaceKeyModal(false)}
           confirmLoading={addFaceKeyLoading}
           setOptionVisible={() => this.setOptionVisible(true)}
           faceKey={selectedFaceKey}
-        />
+        /> */}
       </PageHeaderWrapper>
     )
   }

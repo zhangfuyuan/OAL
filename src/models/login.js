@@ -1,7 +1,7 @@
 import { routerRedux } from 'dva/router';
 import router from 'umi/router';
 import { stringify } from 'querystring';
-import { fakeAccountLogin, getFakeCaptcha, getOrg, signin, ajaxLogout } from '@/services/login';
+import { fakeAccountLogin, getFakeCaptcha, getOrg, signin, ajaxLogout, ajaxLoginStateInServer } from '@/services/login';
 import { setAuthority, getPermissionRoutes } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import CONSTANTS from '@/utils/constants';
@@ -19,11 +19,13 @@ const Model = {
   effects: {
     *login({ payload }, { call, put }) {
       const response = yield call(signin, payload);
+
       if (response && response.res > 0) {
         // 登录成功
         let loginState = {
           status: 'ok',
         };
+
         if (response.data.user) {
           if (response.data.user.type === 0) {
             loginState.currentAuthority = 'admin';
@@ -31,7 +33,7 @@ const Model = {
             loginState.currentAuthority = 'user';
           }
           loginState.user = response.data.user;
-          if (payload.autoLogin) {
+          if (payload && payload.autoLogin) {
             // 自动登录
             localStorage.setItem(CONSTANTS.AUTH_TOKEN, response.data.token);
             localStorage.setItem(CONSTANTS.AUTH_AUTO_LOGIN, CONSTANTS.AUTH_AUTO_LOGIN);
@@ -41,40 +43,28 @@ const Model = {
             localStorage.removeItem(CONSTANTS.AUTH_TOKEN);
           }
         }
+
         yield put({
           type: 'changeLoginStatus',
           payload: loginState,
-        }); // Login successfully
+        });
+
         yield put({
           type: 'saveCurrentUser',
           payload: response,
         });
-        // const urlParams = new URL(window.location.href);
-        // const params = getPageQuery();
-        // let { redirect } = params;
-        // console.log('redirect-----------', redirect)
-        // if (redirect) {
-        //   const redirectUrlParams = new URL(redirect);
-        //   if (redirectUrlParams.origin === urlParams.origin) {
-        //     redirect = redirect.substr(urlParams.origin.length);
-        //     if (redirect.match(/^\/.*#/)) {
-        //       redirect = redirect.substr(redirect.indexOf('#') + 1);
-        //     }
-        //   } else {
-        //     window.location.href = redirect;
-        //     return;
-        //   }
-        // }
 
         const { type, org } = response.data.user || { org: {} };
         const { redirect } = getPermissionRoutes(type, org.type);
 
         yield put(routerRedux.replace(redirect || '/'));
-      } else if (!response || response.res !== 0) {
+      } else if (response && response.res !== 0) {
         console.error('login error:', response);
+
         let loginState = {
           status: 'error',
         };
+
         yield put({
           type: 'changeLoginStatus',
           payload: loginState,
@@ -120,6 +110,33 @@ const Model = {
           payload: 'error',
         });
       }
+    },
+    // 判断当前用户是否处于后台的登录状态
+    *getLoginStateInServer({ payload }, { call, put }) {
+      const response = yield call(ajaxLoginStateInServer, payload);
+
+      // if (response && response.res > 0) {
+      //   const { isLogin, path, token } = response.data || {};
+
+      //   if (isLogin && !sessionStorage.getItem(CONSTANTS.AUTH_TOKEN) && !localStorage.getItem(CONSTANTS.AUTH_TOKEN)) {
+      //     // 暂时写死不自动登录
+      //     const autoLogin = false;
+
+      //     if (autoLogin) {
+      //       // 自动登录
+      //       localStorage.setItem(CONSTANTS.AUTH_TOKEN, token);
+      //       localStorage.setItem(CONSTANTS.AUTH_AUTO_LOGIN, CONSTANTS.AUTH_AUTO_LOGIN);
+      //     } else {
+      //       // 不自动登录
+      //       sessionStorage.setItem(CONSTANTS.AUTH_TOKEN, token);
+      //       localStorage.removeItem(CONSTANTS.AUTH_TOKEN);
+      //     }
+
+      //     yield put(routerRedux.replace(path === 'admin' ? '/org' : '/device'));
+      //   }
+      // }
+
+      return Promise.resolve(response);
     },
   },
   reducers: {

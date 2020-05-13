@@ -14,7 +14,6 @@ const RuleRelateDeviceModal = props => {
   const isSingle = (selectedBean && selectedBean.length === 1 || false);
 
   useEffect(() => {
-    // 8126TODO 遍历
     // 每次 visible 发生变化，刷新已选设备属性 selectedItems 的值
     if (visible === true) {
       setSelectedItems(

@@ -1,8 +1,5 @@
 import request from '@/utils/request';
 import { get, post } from '@/utils/ajax';
-import defaultSettings from '../../config/defaultSettings';
-
-const { isAjaxOAL } = defaultSettings;
 
 export async function query() {
   return request('/api/users');
@@ -16,7 +13,7 @@ export async function queryNotices() {
  */
 export async function authByToken() {
   // return get('/api/user/authByToken');
-  return isAjaxOAL ? get('/api/user/authByToken') : get('/guard-web/a/sys/user/authByToken');
+  return get('/guard-web/a/sys/user/authByToken');
 }
 
 /**

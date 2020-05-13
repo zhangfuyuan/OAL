@@ -1,8 +1,5 @@
 import request from '@/utils/request';
 import { post, get } from '@/utils/ajax';
-import defaultSettings from '../../config/defaultSettings';
-
-const { isAjaxOAL } = defaultSettings;
 
 export async function fakeAccountLogin(params) {
   return request('/api/login/account', {
@@ -21,7 +18,7 @@ export async function getFakeCaptcha(mobile) {
  * @returns {Promise<*>}
  */
 export async function getOrg(path) {
-  return isAjaxOAL ? get(`/api/org/getByPath/${path}`) : post(`/guard-web/f/com/getByPath`, { path });
+  return post(`/guard-web/f/com/getByPath`, { path });
 }
 
 /**
@@ -30,7 +27,12 @@ export async function getOrg(path) {
  * @returns {Promise<*>}
  */
 export async function signin(data) {
-  return isAjaxOAL ? post('/api/user/signin', data) : post('/guard-web/a/login', data);
+  const _data = { ...data };
+  const { errorHandler } = _data || {};
+
+  if (errorHandler) delete _data.errorHandler;
+
+  return post('/guard-web/a/login', _data, { errorHandler });
 }
 
 /**
@@ -38,4 +40,11 @@ export async function signin(data) {
  */
 export async function ajaxLogout() {
   return get('/guard-web/a/sys/user/logout');
+}
+
+/**
+ * （通用8）询问当前用户是否处于登录状态
+ */
+export async function ajaxLoginStateInServer() {
+  return get('/guard-web/f/com/isLogin');
 }

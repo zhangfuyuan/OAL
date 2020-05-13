@@ -48,7 +48,7 @@ const TableAddAuthoryModal = props => {
   };
 
   const renderNodes = data =>
-    // 8126TODO 已关联设备的节点要禁用
+    // TODO 已关联设备的节点要禁用
     data.map(item => {
       if (item.children && item.children.length > 0) {
         return (
@@ -79,7 +79,7 @@ const TableAddAuthoryModal = props => {
     <Modal
       width="60%"
       destroyOnClose
-      title={formatMessage({ id: 'oal.log.addAuthoryTitle' }, { num: treeOriginalData.filter(node => node.isPeople && checkedKeys.indexOf(node._id) > -1).length })} // 8126TODO 需判断是否为用户
+      title={formatMessage({ id: 'oal.log.addAuthoryTitle' }, { num: treeOriginalData.filter(node => node.isPeople && checkedKeys.indexOf(node._id) > -1).length })} // TODO 需判断是否为用户
       visible={visible}
       onOk={handleOk}
       onCancel={handleCancel}

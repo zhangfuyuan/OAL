@@ -102,19 +102,16 @@ const SettingPsw = props => {
       alignItems: 'center',
     }}>
       <Card bordered={false} style={{ width: 400 }}>
-        {
-          newpswError || renewpswError ?
-            (<Alert
-              message={formatMessage({
-                id: 'oal.common.setPassword',
-              })}
-              description={formatMessage({
-                id: 'oal.common.resetPasswordTips',
-              })}
-              type="error"
-              showIcon
-            />) : ''
-        }
+        <Alert
+          message={formatMessage({
+            id: 'oal.common.setPassword',
+          })}
+          description={formatMessage({
+            id: 'oal.common.resetPasswordTips',
+          })}
+          type="error"
+          showIcon
+        />
         <br />
         <Input.Password
           placeholder={formatMessage({

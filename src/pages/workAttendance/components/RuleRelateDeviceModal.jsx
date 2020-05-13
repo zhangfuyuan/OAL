@@ -14,17 +14,10 @@ const RuleRelateDeviceModal = props => {
   const [checkboxChecked, setCheckboxChecked] = useState([]);
 
   useEffect(() => {
-    // 8126TODO 遍历
     // 每次 visible 发生变化，刷新已选设备属性 selectedItems 的值
     if (visible === true) {
-      // setSelectedItems(
-      //   selectedBean &&
-      //   selectedBean.deviceInfo &&
-      //   selectedBean.deviceInfo._id &&
-      //   [dUuid(selectedBean.deviceInfo)] ||
-      //   []
-      // );
-      setCheckboxChecked(deviceList &&
+      setCheckboxChecked(
+        deviceList &&
         deviceList.length > 0 &&
         deviceList.filter(device => device.relateRuleId && device.relateRuleId.indexOf(selectedBean._id) > -1 || false).map(device => device._id) ||
         []

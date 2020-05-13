@@ -108,12 +108,14 @@ class Visitor extends Component {
   };
 
   table_columns = () => {
+    const _t = Date.now();
+
     const cl = [
       {
         title: formatMessage({ id: 'oal.common.photo' }),
         key: 'avatar',
         width: 100,
-        render: (text, record) => <Avatar src={`${record.imgPath}.jpg?height=64&width=64&mode=fit`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
+        render: (text, record) => <Avatar src={`${record.imgPath}?t=${_t}`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
       },
       {
         title: formatMessage({ id: 'oal.common.fullName' }),
@@ -322,7 +324,7 @@ class Visitor extends Component {
 
   // table_submitRelateModal = (faceId, deviceId) => {
   //   const { dispatch } = this.props;
-  //   // 8126TODO 需对接
+
   //   dispatch({
   //     type: 'faceVisitor/relateDevice',
   //     payload: {

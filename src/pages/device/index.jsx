@@ -103,7 +103,7 @@ class Device extends Component {
   }
 
   loadData = key => {
-    // 8126TODO 设备不再区分审核状态
+    // 设备不再区分审核状态
     // if (!key) {
     //     key = this.props.match.params.type;
     // }

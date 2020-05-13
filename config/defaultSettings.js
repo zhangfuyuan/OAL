@@ -14,5 +14,4 @@ export default {
   title: 'LangoAI',
   pwa: false,
   iconfontUrl: '',
-  isAjaxOAL: true,
 };

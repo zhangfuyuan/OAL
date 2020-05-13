@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import router from 'umi/router';
 import { connect } from 'dva';
 import styles from './style.less';
+import { SYSTEM_PATH } from '@/utils/constants';
 
 const FormItem = Form.Item;
 
@@ -12,6 +13,18 @@ const FormItem = Form.Item;
   submitting: loading.effects['global/updateSystemOrigin'],
 }))
 class InitOrigin extends Component {
+
+  UNSAFE_componentWillMount() {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'global/getSystemVersion',
+    });
+    dispatch({
+      type: 'login/getOrgInfo',
+      payload: localStorage.getItem(SYSTEM_PATH) || 'admin',
+    });
+  }
 
   handleSubmit = e => {
     e.preventDefault();
@@ -27,7 +40,7 @@ class InitOrigin extends Component {
         },
       }).then(res => {
         if (res && res.res > 0) {
-          router.push('/');
+          router.push(`/user/${localStorage.getItem(SYSTEM_PATH) || 'admin'}/login`);
         } else {
           console.log(res);
         }

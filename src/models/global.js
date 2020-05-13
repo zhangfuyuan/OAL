@@ -74,6 +74,7 @@ const GlobalModel = {
 
     *getSystemVersion(_, { call, put }) {
       const response = yield call(querySystemVersion);
+
       const { res, data } = response || {};
       let version = 'v2.0.0';
       if (res && data && data.version) {
@@ -87,8 +88,10 @@ const GlobalModel = {
         },
       });
 
-      if (process.env.NODE_ENV === 'production' && res && data) {
-        const { ip } = data;
+      // if (process.env.NODE_ENV === 'production' && res && data) {
+      const { ip } = data || {};
+
+      if (ip) {
         yield put({
           type: 'saveOrigin',
           payload: {
@@ -96,17 +99,16 @@ const GlobalModel = {
           },
         });
 
-        if (ip) {
-          try {
-            const { origin: curOrigin, href: curHref } = new URL(window.location.href);
-            if (!~curHref.indexOf(ip)) window.location.href = curHref.replace(curOrigin, /\/\/./.test(ip) ? ip : `//${ip}`);
-          } catch (err) {
-            console.log(err);
-          }
-        } else {
-          yield put(routerRedux.replace('/user/initOrigin'));
+        try {
+          const { origin: curOrigin, href: curHref } = new URL(window.location.href);
+          if (!~curHref.indexOf(ip)) window.location.href = curHref.replace(curOrigin, /\/\/./.test(ip) ? ip : `//${ip}`);
+        } catch (err) {
+          console.log(err);
         }
+      } else {
+        yield put(routerRedux.replace('/user/initOrigin'));
       }
+      // }
     },
 
     // 初始化部署时，提交访问IP/域名

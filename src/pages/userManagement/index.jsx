@@ -267,8 +267,6 @@ class UserManagement extends Component {
     const { selectedUser } = this.state;
     // eslint-disable-next-line no-underscore-dangle
     if (selectedUser && selectedUser._id) {
-      console.log(8126, '修改用户信息', values);
-      // 8126TODO 对接修改账号信息接口
       dispatch({
         type: 'userManagement/modify',
         payload: values,
@@ -280,10 +278,6 @@ class UserManagement extends Component {
           callback();
         }
       });
-      message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
-      this.closeAddOrUpdateModal();
-      this.loadUserList();
-      callback();
     } else {
       dispatch({
         type: 'userManagement/add',
