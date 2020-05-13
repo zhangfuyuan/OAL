@@ -33,6 +33,7 @@ const { Item } = Menu;
   sysConfigs: settingInfo.sysConfigs,
   modifyPasswordLoading: loading.effects['user/modifyPassword'],
   modifySaasInfoLoading: loading.effects['user/modifySaasInfo'],
+  baseViewLoading: loading.effects['user/modifyUser'],
 }))
 class Settings extends Component {
   constructor(props) {
@@ -311,13 +312,14 @@ class Settings extends Component {
   };
 
   renderChildren = () => {
-    const { currentUser, devInfo, devInfoLoading, faceKeyList, faceKeyListLoading, sysConfigs, systemVersion } = this.props;
+    const { currentUser, devInfo, devInfoLoading, faceKeyList, faceKeyListLoading, sysConfigs, systemVersion, baseViewLoading } = this.props;
     const { selectKey } = this.state;
     switch (selectKey) {
       case 'base':
         return <BaseView
           currentUser={currentUser}
           toSubmit={this.submitBaseInfo}
+          loading={baseViewLoading}
         />;
       case 'security':
         return <SecurityView

@@ -172,7 +172,9 @@ const TableBatchAddModal = props => {
         const { taskProgress, successNum } = res.data;
 
         if (taskProgress >= 100) {
-          handleSubmit(successNum);
+          setTimeout(() => {
+            handleSubmit(successNum);
+          }, 500);
         } else {
           setTimeout(() => {
             if (!visible || !myUploadLoading) return;

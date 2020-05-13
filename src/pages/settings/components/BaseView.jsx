@@ -34,6 +34,7 @@ class BaseView extends Component {
     const {
       form: { getFieldDecorator },
       currentUser,
+      loading,
     } = this.props;
     // console.log('currentUser-------', currentUser);
     return (
@@ -117,7 +118,7 @@ class BaseView extends Component {
                 <Input placeholder={formatMessage({ id: 'oal.settings.contactNumber' })} />,
               )}
             </FormItem> */}
-            <Button type="primary" onClick={this.handlerSubmit}>
+            <Button type="primary" onClick={this.handlerSubmit} loading={loading}>
               <FormattedMessage id="oal.common.save" />
             </Button>
           </Form>

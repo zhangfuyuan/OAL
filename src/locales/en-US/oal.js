@@ -308,7 +308,7 @@ export default {
   'oal.ajax.503': `The service is unavailable, the server is temporarily overloaded or maintained.`,
   'oal.ajax.504': `Gateway timeout`,
   'oal.ajax.requestError': `Request error`,
-  'oal.ajax.requestErrorDescription': `Your network is abnormal and cannot connect to the server`,
+  'oal.ajax.requestErrorDescription': `Your network has an exception, please try to refresh the page`,
   'oal.ajax.requestErrorMessage': `Network anomaly`,
   'oal.common.notSupportBrowserTips': `System detected that you are using the Internet Explorer kernel browser, can not achieve a perfect experience, please change the browser access!`,
   'oal.common.addItems': `Add item`,
@@ -527,4 +527,5 @@ export default {
   'oal.face-visitor.thisWeek': `This week`,
   'oal.face-visitor.thisMonth': `This month`,
   'oal.log-query.currentToTotal': `There are {total} records`,
+  'oal.common.unregistered': `Unregistered`,
 };

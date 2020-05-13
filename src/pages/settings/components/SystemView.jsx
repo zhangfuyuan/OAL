@@ -70,7 +70,7 @@ class SystemView extends Component {
       },
     ];
 
-    if (currentUser.type === 0 && orgInfo.type === 0) {
+    if (currentUser.type === 0/* && orgInfo.type === 0*/) {
       items.push({
         title: formatMessage({ id: 'oal.settings.sysname' }),
         description: (
@@ -87,7 +87,7 @@ class SystemView extends Component {
         title: (
           <Fragment>
             <span style={{ marginRight: '16px' }}><FormattedMessage id="oal.settings.systemIcons" /></span>
-            <Avatar src={orgInfo.saasIconsUrl || logo} />
+            <Avatar src={orgInfo && orgInfo.saasIconsUrl || logo} />
           </Fragment>
         ),
         description: '',

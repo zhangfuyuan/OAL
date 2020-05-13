@@ -39,7 +39,7 @@ class SecurityView extends Component {
       //   </Fragment>
       // ),
       actions: [
-        <a href="#" onClick={() => this.handleModify()}>
+        <a key="modify" onClick={() => this.handleModify()}>
           <FormattedMessage id="oal.common.modify" />
         </a>,
       ],

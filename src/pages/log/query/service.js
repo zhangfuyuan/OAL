@@ -15,7 +15,7 @@ export async function ajaxDeviceList(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxLogQuery(data) {
-  return post('/guard-web/a/sys/logQuery/fetchList', data);
+  return post('/guard-web/a/record/fetchList', data);
 }
 
 /**

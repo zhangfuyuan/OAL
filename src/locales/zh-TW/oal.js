@@ -308,7 +308,7 @@ export default {
   'oal.ajax.503': `服務不可用，伺服器暫時超載或維護。`,
   'oal.ajax.504': `網關超時。`,
   'oal.ajax.requestError': `請求錯誤`,
-  'oal.ajax.requestErrorDescription': `您的網路發生異常，無法連接伺服器`,
+  'oal.ajax.requestErrorDescription': `您的網絡發生異常，請嘗試刷新頁面`,
   'oal.ajax.requestErrorMessage': `網路異常`,
   'oal.common.notSupportBrowserTips': `系統檢測到您正在使用 Internet Explorer 內核的瀏覽器，不能實現完美體驗，請更換瀏覽器訪問！`,
   'oal.common.addItems': `添加子項`,
@@ -527,4 +527,5 @@ export default {
   'oal.face-visitor.thisWeek': `本週`,
   'oal.face-visitor.thisMonth': `本月`,
   'oal.log-query.currentToTotal': `總共 {total} 條記錄`,
+  'oal.common.unregistered': `未註冊`,
 };

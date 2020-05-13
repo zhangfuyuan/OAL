@@ -29,7 +29,7 @@ export async function modifyUser(data) {
  * （账号4）重置密码
  */
 export async function ajaxResetPsw(data) {
-  return post(`/guard-web/a/sys/user/actionUser`, data);
+  return post(`/guard-web/a/sys/user/resetPassword`, data);
 }
 
 /**

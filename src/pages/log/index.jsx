@@ -39,7 +39,7 @@ const peopleTypeMap = {
   '0': 'oal.common.certifiedPeople',
   '1': 'oal.common.blacklist',
   '2': 'oal.common.visitor',
-  '3': 'oal.log-query.stranger',
+  '3': 'oal.common.unregistered',
 }
 
 @connect(({ log, loading }) => ({

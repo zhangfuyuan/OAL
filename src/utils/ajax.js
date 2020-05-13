@@ -54,9 +54,10 @@ const errorMsg = {
  */
 request.interceptors.response.use(async (response, options) => {
   // console.log('response-->', response);
+  const { status } = response || {};
 
-  if (response.status !== 200) {
-    if (response.status === 401) {
+  if (status !== 200) {
+    if (status === 401) {
       // 鉴权失败，跳转到登录
       notification.error({
         message: formatMessage({ id: 'oal.ajax.401-message' }),
@@ -67,8 +68,14 @@ request.interceptors.response.use(async (response, options) => {
       router.replace({
         pathname: `/user/${localStorage.getItem(SYSTEM_PATH)}/login`,
       });
+    } else {
+      notification.error({
+        message: `${formatMessage({ id: 'oal.ajax.requestError' })} ${status}`,
+        description: formatMessage({ id: `oal.ajax.${status}` }),
+      });
     }
-    return { res: -1, status: response.status }
+
+    return { res: -1, status: status }
   }
   const data = await response.clone().json();
   // console.info('http response:', data);

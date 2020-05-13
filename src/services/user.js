@@ -29,7 +29,7 @@ export async function modifyPsw(data) {
  * （设置1）admin组织账号设置
  */
 export async function modifyUser(data) {
-  return post('/guard-web/a/sys/office/update', data);
+  return post('/guard-web/a/sys/user/saveUser', data);
 }
 
 /**

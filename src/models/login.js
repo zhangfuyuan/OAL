@@ -115,27 +115,6 @@ const Model = {
     *getLoginStateInServer({ payload }, { call, put }) {
       const response = yield call(ajaxLoginStateInServer, payload);
 
-      // if (response && response.res > 0) {
-      //   const { isLogin, path, token } = response.data || {};
-
-      //   if (isLogin && !sessionStorage.getItem(CONSTANTS.AUTH_TOKEN) && !localStorage.getItem(CONSTANTS.AUTH_TOKEN)) {
-      //     // 暂时写死不自动登录
-      //     const autoLogin = false;
-
-      //     if (autoLogin) {
-      //       // 自动登录
-      //       localStorage.setItem(CONSTANTS.AUTH_TOKEN, token);
-      //       localStorage.setItem(CONSTANTS.AUTH_AUTO_LOGIN, CONSTANTS.AUTH_AUTO_LOGIN);
-      //     } else {
-      //       // 不自动登录
-      //       sessionStorage.setItem(CONSTANTS.AUTH_TOKEN, token);
-      //       localStorage.removeItem(CONSTANTS.AUTH_TOKEN);
-      //     }
-
-      //     yield put(routerRedux.replace(path === 'admin' ? '/org' : '/device'));
-      //   }
-      // }
-
       return Promise.resolve(response);
     },
   },
@@ -145,6 +124,10 @@ const Model = {
       return { ...state, status: payload.status };
     },
     setOrg(state, { payload }) {
+      const { saasIconsUrl } = payload;
+
+      if (saasIconsUrl) payload.saasIconsUrl = `${saasIconsUrl}?t=${Date.now()}`;
+
       return { ...state, org: payload };
     },
     setAgent(state, { payload }) {

@@ -9,6 +9,7 @@ const UserModel = {
     org: {},
     modifyPwdLoading: false,
     menuList: [],
+    menuRedirect: '/',
   },
   effects: {
     *fetch(_, { call, put }) {
@@ -101,16 +102,23 @@ const UserModel = {
   },
   reducers: {
     saveCurrentUser(state, action) {
+      const _currentUser = action.payload.data.user || action.payload.data;
+      const _path = _currentUser && _currentUser.org && _currentUser.org.path || '';
+      const _saasIconsUrl = _currentUser && _currentUser.org && _currentUser.org.saasIconsUrl || '';
+
+      if (_saasIconsUrl) _currentUser.org.saasIconsUrl = `${_saasIconsUrl}?t=${Date.now()}`;
+
       return {
         ...state,
-        currentUser: action.payload.data.user || action.payload.data || {},
+        currentUser: _currentUser || {},
         // menuList: action.payload.data.menus || [],
         menuList: (user => {
           const { type, org } = user || { org: {} };
           const { menuList: _menuList } = getPermissionRoutes(type, org.type);
 
           return _menuList;
-        })(action.payload.data.user || action.payload.data),
+        })(_currentUser),
+        menuRedirect: _path === 'admin' ? '/org' : '/device',
       };
     },
     setPswVersion(state, action) {
@@ -123,7 +131,13 @@ const UserModel = {
     },
     setOrg(state, action) {
       const { currentUser } = state;
-      currentUser.org = action.payload.org;
+      const _org = action.payload.org;
+      const { saasIconsUrl } = _org;
+
+      currentUser.org = _org;
+
+      if (saasIconsUrl) currentUser.org.saasIconsUrl = `${saasIconsUrl}?t=${Date.now()}`;
+
       return { ...state, currentUser }
     },
     changeNotifyCount(

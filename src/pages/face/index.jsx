@@ -67,7 +67,7 @@ class Face extends Component {
       columnKey: '',
       order: '', // ascend（正序）、descend（倒序）
     },
-    treeFocusKey: '',
+    selectedKeys: [],
     tablePage: {
       current: 1,
       pageSize: 10,
@@ -90,7 +90,7 @@ class Face extends Component {
 
   tree_loadData = (isRefreshTable) => {
     const { dispatch } = this.props;
-    const { treeFocusKey } = this.state;
+    const { selectedKeys } = this.state;
 
     this.tree_clearMenu();
     this.setState({ treeData: [] });
@@ -98,11 +98,11 @@ class Face extends Component {
       type: 'face/fetchGroupTree',
       payload: {},
     }).then(res => {
-      if (res && res.res > 0) {
+      if (res && res.res > 0 && res.data) {
         const treeData = toTree(res.data) || [];
         this.setState({
           treeData,
-          treeFocusKey: treeFocusKey || (treeData[0] && treeData[0]._id) || '0',
+          selectedKeys: [(selectedKeys[0] || (treeData[0] && treeData[0]._id) || '0')],
         }, () => {
           isRefreshTable && this.table_loadFaceList();
         });
@@ -200,9 +200,10 @@ class Face extends Component {
     });
   };
 
-  tree_onSelect = (selectedKeys, e) => {
+  tree_onSelect = (selectedKeys, info) => {
     this.setState({
-      treeFocusKey: selectedKeys[0],
+      selectedKeys: [info.node.props.dataRef._id],
+      tableSelectedRows: [],
     }, () => {
       this.table_loadFaceList();
     });
@@ -234,14 +235,14 @@ class Face extends Component {
 
   table_loadFaceList = () => {
     const { dispatch } = this.props;
-    const { tableSearchName, treeFocusKey, tablePage, sortedInfo } = this.state;
+    const { tableSearchName, selectedKeys, tablePage, sortedInfo } = this.state;
     const { columnKey, order } = sortedInfo;
 
     dispatch({
       type: 'face/fetch',
       payload: {
         ...tablePage,
-        groupId: treeFocusKey,
+        groupId: selectedKeys[0],
         // columnKey,
         // order,
         name: tableSearchName.trim(),
@@ -265,6 +266,7 @@ class Face extends Component {
         title: formatMessage({ id: 'oal.common.fullName' }),
         key: 'name',
         dataIndex: 'name',
+        render: (text, record) => <span>{record.name || '-'}</span>,
         // sorter: (a, b) => a.name - b.name,
         // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
       },
@@ -375,9 +377,13 @@ class Face extends Component {
       type: 'face/addGroupNode',
       payload: params,
     }).then(res => {
-      if (res && res.res > 0) {
+      if (res && res.res > 0 && res.data) {
         message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
-        this.tree_loadData();
+        this.setState({
+          selectedKeys: [res.data.id],
+        }, () => {
+          this.tree_loadData(true);
+        });
         this.tree_closeTreeAddModal();
         callback && callback();
       } else {
@@ -409,9 +415,13 @@ class Face extends Component {
       type: 'face/modifyGroupNode',
       payload: params,
     }).then(res => {
-      if (res && res.res > 0) {
+      if (res && res.res > 0 && res.data) {
         message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
-        this.tree_loadData();
+        this.setState({
+          selectedKeys: [res.data.id],
+        }, () => {
+          this.tree_loadData(true);
+        });
         this.tree_closeTreeModifyModal();
         callback && callback();
       } else {
@@ -448,7 +458,7 @@ class Face extends Component {
       if (res && res.res > 0) {
         message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
         this.setState({
-          treeFocusKey: groupPid,
+          selectedKeys: [groupPid],
         }, () => {
           this.tree_loadData(true);
         });
@@ -483,7 +493,7 @@ class Face extends Component {
   table_submitTableAddOrModifyModal = isEdit => {
     message.success(formatMessage({ id: (isEdit ? 'oal.common.saveSuccessfully' : 'oal.face.addSuccessfully') }));
     this.table_closeTableAddOrModifyModal();
-    this.table_loadFaceList();
+    this.tree_loadData(true);
   };
 
   // 批量添加（上传人脸信息）TableBatchAddModal
@@ -502,7 +512,7 @@ class Face extends Component {
   table_submitTableBatchAddModal = successNum => {
     message.success(formatMessage({ id: 'oal.face.addedNumPeopleSuccessfully' }, { num: successNum }));
     this.table_closeTableBatchAddModal();
-    this.table_loadFaceList();
+    this.tree_loadData(true);
   };
 
   // 单个/批量移动（人脸分组）
@@ -522,10 +532,11 @@ class Face extends Component {
 
   table_submitTableMoveModal = (param, callback) => {
     const { dispatch } = this.props;
-    const { tableSelectedBean, tableSelectedRows } = this.state;
+    const { tableSelectedBean, tableSelectedRows, selectedKeys } = this.state;
     dispatch({
       type: 'face/moveFace',
       payload: {
+        oldGroupId: selectedKeys[0],
         groupId: param,
         faceId: tableSelectedBean && tableSelectedBean._id || tableSelectedRows.map(item => item._id).join(','),
         peopleType: '0',
@@ -534,7 +545,7 @@ class Face extends Component {
       if (res && res.res > 0) {
         message.success(formatMessage({ id: 'oal.common.moveSuccessfully' }));
         this.table_closeTableMoveModal();
-        this.table_loadFaceList();
+        this.tree_loadData(true);
         callback && callback();
       } else {
         console.log(res);
@@ -614,7 +625,7 @@ class Face extends Component {
     } = this.props;
     const {
       treeData,
-      treeFocusKey,
+      selectedKeys,
       nodeTreeItem,
       treeAddVisible,
       treeModifyVisible,
@@ -654,10 +665,11 @@ class Face extends Component {
                       // showLine={true}
                       // blockNode={true}
                       // draggable
-                      defaultExpandedKeys={[treeFocusKey]}
-                      defaultSelectedKeys={[treeFocusKey]}
+                      defaultExpandedKeys={selectedKeys}
+                      defaultSelectedKeys={selectedKeys}
                       onMouseEnter={this.tree_onMouseEnter}
                       onSelect={this.tree_onSelect}
+                      selectedKeys={selectedKeys}
                       // onDrop={this.tree_onDrop}
                       onExpand={this.tree_clearMenu}
                     >
@@ -774,14 +786,14 @@ class Face extends Component {
             visible={tableAddOrModifyVisible}
             bean={tableSelectedBean}
             dispatch={dispatch}
-            groupId={treeFocusKey}
+            groupId={selectedKeys[0]}
             handleCancel={this.table_closeTableAddOrModifyModal}
             handleSubmit={this.table_submitTableAddOrModifyModal}
           />
           <TableBatchAddModal
             visible={tableBatchAddVisible}
             dispatch={dispatch}
-            groupId={treeFocusKey}
+            groupId={selectedKeys[0]}
             handleCancel={this.table_closeTableBatchAddModal}
             handleSubmit={this.table_submitTableBatchAddModal}
           />

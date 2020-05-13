@@ -16,7 +16,7 @@ const getPidFn = (pid, list, res = []) => {
   }
 };
 
-let myTreeOriginalData = [];
+// let myTreeOriginalData = [];
 let mySelectedPeopleIds = [];
 
 const TableAddAuthoryModal = props => {
@@ -44,7 +44,7 @@ const TableAddAuthoryModal = props => {
 
         if (res && res.res > 0 && res.data) {
           const _data = res.data;
-          myTreeOriginalData.push(..._data);
+          // myTreeOriginalData.push(..._data);
           setTreeData(toTree(_data) || []);
           setCheckedKeys(checkedKeys.concat(_data.filter(node => node.isPeople && node.isRelateDevice).map(node => node._id)));
         } else {
@@ -65,7 +65,7 @@ const TableAddAuthoryModal = props => {
     setSelectedPeople([]);
     setInitTreeLoading(false);
     setModalLoading(false);
-    myTreeOriginalData = [];
+    // myTreeOriginalData = [];
     mySelectedPeopleIds = [];
   };
 
@@ -129,7 +129,9 @@ const TableAddAuthoryModal = props => {
             if (!~_checkedPeopleIdList.indexOf(item._id) && !item.isRelateDevice) _data.push(item);
           });
 
-          setSelectedPeople([..._data, ..._checkedPeopleInfoList]);
+          const _selectedPeopleList = [..._data, ..._checkedPeopleInfoList];
+          setSelectedPeople(_selectedPeopleList);
+          mySelectedPeopleIds = _selectedPeopleList.map(item => item._id);
           _data = null;
         } else {
           console.log(res);
@@ -190,12 +192,13 @@ const TableAddAuthoryModal = props => {
       if (res && res.res > 0 && res.data) {
         let _data = res.data;
 
-        myTreeOriginalData.push(..._data);
+        // myTreeOriginalData.push(..._data);
         treeNode.props.dataRef.children = _data;
         setTreeData([...treeData]);
 
         if (_curIsChecked) {
           setCheckedKeys(checkedKeys.concat(_data.filter(node => node.isPeople && node.pIds.indexOf(_curId) > -1).map(node => node._id)));
+          setSelectedPeople([...selectedPeople, ..._data.filter(node => node.isPeople && node.pIds.indexOf(_curId) > -1 && !~mySelectedPeopleIds.indexOf(node._id))]);
         } else {
           setCheckedKeys(checkedKeys.concat(_data.filter(node => node.isPeople && node.isRelateDevice).map(node => node._id)));
         }
@@ -215,10 +218,12 @@ const TableAddAuthoryModal = props => {
   const renderNodes = data =>
     data.map(item => {
       if (item.children && item.children.length > 0) {
+        const _rootId = treeData[0] && treeData[0]._id || '0';
+
         return (
           <TreeNode
             key={item._id}
-            title={treeData[0] && item._id === treeData[0]._id ? `${item.name}(${item.num})` : item.name}
+            title={item._id === _rootId ? `${item.name} (${item.num || 0})` : item.name}
             dataRef={item}
           >
             {renderNodes(item.children)}
@@ -227,7 +232,7 @@ const TableAddAuthoryModal = props => {
       }
       return <TreeNode
         key={item._id}
-        title={item.name}
+        title={item.name || '-'}
         disableCheckbox={item.isPeople && item.isRelateDevice || false}
         {...item}
         dataRef={item} />;

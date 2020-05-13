@@ -308,7 +308,7 @@ export default {
   'oal.ajax.503': `服务不可用，服务器暂时过载或维护。`,
   'oal.ajax.504': `网关超时。`,
   'oal.ajax.requestError': `请求错误`,
-  'oal.ajax.requestErrorDescription': `您的网络发生异常，无法连接服务器`,
+  'oal.ajax.requestErrorDescription': `您的网络发生异常，请尝试刷新页面`,
   'oal.ajax.requestErrorMessage': `网络异常`,
   'oal.common.notSupportBrowserTips': `系统检测到您正在使用 Internet Explorer 内核的浏览器，不能实现完美体验，请更换浏览器访问！`,
   'oal.common.addItems': `添加子项`,
@@ -527,4 +527,5 @@ export default {
   'oal.face-visitor.thisWeek': `本周`,
   'oal.face-visitor.thisMonth': `本月`,
   'oal.log-query.currentToTotal': `总共 {total} 条记录`,
+  'oal.common.unregistered': `未注册`,
 };

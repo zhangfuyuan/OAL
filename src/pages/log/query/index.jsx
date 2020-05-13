@@ -19,7 +19,7 @@ import {
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import router from 'umi/router';
 import Link from 'umi/link';
-import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import { FormattedMessage, formatMessage, getLocale } from 'umi-plugin-react/locale';
 import { connect } from 'dva';
 import { findIndex } from 'lodash';
 import moment from 'moment';
@@ -39,7 +39,7 @@ const peopleTypeMap = {
   '0': 'oal.common.certifiedPeople',
   '1': 'oal.common.blacklist',
   '2': 'oal.common.visitor',
-  '3': 'oal.log-query.stranger',
+  '3': 'oal.common.unregistered',
 }
 
 @connect(({ logQuery, loading }) => ({
@@ -398,6 +398,7 @@ class logQuery extends Component {
       formValues,
     } = this.state;
     const { peopleType, name, date } = formValues;
+    const language = getLocale();
 
     logQueryList && logQueryList.pagination && (logQueryList.pagination.showTotal = (total, range) => (formatMessage({
       id: 'oal.log-query.currentToTotal',
@@ -440,7 +441,7 @@ class logQuery extends Component {
                 >
                   <FormattedMessage id="oal.common.export" />
                 </Button>
-                <a ref={el => { this.ref_download = el }} href={`/guard-web/a/record/export?deviceId=${listSelectedBean && listSelectedBean._id || ''}&startDate=${date && date[0] || ''}&endDate=${date && date[1] || ''}&peopleType=${peopleType || ''}&faceName=${name || ''}`} />
+                <a ref={el => { this.ref_download = el }} href={`/guard-web/a/record/export?deviceId=${listSelectedBean && listSelectedBean._id || ''}&startDate=${date && date[0] || ''}&endDate=${date && date[1] || ''}&peopleType=${peopleType || ''}&faceName=${name || ''}&language=${language}`} />
               </div>
               <StandardTable
                 // eslint-disable-next-line no-underscore-dangle

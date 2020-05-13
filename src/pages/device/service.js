@@ -6,7 +6,7 @@ import { post, get } from '@/utils/ajax';
  * @returns {Promise<*>}
  */
 export async function getDeviceList(data) {
-    return post(`/guard-web/a/device/fetchList`, data);
+  return post(`/guard-web/a/device/fetchList`, data);
 }
 
 /**
@@ -32,19 +32,19 @@ export async function ajaxDeviceDelete(data) {
  *
  */
 export async function verifyDevice(data) {
-    return get(`/api/device/${data.deviceId}/verify/${data.result}`);
+  return get(`/api/device/${data.deviceId}/verify/${data.result}`);
 }
 
 /**
  * 删除设备
  */
 export async function removeDevice(data) {
-    return get(`/api/device/${data.deviceId}/remove`);
+  return get(`/api/device/${data.deviceId}/remove`);
 }
 
 /**
  * 设备重命名
  */
 export async function renameDevice(data) {
-    return get(`/api/device/${data.deviceId}/rename/${data.name}`);
+  return get(`/api/device/${data.deviceId}/rename/${data.name}`);
 }

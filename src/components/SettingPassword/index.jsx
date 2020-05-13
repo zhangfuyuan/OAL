@@ -64,6 +64,8 @@ const SettingPsw = props => {
   }
 
   const onSubmit = () => {
+    if (newpswError || renewpswError) return;
+
     if (!newpsw) {
       // message.error('请输入密码');
       setNewPswError(
@@ -121,6 +123,7 @@ const SettingPsw = props => {
           onChange={e => onChange('newpsw', e.target.value)}
           onBlur={e => onBlur('newpsw', e.target.value)}
           prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+          onPressEnter={onSubmit}
         />
         <span style={{ color: '#ff0000' }}>{newpswError}</span>
         <br />
@@ -133,6 +136,7 @@ const SettingPsw = props => {
           onChange={e => onChange('renewpsw', e.target.value)}
           onBlur={e => onBlur('renewpsw', e.target.value)}
           prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+          onPressEnter={onSubmit}
         />
         <span style={{ color: '#ff0000' }}>{renewpswError}</span>
         <br />

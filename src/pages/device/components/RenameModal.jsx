@@ -1,7 +1,7 @@
 import { Modal, Form, Input, Radio, Button, Switch, Tooltip, Icon, } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
-import { pswBase64Thrice, pswBase64ThriceRestore } from '@/utils/utils';
+// import { pswBase64Thrice, pswBase64ThriceRestore } from '@/utils/utils';
 
 const formItemLayout = {
   labelCol: {
@@ -13,6 +13,7 @@ const formItemLayout = {
     sm: { span: 16 },
   },
 };
+
 const RenameModal = props => {
   const { form, bean, visible, handleSubmit, confirmLoading, handleCancel } = props;
   const { getFieldDecorator, getFieldError } = form;
@@ -24,7 +25,7 @@ const RenameModal = props => {
   useEffect(() => {
     if (visible === true) {
       setShowAlarm((bean && !!bean.alarm) || false);
-      setShowWaitShutdownTime((bean && bean.relayOperationMode === '2') || false)
+      setShowWaitShutdownTime((bean && bean.relayOperationMode === '1') || false)
     }
   }, [visible]);
 
@@ -35,7 +36,6 @@ const RenameModal = props => {
       const { pwd, alarmValue, waitShutdownTime } = fieldsValue;
       const params = {
         ...fieldsValue,
-        pwd: pswBase64Thrice(pwd),
       };
 
       alarmValue && (params.alarmValue = alarmValue.replace(/((℃)|(℉))$/, ''));
@@ -207,7 +207,7 @@ const RenameModal = props => {
                 validator: checkSixNumber,
               },
             ],
-            initialValue: bean && bean.pwd && pswBase64ThriceRestore(bean.pwd) || '',
+            initialValue: bean && bean.pwd || '',
           })(<Input placeholder={formatMessage({ id: 'oal.device.devicePaswPlaceholder' })} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.device.temperatureUnit' })}>
@@ -243,7 +243,7 @@ const RenameModal = props => {
                     validator: checkAlarmValue,
                   },
                 ],
-                initialValue: bean && bean.alarmValue ? `${bean.alarmValue}${bean && bean.temperatureUnit === '1' ? '℉' : '℃'}` : '',
+                initialValue: bean && bean.alarmValue ? `${bean.alarmValue}${form.getFieldValue('temperatureUnit') === '1' ? '℉' : '℃'}` : '',
               })(<Input placeholder="34.0-120.0（℃/℉）" onFocus={handleAlarmValueFocus} onBlur={handleAlarmValueBlur} />)}
             </Form.Item>) : ''
         }

@@ -28,7 +28,12 @@ const SettingPsw = (props) => {
           showIcon
         />
         <br />
-        <Input ref={(ref) =>self.saasName = ref } size="large" placeholder={formatMessage({ id: 'oal.common.enterSaasName' })} />
+        <Input
+          ref={(ref) => self.saasName = ref}
+          size="large"
+          placeholder={formatMessage({ id: 'oal.common.enterSaasName' })}
+          onPressEnter={onSubmit}
+        />
         <br />
         <br />
         <Button onClick={onSubmit} type="primary" htmlType="submit" className="login-form-button" loading={props.loading} block>

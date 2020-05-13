@@ -20,7 +20,7 @@ const footerRender = (_, defaultDom) => {
 };
 
 const BasicLayout = props => {
-  const { dispatch, children, settings, user, modifyPwdLoading, menuList } = props;
+  const { dispatch, children, settings, user, modifyPwdLoading, menuList, menuRedirect } = props;
 
   const fetchCurrent = () => {
     dispatch({
@@ -102,7 +102,7 @@ const BasicLayout = props => {
     <ProLayout
       logo={logo}
       menuHeaderRender={(logo, title) => (
-        <Link to="/">
+        <Link to={menuRedirect}>
           {logo}
           {title}
         </Link>
@@ -145,4 +145,5 @@ export default connect(({ global, settings, user }) => ({
   user: user.currentUser,
   modifyPwdLoading: user.modifyPwdLoading,
   menuList: user.menuList,
+  menuRedirect: user.menuRedirect,
 }))(BasicLayout);

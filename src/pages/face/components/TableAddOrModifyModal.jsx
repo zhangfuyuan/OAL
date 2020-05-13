@@ -141,7 +141,7 @@ const TableAddOrModifyModal = props => {
           const len = userPhotos && userPhotos.length || 0;
 
           if (window.WebUploader && len > 0) {
-            wuInit([userPhotos[len - 1].originFileObj]);
+            wuInit([userPhotos[len - 1].originFileObj], name, staffid);
           } else if (isEdit) {
             // 编辑，可不修改图片直接结束
             handleSubmit(isEdit);
@@ -171,7 +171,7 @@ const TableAddOrModifyModal = props => {
   /********************************************** WebUploader API Start **********************************************/
 
   // 初始化 WebUploader 实例对象
-  const wuInit = newFileList => {
+  const wuInit = (newFileList, staffname, staffid) => {
     if (uploader) wuDestroy();
 
     uploader = window.WebUploader.create({
@@ -187,9 +187,11 @@ const TableAddOrModifyModal = props => {
       let wuFile = new window.WebUploader.Lib.File(window.WebUploader.guid('rt_'), item);
       let newfile = new window.WebUploader.File(wuFile);
 
-      isEdit && (newfile.faceId = bean._id);
-      newfile.groupId = groupId;
       newfile.isEdit = isEdit;
+      isEdit && (newfile.faceId = bean._id);
+      newfile.staffname = staffname;
+      newfile.staffid = staffid;
+      newfile.groupId = groupId;
       uploader.addFiles(newfile);
       wuFile = null;
       newfile = null;
@@ -206,12 +208,14 @@ const TableAddOrModifyModal = props => {
 
     uploader.on('uploadBeforeSend', (block, data) => {
       if (!visible) return;
-      const { file: { md5, groupId, isEdit, _id } } = block;
+      const { file: { md5, groupId, isEdit, _id, staffname, staffid } } = block;
 
       data.md5 = md5;
-      data.groupId = groupId;
       data.isEdit = isEdit;
       isEdit && (data.faceId = _id);
+      data.staffname = staffname;
+      data.staffid = staffid;
+      data.groupId = groupId;
       data.peopleType = '0';
     });
 
