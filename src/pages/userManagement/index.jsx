@@ -56,9 +56,14 @@ class UserManagement extends Component {
 
   columns = [
     {
-      title: formatMessage({ id: 'oal.common.account' }),
+      title: formatMessage({ id: 'oal.user-manage.accountName' }),
       dataIndex: 'userName',
       key: 'userName',
+      render: (text, record) => (
+        <span>
+          {record && record.userName || '-'}
+        </span>
+      ),
     },
     {
       title: formatMessage({ id: 'oal.common.nickname' }),
@@ -66,7 +71,7 @@ class UserManagement extends Component {
       dataIndex: 'nickname',
       render: (text, record) => (
         <span>
-          {record && record.profile && record.profile.nickName ? record.profile.nickName : '-'}
+          {record && record.profile && record.profile.nickName || '-'}
         </span>
       ),
     },
@@ -76,7 +81,7 @@ class UserManagement extends Component {
       dataIndex: 'phoneNumber',
       render: (text, record) => (
         <span>
-          {record && record.profile && record.profile.mobile ? record.profile.mobile : ''}
+          {record && record.profile && record.profile.mobile || '-'}
         </span>
       ),
     },
@@ -86,7 +91,7 @@ class UserManagement extends Component {
       dataIndex: 'email',
       render: (text, record) => (
         <span>
-          {record && record.profile && record.profile.email ? record.profile.email : ''}
+          {record && record.profile && record.profile.email || '-'}
         </span>
       ),
     },
@@ -114,8 +119,8 @@ class UserManagement extends Component {
           <Divider type="vertical" />
           {
             record.state === 1 ?
-              <a onClick={() => this.openDelModal(record)} disabled={this.props.currentUser.userName === record.userName}><FormattedMessage id="oal.common.disable" /></a> :
-              <a onClick={() => this.handleState(1, record._id)} disabled={this.props.currentUser.userName === record.userName}><FormattedMessage id="oal.common.enable" /></a>
+              <a onClick={() => this.openDelModal(record)} disabled={this.props.currentUser._id === record._id}><FormattedMessage id="oal.common.disable" /></a> :
+              <a onClick={() => this.handleState(1, record._id)}><FormattedMessage id="oal.common.enable" /></a>
           }
           {/* <Popconfirm title={formatMessage({ id: 'oal.user-manage.confirmDeleteUser' })} okText={formatMessage({ id: 'oal.common.confirm' })} cancelText={formatMessage({ id: 'oal.common.cancel' })} onConfirm={() => this.deleteUser(record)}>
                 <a href="#" disabled={!record.type}><FormattedMessage id="oal.common.delete" /></a>
@@ -305,7 +310,12 @@ class UserManagement extends Component {
             xl: 48,
           }}
         >
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
+          <Col xxl={6} xl={7} lg={8} md={8} sm={24}>
+            <FormItem label={formatMessage({ id: 'oal.user-manage.accountName' })}>
+              {getFieldDecorator('userName')(<Input placeholder={formatMessage({ id: 'oal.user-manage.enterAccountNameTips' })} />)}
+            </FormItem>
+          </Col>
+          {/* <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.nickname' })}>
               {getFieldDecorator('nickname')(<Input placeholder={formatMessage({ id: 'oal.user-manage.enterNickname' })} />)}
             </FormItem>
@@ -314,7 +324,7 @@ class UserManagement extends Component {
             <FormItem label={formatMessage({ id: 'oal.org.orgPath' })}>
               {getFieldDecorator('orgPath')(<Input placeholder={formatMessage({ id: 'oal.org.enterPath' })} />)}
             </FormItem>
-          </Col>
+          </Col> */}
           <Col xxl={4} lg={4} md={4} sm={24}>
             <span className={styles.submitButtons}>
               <Button onClick={this.handleSearch} type="primary" htmlType="submit" loading={userListLoading}>

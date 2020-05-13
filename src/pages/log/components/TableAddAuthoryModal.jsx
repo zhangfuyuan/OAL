@@ -46,6 +46,7 @@ const TableAddAuthoryModal = props => {
           const _data = res.data;
           myTreeOriginalData.push(..._data);
           setTreeData(toTree(_data) || []);
+          setCheckedKeys(checkedKeys.concat(_data.filter(node => node.isPeople && node.isRelateDevice).map(node => node._id)));
         } else {
           console.log(res);
         }

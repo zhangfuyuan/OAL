@@ -42,6 +42,7 @@ const errorCode = {
 };
 
 const errorMsg = {
+  3002: 'oal.user-login.loginFailed',
   3004: 'oal.user-login.loginFailed',
   3007: 'oal.user-login.loginFailed',
   6007: 'oal.face.staffidRepeat',

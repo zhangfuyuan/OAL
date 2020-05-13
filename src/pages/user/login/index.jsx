@@ -7,7 +7,7 @@ import Link from 'umi/link';
 import { connect } from 'dva';
 import LoginComponents from './components/Login';
 import styles from './style.less';
-import { pswBase64Thrice, pswBase64ThriceRestore } from '@/utils/utils';
+import { pswBase64Thrice } from '@/utils/utils';
 import router from 'umi/router';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;
@@ -35,7 +35,7 @@ class Login extends Component {
       type: 'login/getLoginStateInServer',
     }).then(res => {
       if (res && res.res > 0 && res.data && res.data.isLogin) {
-        console.log(org, '后台已登录');
+        console.log(res.data.path, '后台已登录');
         dispatch({
           type: 'login/login',
           payload: {},
@@ -83,15 +83,19 @@ class Login extends Component {
           errorHandler: (err) => {
             console.log(err);
 
-            if (err &&
+            if (
+              err &&
               err.toString &&
               err.toString() === 'TypeError: Failed to fetch' &&
-              document.cookie.indexOf('loginTryAgain=1') > -1) {
+              document.cookie.indexOf('loginTryAgain=1') > -1
+            ) {
               // 重定向处理
               console.log('自动登录两次╮(╯▽╰)╭');
-              this.handleSubmit(null, {
-                ...params,
-                pwd,
+              dispatch({
+                type: 'login/login',
+                payload: {
+                  ...params,
+                },
               });
             } else {
               notification.error({
@@ -104,9 +108,11 @@ class Login extends Component {
       }).then(res => {
         if (res && res.res === 0) {
           console.log('自动登录两次╮(╯▽╰)╭');
-          this.handleSubmit(null, {
-            ...params,
-            pwd,
+          dispatch({
+            type: 'login/login',
+            payload: {
+              ...params,
+            },
           });
         }
       }).catch(err => {

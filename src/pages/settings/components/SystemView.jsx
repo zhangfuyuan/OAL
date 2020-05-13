@@ -131,7 +131,7 @@ class SystemView extends Component {
 
     this.uploader = window.WebUploader.create({
       swf: (process.env === 'production' ? publicPath : '/') + 'lib/webuploader/Uploader.swf', // 请根据实际项目部署路径配置swf文件路径
-      server: '/guard-web/a/fileResource/upload',
+      server: '/guard-web/a/fileResource/upload', // 修改系统图标
       thumb: false, // 不生成缩略图
       compress: false, // 如果此选项为false, 则图片在上传前不进行压缩
       prepareNextFile: true, // 是否允许在文件传输时提前把下一个文件准备好

@@ -24,6 +24,7 @@ import styles from './style.less';
 import defaultSettings from '../../../config/defaultSettings';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import { getPageQuery } from '@/utils/utils';
+import { SYSTEM_PATH } from '@/utils/constants';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -118,12 +119,12 @@ class OrgList extends Component {
         key: 'contactName',
         render: (text, record) => <span>{(record && record.contact && record.contact.nickName) || '-'}</span>,
       },
-      {
-        title: formatMessage({ id: 'oal.org.creator' }),
-        dataIndex: 'creator',
-        key: 'creator',
-        render: (text, record) => <span>{text || '-'}</span>,
-      },
+      // {
+      //   title: formatMessage({ id: 'oal.org.creator' }),
+      //   dataIndex: 'creator',
+      //   key: 'creator',
+      //   render: (text, record) => <span>{text || '-'}</span>,
+      // },
       {
         title: formatMessage({ id: 'oal.common.handle' }),
         width: 250,
@@ -178,9 +179,15 @@ class OrgList extends Component {
   };
 
   openWin = path => {
-    const { origin } = window.location;
-    const href = `${origin}${publicPath}user/${path}/login`;
-    window.open(href);
+    // 由于后台框架限制，同时只能一个账号处于登录状态，所以需先登出
+    localStorage.setItem(SYSTEM_PATH, path);
+    this.props.dispatch({
+      type: 'login/logout',
+      payload: {},
+    });
+    // const { origin } = window.location;
+    // const href = `${origin}${publicPath}user/${path}/login`;
+    // window.open(href);
   };
 
   handleSearch = () => {
@@ -326,13 +333,13 @@ class OrgList extends Component {
               {getFieldDecorator('path')(<Input placeholder={formatMessage({ id: 'oal.org.enterPath' })} />)}
             </FormItem>
           </Col>
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
+          {/* <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.org.creator' })}>
               {getFieldDecorator('creator', {
                 initialValue: formValues && formValues.creator || '',
               })(<Input placeholder={formatMessage({ id: 'oal.org.enterCreator' })} />)}
             </FormItem>
-          </Col>
+          </Col> */}
           <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.status' })}>
               {getFieldDecorator('state', {
@@ -351,7 +358,7 @@ class OrgList extends Component {
               )}
             </FormItem>
           </Col>
-          <Col xxl={4} lg={4} md={4} sm={24}>
+          <Col xxl={5} lg={6} md={6} sm={24}>
             <span className={styles.submitButtons}>
               <Button onClick={this.handleSearch} type="primary" htmlType="submit" loading={orgListLoading}>
                 <FormattedMessage id="oal.face.search" />

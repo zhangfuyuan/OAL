@@ -326,7 +326,7 @@ export default {
   'oal.org.loginAccount': `登錄賬號`,
   'oal.org.initialPassword': `初始密碼`,
   'oal.org.resetSuccessfully': `重置成功`,
-  'oal.org.resetPasswordConfirm': `{org}組織的admin賬號恢復密碼123465，是否重置？`,
+  'oal.org.resetPasswordConfirm': `{org}組織的admin賬號的密碼恢復爲123465，是否重置？`,
   'oal.user-manage.enterNickname': `請輸入暱稱`,
   'oal.common.account': `賬號`,
   'oal.user-manage.orgNum': `組織數`,

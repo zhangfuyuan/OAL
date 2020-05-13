@@ -88,27 +88,27 @@ const GlobalModel = {
         },
       });
 
-      // if (process.env.NODE_ENV === 'production' && res && data) {
-      const { ip } = data || {};
+      if (process.env.NODE_ENV === 'production' && res && data) {
+        const { ip } = data || {};
 
-      if (ip) {
-        yield put({
-          type: 'saveOrigin',
-          payload: {
-            origin: ip,
-          },
-        });
+        if (ip) {
+          yield put({
+            type: 'saveOrigin',
+            payload: {
+              origin: ip,
+            },
+          });
 
-        try {
-          const { origin: curOrigin, href: curHref } = new URL(window.location.href);
-          if (!~curHref.indexOf(ip)) window.location.href = curHref.replace(curOrigin, /\/\/./.test(ip) ? ip : `//${ip}`);
-        } catch (err) {
-          console.log(err);
+          try {
+            const { origin: curOrigin, href: curHref } = new URL(window.location.href);
+            if (!~curHref.indexOf(ip)) window.location.href = curHref.replace(curOrigin, /\/\/./.test(ip) ? ip : `//${ip}`);
+          } catch (err) {
+            console.log(err);
+          }
+        } else {
+          yield put(routerRedux.replace('/user/initOrigin'));
         }
-      } else {
-        yield put(routerRedux.replace('/user/initOrigin'));
       }
-      // }
     },
 
     // 初始化部署时，提交访问IP/域名
