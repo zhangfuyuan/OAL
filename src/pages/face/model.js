@@ -14,6 +14,7 @@ import {
   ajaxGetBatchAddTaskProgress,
   ajaxCancelBatchAddTask,
   ajaxMoveFace,
+  ajaxRefreshGroupNum,
 } from './service';
 import { getSysConfig } from '@/services/sys';
 
@@ -77,6 +78,12 @@ const Model = {
     // 删除分组节点
     *delGroupNode({ payload }, { call, put, select }) {
       const response = yield call(ajaxDelGroupNode, payload);
+
+      return Promise.resolve(response);
+    },
+    // 刷新分组数量
+    *refreshGroupNum({ payload }, { call, put, select }) {
+      const response = yield call(ajaxRefreshGroupNum, payload);
 
       return Promise.resolve(response);
     },

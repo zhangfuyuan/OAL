@@ -128,11 +128,17 @@ const TableAddOrModifyModal = props => {
       }).then(res => {
         if (!visible) return;
 
-        if (res && res.res > 0) {
+        if (res && res.res > 0 && res.data) {
           const len = userPhotos && userPhotos.length || 0;
 
           if (window.WebUploader && len > 0) {
-            wuInit([userPhotos[len - 1].originFileObj]);
+            const _originFileObj = userPhotos[len - 1].originFileObj;
+            const { _id, name: _name, staffid: _staffid } = res.data;
+
+            _originFileObj.faceId = _id;
+            _originFileObj._name = _name;
+            _originFileObj._staffid = _staffid;
+            wuInit([_originFileObj]);
           } else if (isEdit) {
             // 编辑，可不修改图片直接结束
             handleSubmit(isEdit);
@@ -175,7 +181,7 @@ const TableAddOrModifyModal = props => {
 
     uploader = window.WebUploader.create({
       swf: (process.env === 'production' ? publicPath : '/') + 'lib/webuploader/Uploader.swf', // 请根据实际项目部署路径配置swf文件路径
-      server: '/guard-web/a/face/visitor/addOrEditFace',
+      server: '/guard-web/a/face/uploadFace', // 上传人员的头像
       thumb: false, // 不生成缩略图
       compress: false, // 如果此选项为false, 则图片在上传前不进行压缩
       prepareNextFile: true, // 是否允许在文件传输时提前把下一个文件准备好
@@ -186,8 +192,10 @@ const TableAddOrModifyModal = props => {
       let wuFile = new window.WebUploader.Lib.File(window.WebUploader.guid('rt_'), item);
       let newfile = new window.WebUploader.File(wuFile);
 
-      isEdit && (newfile.faceId = bean._id);
       newfile.isEdit = isEdit;
+      newfile.faceId = item.faceId;
+      newfile.staffname = item._name;
+      newfile.staffid = item._staffid;
       uploader.addFiles(newfile);
       wuFile = null;
       newfile = null;
@@ -204,11 +212,14 @@ const TableAddOrModifyModal = props => {
 
     uploader.on('uploadBeforeSend', (block, data) => {
       if (!visible) return;
-      const { file: { md5, isEdit, faceId } } = block;
+      const { file: { md5, isEdit, faceId, staffname, staffid } } = block;
 
       data.md5 = md5;
       data.isEdit = isEdit;
-      isEdit && (data.faceId = faceId);
+      data.faceId = faceId
+      data.staffname = staffname;
+      data.staffid = staffid;
+      data.peopleType = '2';
     });
 
     uploader.on('uploadProgress', (file, percentage) => {
@@ -374,7 +385,7 @@ const TableAddOrModifyModal = props => {
               accept="image/*"
               listType="picture"
               showUploadList={false}
-              action="/guard-web/a/face/visitor/addOrEditFace"
+              action="/guard-web/a/face/uploadFace"
               withCredentials
               beforeUpload={beforeUpload}
             >

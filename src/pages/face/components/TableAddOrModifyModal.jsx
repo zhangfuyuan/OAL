@@ -137,11 +137,17 @@ const TableAddOrModifyModal = props => {
       }).then(res => {
         if (!visible) return;
 
-        if (res && res.res > 0) {
+        if (res && res.res > 0 && res.data) {
           const len = userPhotos && userPhotos.length || 0;
 
           if (window.WebUploader && len > 0) {
-            wuInit([userPhotos[len - 1].originFileObj], name, staffid);
+            const _originFileObj = userPhotos[len - 1].originFileObj;
+            const { _id, name: _name, staffid: _staffid } = res.data;
+
+            _originFileObj.faceId = _id;
+            _originFileObj._name = _name;
+            _originFileObj._staffid = _staffid;
+            wuInit([_originFileObj]);
           } else if (isEdit) {
             // 编辑，可不修改图片直接结束
             handleSubmit(isEdit);
@@ -150,13 +156,6 @@ const TableAddOrModifyModal = props => {
             console.log(userPhotos);
             setUploadLoading(false);
           }
-        } else if (res && res.errcode === 6007) {
-          // 异常情况1：工号重复
-          notification.error({
-            message: formatMessage({ id: 'oal.face.staffidRepeat' }),
-            description: formatMessage({ id: 'oal.face.staffidRepeatTips' }),
-          });
-          setUploadLoading(false);
         } else {
           console.log(res);
           setUploadLoading(false);
@@ -171,7 +170,7 @@ const TableAddOrModifyModal = props => {
   /********************************************** WebUploader API Start **********************************************/
 
   // 初始化 WebUploader 实例对象
-  const wuInit = (newFileList, staffname, staffid) => {
+  const wuInit = (newFileList) => {
     if (uploader) wuDestroy();
 
     uploader = window.WebUploader.create({
@@ -188,9 +187,9 @@ const TableAddOrModifyModal = props => {
       let newfile = new window.WebUploader.File(wuFile);
 
       newfile.isEdit = isEdit;
-      isEdit && (newfile.faceId = bean._id);
-      newfile.staffname = staffname;
-      newfile.staffid = staffid;
+      newfile.faceId = item.faceId;
+      newfile.staffname = item._name;
+      newfile.staffid = item._staffid;
       newfile.groupId = groupId;
       uploader.addFiles(newfile);
       wuFile = null;
@@ -208,11 +207,11 @@ const TableAddOrModifyModal = props => {
 
     uploader.on('uploadBeforeSend', (block, data) => {
       if (!visible) return;
-      const { file: { md5, groupId, isEdit, _id, staffname, staffid } } = block;
+      const { file: { md5, groupId, isEdit, faceId, staffname, staffid } } = block;
 
       data.md5 = md5;
       data.isEdit = isEdit;
-      isEdit && (data.faceId = _id);
+      data.faceId = faceId;
       data.staffname = staffname;
       data.staffid = staffid;
       data.groupId = groupId;

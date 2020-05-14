@@ -184,6 +184,9 @@ class Device extends Component {
         message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
         this.loadData();
         this.closeDelModal();
+        this.setState({
+          selectedRows: [],
+        });
       } else {
         message.success(formatMessage({ id: 'oal.ajax.5004' }));
       }

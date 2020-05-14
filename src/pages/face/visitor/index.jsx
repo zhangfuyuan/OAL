@@ -304,6 +304,9 @@ class Visitor extends Component {
         message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
         this.table_closeTableDelModal();
         this.table_loadData();
+        this.setState({
+          tableSelectedRows: [],
+        });
         callback && callback();
       } else {
         console.log(res);

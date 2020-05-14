@@ -217,22 +217,25 @@ const TableAddAuthoryModal = props => {
 
   const renderNodes = data =>
     data.map(item => {
-      if (item.children && item.children.length > 0) {
-        const _rootId = treeData[0] && treeData[0]._id || '0';
+      const _isRoot = item._id === (treeData[0] && treeData[0]._id || '0');
+      const _isVisitor = item.type === '2';
 
+      if (item.children && item.children.length > 0) {
         return (
           <TreeNode
             key={item._id}
-            title={item._id === _rootId ? `${item.name} (${item.num || 0})` : item.name}
+            title={_isRoot ? `${item.name} (${item.num || 0})` : (_isVisitor ? formatMessage({ id: 'oal.common.visitor' }) : (item.name || '-'))}
+            {...item}
             dataRef={item}
           >
             {renderNodes(item.children)}
           </TreeNode>
         );
       }
+
       return <TreeNode
         key={item._id}
-        title={item.name || '-'}
+        title={_isRoot ? `${item.name} (${item.num || 0})` : (_isVisitor ? formatMessage({ id: 'oal.common.visitor' }) : (item.name || '-'))}
         disableCheckbox={item.isPeople && item.isRelateDevice || false}
         {...item}
         dataRef={item} />;

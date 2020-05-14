@@ -38,6 +38,15 @@ export async function ajaxDelGroupNode(data) {
 }
 
 /**
+ * （人员-认证-分组5）刷新分组数量
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxRefreshGroupNum(data) {
+  return post('/guard-web/a/group/updateFaceNum', data);
+}
+
+/**
  * （人员-认证-列表1）获取/搜索认证人员列表
  * @param data
  * @returns {Promise<*>}

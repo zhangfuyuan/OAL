@@ -32,7 +32,6 @@ const { TreeNode } = Tree;
   user: user.currentUser,
   tableLoading: loading.effects['face/fetch'],
   modifyLoading: loading.effects['face/modify'],
-  faceKeyList: faceKey.faceKeyList,
   sysConfigs: face.sysConfigs,
   treeLoading: loading.effects['face/fetchGroupTree'],
   addGroupNodeLoading: loading.effects['face/addGroupNode'],
@@ -75,9 +74,10 @@ class Face extends Component {
   };
 
   ref_leftDom = null;
+  tree_originalData = [];
 
   componentDidMount() {
-    this.tree_loadData(true);
+    this.tree_loadData();
     // this.errorList = [];
     // this.excludeNum = 0;
   }
@@ -88,7 +88,7 @@ class Face extends Component {
 
   /************************************************* Tree Start *************************************************/
 
-  tree_loadData = (isRefreshTable) => {
+  tree_loadData = () => {
     const { dispatch } = this.props;
     const { selectedKeys } = this.state;
 
@@ -99,12 +99,14 @@ class Face extends Component {
       payload: {},
     }).then(res => {
       if (res && res.res > 0 && res.data) {
+        this.tree_originalData = res.data;
         const treeData = toTree(res.data) || [];
+
         this.setState({
           treeData,
           selectedKeys: [(selectedKeys[0] || (treeData[0] && treeData[0]._id) || '0')],
         }, () => {
-          isRefreshTable && this.table_loadFaceList();
+          this.table_loadFaceList();
         });
       }
     }).catch(err => {
@@ -229,6 +231,141 @@ class Face extends Component {
   //   });
   // };
 
+  tree_refreshGroupNum = groupId => {
+    this.props.dispatch({
+      type: 'face/refreshGroupNum',
+      payload: {
+        groupId,
+      },
+    }).then(res => {
+      if (res && res.res > 0) {
+        this.tree_loadData();
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
+  };
+
+  // 树节点增 TreeAddModal
+  tree_showTreeAddModal = (e) => {
+    if (this.state.nodeTreeItem && this.state.nodeTreeItem.level < 5) {
+      this.setState({
+        treeAddVisible: true,
+      });
+    } else {
+      message.error(formatMessage({ id: 'oal.face.groupLevelLimit' }));
+    }
+  };
+
+  tree_closeTreeAddModal = () => {
+    this.setState({
+      treeAddVisible: false,
+    });
+  };
+
+  tree_submitTreeAddModal = (params, callback) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'face/addGroupNode',
+      payload: params,
+    }).then(res => {
+      if (res && res.res > 0 && res.data) {
+        message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
+        this.setState({
+          selectedKeys: [res.data.id],
+        }, () => {
+          this.tree_loadData();
+        });
+        this.tree_closeTreeAddModal();
+        callback && callback();
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
+  };
+
+  // 树节点改 TreeModifyModal
+  tree_showTreeModifyModal = (e) => {
+    if (this.state.nodeTreeItem) {
+      this.setState({
+        treeModifyVisible: true,
+      });
+    }
+  };
+
+  tree_closeTreeModifyModal = () => {
+    this.setState({
+      treeModifyVisible: false,
+    });
+  };
+
+  tree_submitTreeModifyModal = (params, callback) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'face/modifyGroupNode',
+      payload: params,
+    }).then(res => {
+      if (res && res.res > 0 && res.data) {
+        message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+        this.setState({
+          selectedKeys: [res.data.id],
+        }, () => {
+          this.tree_loadData();
+        });
+        this.tree_closeTreeModifyModal();
+        callback && callback();
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
+  };
+
+  // 树节点删
+  tree_showTreeDelModal = (e) => {
+    if (this.state.nodeTreeItem) {
+      this.setState({
+        treeDelVisible: true,
+      });
+    }
+  };
+
+  tree_closeTreeDelModal = () => {
+    this.setState({
+      treeDelVisible: false,
+    });
+  };
+
+  tree_submitTreeDelModal = (params, callback) => {
+    const { dispatch } = this.props;
+    const { groupPid } = params;
+
+    dispatch({
+      type: 'face/delGroupNode',
+      payload: params,
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+        this.setState({
+          selectedKeys: [groupPid],
+        }, () => {
+          this.tree_refreshGroupNum(groupPid);
+        });
+        this.tree_closeTreeDelModal();
+        callback && callback();
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
+  };
+
   /************************************************* Tree End *************************************************/
 
   /************************************************ Table Start ************************************************/
@@ -252,7 +389,7 @@ class Face extends Component {
   };
 
   table_columns = () => {
-    const { user, faceKeyList } = this.props;
+    const { user } = this.props;
     const _t = Date.now();
 
     const cl = [
@@ -350,128 +487,6 @@ class Face extends Component {
     });
   };
 
-  /************************************************* Table End *************************************************/
-
-  /************************************************ Modal Start ************************************************/
-
-  // 树节点增 TreeAddModal
-  tree_showTreeAddModal = (e) => {
-    if (this.state.nodeTreeItem && this.state.nodeTreeItem.level < 5) {
-      this.setState({
-        treeAddVisible: true,
-      });
-    } else {
-      message.error(formatMessage({ id: 'oal.face.groupLevelLimit' }));
-    }
-  };
-
-  tree_closeTreeAddModal = () => {
-    this.setState({
-      treeAddVisible: false,
-    });
-  };
-
-  tree_submitTreeAddModal = (params, callback) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'face/addGroupNode',
-      payload: params,
-    }).then(res => {
-      if (res && res.res > 0 && res.data) {
-        message.success(formatMessage({ id: 'oal.common.newSuccessfully' }));
-        this.setState({
-          selectedKeys: [res.data.id],
-        }, () => {
-          this.tree_loadData(true);
-        });
-        this.tree_closeTreeAddModal();
-        callback && callback();
-      } else {
-        console.log(res);
-      }
-    }).catch(err => {
-      console.log(err);
-    });
-  };
-
-  // 树节点改 TreeModifyModal
-  tree_showTreeModifyModal = (e) => {
-    if (this.state.nodeTreeItem) {
-      this.setState({
-        treeModifyVisible: true,
-      });
-    }
-  };
-
-  tree_closeTreeModifyModal = () => {
-    this.setState({
-      treeModifyVisible: false,
-    });
-  };
-
-  tree_submitTreeModifyModal = (params, callback) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'face/modifyGroupNode',
-      payload: params,
-    }).then(res => {
-      if (res && res.res > 0 && res.data) {
-        message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
-        this.setState({
-          selectedKeys: [res.data.id],
-        }, () => {
-          this.tree_loadData(true);
-        });
-        this.tree_closeTreeModifyModal();
-        callback && callback();
-      } else {
-        console.log(res);
-      }
-    }).catch(err => {
-      console.log(err);
-    });
-  };
-
-  // 树节点删
-  tree_showTreeDelModal = (e) => {
-    if (this.state.nodeTreeItem) {
-      this.setState({
-        treeDelVisible: true,
-      });
-    }
-  };
-
-  tree_closeTreeDelModal = () => {
-    this.setState({
-      treeDelVisible: false,
-    });
-  };
-
-  tree_submitTreeDelModal = (params, callback) => {
-    const { dispatch } = this.props;
-    const { groupPid } = params;
-
-    dispatch({
-      type: 'face/delGroupNode',
-      payload: params,
-    }).then(res => {
-      if (res && res.res > 0) {
-        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
-        this.setState({
-          selectedKeys: [groupPid],
-        }, () => {
-          this.tree_loadData(true);
-        });
-        this.tree_closeTreeDelModal();
-        callback && callback();
-      } else {
-        console.log(res);
-      }
-    }).catch(err => {
-      console.log(err);
-    });
-  };
-
   // 添加/编辑（单个人脸信息）TableAddOrModifyModal
   table_showTableAddOrModifyModal = bean => {
     const _state = {
@@ -493,7 +508,7 @@ class Face extends Component {
   table_submitTableAddOrModifyModal = isEdit => {
     message.success(formatMessage({ id: (isEdit ? 'oal.common.saveSuccessfully' : 'oal.face.addSuccessfully') }));
     this.table_closeTableAddOrModifyModal();
-    this.tree_loadData(true);
+    this.tree_refreshGroupNum(this.state.selectedKeys[0] || '');
   };
 
   // 批量添加（上传人脸信息）TableBatchAddModal
@@ -512,7 +527,7 @@ class Face extends Component {
   table_submitTableBatchAddModal = successNum => {
     message.success(formatMessage({ id: 'oal.face.addedNumPeopleSuccessfully' }, { num: successNum }));
     this.table_closeTableBatchAddModal();
-    this.tree_loadData(true);
+    this.tree_refreshGroupNum(this.tree_originalData.map(item => item._id).join(','));
   };
 
   // 单个/批量移动（人脸分组）
@@ -533,11 +548,14 @@ class Face extends Component {
   table_submitTableMoveModal = (param, callback) => {
     const { dispatch } = this.props;
     const { tableSelectedBean, tableSelectedRows, selectedKeys } = this.state;
+    const oldGroupId = selectedKeys[0];
+    const groupId = param;
+
     dispatch({
       type: 'face/moveFace',
       payload: {
-        oldGroupId: selectedKeys[0],
-        groupId: param,
+        oldGroupId,
+        groupId,
         faceId: tableSelectedBean && tableSelectedBean._id || tableSelectedRows.map(item => item._id).join(','),
         peopleType: '0',
       },
@@ -545,7 +563,10 @@ class Face extends Component {
       if (res && res.res > 0) {
         message.success(formatMessage({ id: 'oal.common.moveSuccessfully' }));
         this.table_closeTableMoveModal();
-        this.tree_loadData(true);
+        this.setState({
+          tableSelectedRows: [],
+        });
+        this.tree_refreshGroupNum([oldGroupId, groupId].join(','));
         callback && callback();
       } else {
         console.log(res);
@@ -606,7 +627,7 @@ class Face extends Component {
     this.setState({ viewVisible: false, tableSelectedBean: {} })
   };
 
-  /************************************************* Modal End *************************************************/
+  /************************************************* Table End *************************************************/
 
   render() {
     const {
@@ -615,7 +636,6 @@ class Face extends Component {
       tableLoading,
       user,
       modifyLoading,
-      faceKeyList,
       dispatch,
       addGroupNodeLoading,
       modifyGroupNodeLoading,
