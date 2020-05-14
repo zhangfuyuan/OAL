@@ -67,11 +67,12 @@ class WorkAttendanceRuleEdit extends Component {
       },
     }).then(res => {
       if (res && res.res > 0) {
-        const { name, workAttendanceTimes } = res.data;
+        const { _id, ruleName, workAttendanceTimes } = res.data;
 
         this.setState({
           formValues: {
-            ruleName: name || '-',
+            ruleId: _id,
+            ruleName: ruleName || '-',
             workAttendanceTimes: workAttendanceTimes || [
               {
                 "workStartTime": "00:00",

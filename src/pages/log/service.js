@@ -55,6 +55,15 @@ export async function ajaxPeopleByGroupId(data) {
 }
 
 /**
+ * （通行-授权6）查询人员及分组树根节点总数
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxPeopleTotal(data) {
+  return post('/guard-web/a/face/countFacesNumByCompanyId', data);
+}
+
+/**
  * demo1
  * @param data
  * @returns {Promise<*>}

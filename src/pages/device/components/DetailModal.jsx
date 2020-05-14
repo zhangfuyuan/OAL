@@ -4,8 +4,8 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import moment from 'moment';
 
 const recognitionModeType = {
-  '0': 'oal.device.standardMode',
-  '1': 'oal.device.attendanceMode',
+  '0': 'oal.device.attendanceMode',
+  '1': 'oal.device.standardMode',
   '2': 'oal.device.maskMode',
 };
 

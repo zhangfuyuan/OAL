@@ -6,6 +6,7 @@ import {
   ajaxAddAuthory,
   ajaxDelAuthory,
   ajaxPeopleByGroupId,
+  ajaxPeopleTotal,
 } from './service';
 
 const Model = {
@@ -50,6 +51,12 @@ const Model = {
     // 根据分组ID获取所有人员/访客信息
     *fetchPeopleByGroupId({ payload }, { call, put, select }) {
       const response = yield call(ajaxPeopleByGroupId, payload);
+
+      return Promise.resolve(response);
+    },
+    // 查询人员及分组树根节点总数
+    *fetchPeopleTotal({ payload }, { call, put, select }) {
+      const response = yield call(ajaxPeopleTotal, payload);
 
       return Promise.resolve(response);
     },

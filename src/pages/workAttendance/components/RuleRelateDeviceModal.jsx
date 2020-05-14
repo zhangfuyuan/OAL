@@ -16,10 +16,16 @@ const RuleRelateDeviceModal = props => {
   useEffect(() => {
     // 每次 visible 发生变化，刷新已选设备属性 selectedItems 的值
     if (visible === true) {
+      // setCheckboxChecked(
+      //   deviceList &&
+      //   deviceList.length > 0 &&
+      //   deviceList.filter(device => device.relateRuleId && device.relateRuleId.indexOf(selectedBean._id) > -1 || false).map(device => device._id) ||
+      //   []
+      // )
       setCheckboxChecked(
         deviceList &&
-        deviceList.length > 0 &&
-        deviceList.filter(device => device.relateRuleId && device.relateRuleId.indexOf(selectedBean._id) > -1 || false).map(device => device._id) ||
+        selectedBean.deviceId &&
+        deviceList.filter(device => selectedBean.deviceId.indexOf(device._id) > -1).map(device => device._id) ||
         []
       )
     } else {

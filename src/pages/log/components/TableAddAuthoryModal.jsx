@@ -18,9 +18,10 @@ const getPidFn = (pid, list, res = []) => {
 
 // let myTreeOriginalData = [];
 let mySelectedPeopleIds = [];
+let myTreeRootId = '';
 
 const TableAddAuthoryModal = props => {
-  const { visible, handleSubmit, handleCancel, curDeviceId, dispatch, confirmLoading } = props;
+  const { visible, handleSubmit, handleCancel, curDeviceId, dispatch, confirmLoading, peopleTotal } = props;
   const [treeData, setTreeData] = useState([]);
   const [checkedKeys, setCheckedKeys] = useState([]);
   const [selectedPeople, setSelectedPeople] = useState([]);
@@ -43,10 +44,40 @@ const TableAddAuthoryModal = props => {
         if (!visible) return;
 
         if (res && res.res > 0 && res.data) {
-          const _data = res.data;
+          let _rootGroupList = [];
+          let _rootPeopleList = [];
+          let _groupList = [];
+          let _visitorGroupList = [];
+
+          // 先过滤 "未注册" 分组及人员
+          res.data.filter(item => item.type !== '99').forEach(item => {
+            if (item.isPeople) {
+              // 归属于根节点的人员
+              _rootPeopleList.push(item);
+            } else {
+              // 分组
+              if (item.pid === '1') {
+                // 根节点
+                myTreeRootId = item._id;
+                _rootGroupList.push(item);
+              } else if (item.type === '3') {
+                // 访客分组
+                _visitorGroupList.push(item);
+              } else {
+                // 一级分组
+                _groupList.push(item);
+              }
+            }
+          });
+
+          const _data = [..._rootGroupList, ..._rootPeopleList, ..._groupList, ..._visitorGroupList];
           // myTreeOriginalData.push(..._data);
           setTreeData(toTree(_data) || []);
           setCheckedKeys(checkedKeys.concat(_data.filter(node => node.isPeople && node.isRelateDevice).map(node => node._id)));
+          _rootGroupList = null;
+          _rootPeopleList = null;
+          _groupList = null;
+          _visitorGroupList = null;
         } else {
           console.log(res);
         }
@@ -67,6 +98,7 @@ const TableAddAuthoryModal = props => {
     setModalLoading(false);
     // myTreeOriginalData = [];
     mySelectedPeopleIds = [];
+    myTreeRootId = '';
   };
 
   const handleCheck = (_checkedKeys, info) => {
@@ -113,10 +145,12 @@ const TableAddAuthoryModal = props => {
       });
 
       setModalLoading(true);
+      const _groupId = _checkedGroupIdList.join(',');
       dispatch({
         type: 'log/fetchPeopleByGroupId',
         payload: {
-          groupId: _checkedGroupIdList.join(','),
+          isAll: _groupId.indexOf(myTreeRootId) > -1 ? '1' : '0',
+          groupId: _groupId,
           deviceId: curDeviceId,
         },
       }).then(res => {
@@ -190,7 +224,7 @@ const TableAddAuthoryModal = props => {
       }
 
       if (res && res.res > 0 && res.data) {
-        let _data = res.data;
+        let _data = res.data.sort((a, b) => b.isPeople - a.isPeople); // 人员在前，分组在后
 
         // myTreeOriginalData.push(..._data);
         treeNode.props.dataRef.children = _data;
@@ -198,7 +232,7 @@ const TableAddAuthoryModal = props => {
 
         if (_curIsChecked) {
           setCheckedKeys(checkedKeys.concat(_data.filter(node => node.isPeople && node.pIds.indexOf(_curId) > -1).map(node => node._id)));
-          setSelectedPeople([...selectedPeople, ..._data.filter(node => node.isPeople && node.pIds.indexOf(_curId) > -1 && !~mySelectedPeopleIds.indexOf(node._id))]);
+          setSelectedPeople([...selectedPeople, ..._data.filter(node => node.isPeople && node.pIds.indexOf(_curId) > -1 && !~mySelectedPeopleIds.indexOf(node._id) && !node.isRelateDevice)]);
         } else {
           setCheckedKeys(checkedKeys.concat(_data.filter(node => node.isPeople && node.isRelateDevice).map(node => node._id)));
         }
@@ -218,13 +252,13 @@ const TableAddAuthoryModal = props => {
   const renderNodes = data =>
     data.map(item => {
       const _isRoot = item._id === (treeData[0] && treeData[0]._id || '0');
-      const _isVisitor = item.type === '2';
+      const _isVisitorGroup = !item.isPeople && item.type === '3';
 
       if (item.children && item.children.length > 0) {
         return (
           <TreeNode
             key={item._id}
-            title={_isRoot ? `${item.name} (${item.num || 0})` : (_isVisitor ? formatMessage({ id: 'oal.common.visitor' }) : (item.name || '-'))}
+            title={_isRoot ? `${item.name} (${peopleTotal || 0})` : (_isVisitorGroup ? formatMessage({ id: 'oal.common.visitor' }) : (item.name || '-'))}
             {...item}
             dataRef={item}
           >
@@ -235,7 +269,7 @@ const TableAddAuthoryModal = props => {
 
       return <TreeNode
         key={item._id}
-        title={_isRoot ? `${item.name} (${item.num || 0})` : (_isVisitor ? formatMessage({ id: 'oal.common.visitor' }) : (item.name || '-'))}
+        title={_isRoot ? `${item.name} (${peopleTotal || 0})` : (_isVisitorGroup ? formatMessage({ id: 'oal.common.visitor' }) : (item.name || '-'))}
         disableCheckbox={item.isPeople && item.isRelateDevice || false}
         {...item}
         dataRef={item} />;

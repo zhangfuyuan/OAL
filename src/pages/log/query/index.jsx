@@ -155,6 +155,7 @@ class logQuery extends Component {
         dataIndex: 'name',
         // sorter: (a, b) => a.name - b.name,
         // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
+        render: (text, record) => <span>{(record.peopleType === '99' && formatMessage({ id: peopleTypeMap[record.peopleType] })) || record.name || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.face.staffid' }),
@@ -166,7 +167,7 @@ class logQuery extends Component {
         title: formatMessage({ id: 'oal.log-query.group' }),
         key: 'group',
         dataIndex: 'group',
-        render: (text, record) => <span>{(record.group && record.group.length > 0 && record.group[0].name) || (peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] })) || '-'}</span>,
+        render: (text, record) => <span>{(record.peopleType === '99' && '-') || (record.peopleType === '0' && record.group && record.group.length > 0 && record.group[0].name) || (peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] })) || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.type' }),
@@ -182,11 +183,11 @@ class logQuery extends Component {
       // },
       {
         title: formatMessage({ id: 'oal.log-query.animalHeat' }),
-        key: 'animalHeat',
-        dataIndex: 'animalHeat',
-        sorter: (a, b) => a.animalHeat - b.animalHeat,
-        sortOrder: this.state.sortedInfo.columnKey === 'animalHeat' && this.state.sortedInfo.order,
-        render: (text, record) => <span>{record.animalHeat ? (listSelectedBean && listSelectedBean.temperatureUnit === '1' ? temperatureC2F(record.animalHeat) + '℉' : record.animalHeat + '℃') : '-'}</span>,
+        key: 'temperature',
+        dataIndex: 'temperature',
+        sorter: (a, b) => a.temperature - b.temperature,
+        sortOrder: this.state.sortedInfo.columnKey === 'temperature' && this.state.sortedInfo.order,
+        render: (text, record) => <span>{record.temperature ? (listSelectedBean && listSelectedBean.temperatureUnit === '1' ? temperatureC2F(record.temperature) + '℉' : record.temperature + '℃') : '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.time' }),
@@ -195,7 +196,7 @@ class logQuery extends Component {
         sorter: (a, b) => a.time - b.time,
         sortOrder: this.state.sortedInfo.columnKey === 'time' && this.state.sortedInfo.order,
         width: 150,
-        render: (text, record) => <span>{moment(record.updateAt).format('YYYY-MM-DD HH:mm') || '2020-04-12 15:16'}</span>,
+        render: (text, record) => <span>{record.time && moment(record.time).format('YYYY-MM-DD HH:mm') || '-'}</span>,
       },
     ];
     return cl;

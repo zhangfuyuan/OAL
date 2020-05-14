@@ -73,10 +73,25 @@ class Log extends Component {
     viewVisible: false,
     tableDelVisible: false,
     tableAddAuthoryVisible: false,
+    peopleTotal: 0,
   };
 
   componentDidMount() {
     this.list_loadData();
+    this.props.dispatch({
+      type: 'log/fetchPeopleTotal',
+      payload: {},
+    }).then(res => {
+      if (res && res.res > 0 && res.data) {
+        this.setState({
+          peopleTotal: res.data.num || 0,
+        });
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
   }
 
   componentWillUnmount() {
@@ -159,7 +174,7 @@ class Log extends Component {
         title: formatMessage({ id: 'oal.log-query.group' }),
         key: 'group',
         dataIndex: 'group',
-        render: (text, record) => <span>{(record.group && record.group.length > 0 && record.group[0].name) || (peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] })) || '-'}</span>,
+        render: (text, record) => <span>{(record.peopleType === '0' && record.group && record.group.length > 0 && record.group[0].name) || (peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] })) || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.type' }),
@@ -249,7 +264,7 @@ class Log extends Component {
                   <Option value="0"><FormattedMessage id={peopleTypeMap['0']} /></Option>
                   {/* <Option value="2"><FormattedMessage id={peopleTypeMap['2']} /></Option> */}
                   <Option value="3"><FormattedMessage id={peopleTypeMap['3']} /></Option>
-                  <Option value="99"><FormattedMessage id={peopleTypeMap['99']} /></Option>
+                  {/* <Option value="99"><FormattedMessage id={peopleTypeMap['99']} /></Option> */}
                 </Select>,
               )}
             </FormItem>
@@ -398,6 +413,7 @@ class Log extends Component {
       tableSelectedBean,
       viewVisible,
       tableAddAuthoryVisible,
+      peopleTotal,
     } = this.state;
 
     logList && logList.pagination && (logList.pagination.showTotal = (total, range) => (formatMessage({
@@ -484,6 +500,7 @@ class Log extends Component {
         <TableAddAuthoryModal
           visible={tableAddAuthoryVisible}
           curDeviceId={listSelectedBean._id}
+          peopleTotal={peopleTotal}
           dispatch={dispatch}
           confirmLoading={addAuthoryLoading}
           handleCancel={this.table_closeTableAddAuthoryModal}

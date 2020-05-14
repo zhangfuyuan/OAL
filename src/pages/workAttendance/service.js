@@ -33,7 +33,7 @@ export async function ajaxSetState(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxRelation(data) {
-  return post(`/guard-web/a/device/saveAssociationRules`, data);
+  return post(`/guard-web/a/attendance/saveAssociationRules`, data);
 }
 
 /**

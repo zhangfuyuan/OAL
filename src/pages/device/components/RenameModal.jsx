@@ -24,7 +24,7 @@ const RenameModal = props => {
 
   useEffect(() => {
     if (visible === true) {
-      setShowAlarm((bean && !!bean.alarm) || false);
+      setShowAlarm((bean && bean.alarm === '1') || false);
       setShowWaitShutdownTime((bean && bean.relayOperationMode === '1') || false)
     }
   }, [visible]);
@@ -224,7 +224,7 @@ const RenameModal = props => {
         <Form.Item label={formatMessage({ id: 'oal.device.highTemperatureAlarm' })}>
           {getFieldDecorator('alarm', {
             valuePropName: 'checked',
-            initialValue: (bean && bean.alarm && bean.alarm === '1') || false,
+            initialValue: (bean && bean.alarm === '1') || false,
           })(<Switch onChange={checked => setShowAlarm(checked)} />)}
         </Form.Item>
         {
@@ -281,7 +281,7 @@ const RenameModal = props => {
             initialValue: bean && bean.recognitionMode || '1',
           })(
             <Radio.Group>
-              <Radio value="1"><FormattedMessage id="oal.device.attendanceMode" /></Radio>
+              <Radio value="0"><FormattedMessage id="oal.device.attendanceMode" /></Radio>
               <Radio value="2">
                 <FormattedMessage id="oal.device.maskMode" />
                 &nbsp;&nbsp;

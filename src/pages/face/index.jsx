@@ -84,6 +84,7 @@ class Face extends Component {
 
   componentWillUnmount() {
     this.tree_clearMenu();
+    this.tree_originalData = null;
   }
 
   /************************************************* Tree Start *************************************************/
