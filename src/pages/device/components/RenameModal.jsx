@@ -33,9 +33,10 @@ const RenameModal = props => {
     form.validateFields((err, fieldsValue) => {
       //   console.log('---------fieldsValue----------', fieldsValue)
       if (err) return;
-      const { pwd, alarmValue, waitShutdownTime } = fieldsValue;
+      const { pwd, alarmValue, waitShutdownTime, alarm } = fieldsValue;
       const params = {
         ...fieldsValue,
+        alarm: alarm ? '1' : '0',
       };
 
       alarmValue && (params.alarmValue = alarmValue.replace(/((℃)|(℉))$/, ''));
@@ -223,7 +224,7 @@ const RenameModal = props => {
         <Form.Item label={formatMessage({ id: 'oal.device.highTemperatureAlarm' })}>
           {getFieldDecorator('alarm', {
             valuePropName: 'checked',
-            initialValue: (bean && !!bean.alarm) || false,
+            initialValue: (bean && bean.alarm && bean.alarm === '1') || false,
           })(<Switch onChange={checked => setShowAlarm(checked)} />)}
         </Form.Item>
         {

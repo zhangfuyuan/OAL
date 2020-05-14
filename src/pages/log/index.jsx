@@ -37,9 +37,9 @@ const { Option } = Select;
 const peopleTypeMap = {
   '': 'oal.common.all',
   '0': 'oal.common.certifiedPeople',
-  '1': 'oal.common.blacklist',
-  '2': 'oal.common.visitor',
-  '3': 'oal.common.unregistered',
+  '2': 'oal.common.blacklist',
+  '3': 'oal.common.visitor',
+  '99': 'oal.common.unregistered',
 }
 
 @connect(({ log, loading }) => ({
@@ -247,9 +247,9 @@ class Log extends Component {
                 >
                   <Option value=""><FormattedMessage id={peopleTypeMap['']} /></Option>
                   <Option value="0"><FormattedMessage id={peopleTypeMap['0']} /></Option>
-                  {/* <Option value="1"><FormattedMessage id={peopleTypeMap['1']} /></Option> */}
-                  <Option value="2"><FormattedMessage id={peopleTypeMap['2']} /></Option>
+                  {/* <Option value="2"><FormattedMessage id={peopleTypeMap['2']} /></Option> */}
                   <Option value="3"><FormattedMessage id={peopleTypeMap['3']} /></Option>
+                  <Option value="99"><FormattedMessage id={peopleTypeMap['99']} /></Option>
                 </Select>,
               )}
             </FormItem>
@@ -472,7 +472,7 @@ class Log extends Component {
           footer={null}
           onCancel={this.table_closeViewModal}
         >
-          <img src={tableSelectedBean.imgPath} alt="" style={{ width: '100%', height: '100%' }} />
+          <img src={`${tableSelectedBean.imgPath}?t=${Date.now()}`} alt="" style={{ width: '100%', height: '100%' }} />
         </Modal>
         <TableDelModal
           visible={tableDelVisible}

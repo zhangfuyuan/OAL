@@ -337,7 +337,7 @@ const TableAddOrModifyModal = props => {
           })(<Input placeholder={formatMessage({ id: 'oal.face.enterStaffid' })} disabled={!!bean && !!bean.profile && !!bean.profile.jobNumber} />)}
         </Form.Item>
         <div style={{ position: 'relative', width: 155, height: 155, margin: '0 0 24px 25%', }}>
-          <img src={imageUrl || (isEdit ? bean.imgPath : imgNull)} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: 5, objectFit: 'contain', }} />
+          <img src={imageUrl || (isEdit ? `${bean.imgPath}?t=${Date.now()}` : imgNull)} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: 5, objectFit: 'contain', }} />
           {
             uploadProgress > 0 ?
               (<div className="oal-progress" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 5, }}>

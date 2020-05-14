@@ -837,7 +837,7 @@ class Face extends Component {
             footer={null}
             onCancel={this.table_closeViewModal}
           >
-            <img src={tableSelectedBean.imgPath} alt="" style={{ width: '100%', height: '100%' }} />
+            <img src={`${tableSelectedBean.imgPath}?t=${Date.now()}`} alt="" style={{ width: '100%', height: '100%' }} />
           </Modal>
         </div>
       </PageHeaderWrapper >

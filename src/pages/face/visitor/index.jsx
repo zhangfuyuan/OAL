@@ -86,7 +86,7 @@ class Visitor extends Component {
         ...sortedInfo,
         ...formValues,
         // featureState: 'all',
-        peopleType: '2',
+        peopleType: '3',
       },
     });
   };
@@ -134,6 +134,7 @@ class Visitor extends Component {
         title: formatMessage({ id: 'oal.common.phoneNumber' }),
         key: 'mobile',
         dataIndex: 'mobile',
+        render: (text, record) => <span>{record.mobile || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.face-visitor.validity' }),
@@ -297,7 +298,7 @@ class Visitor extends Component {
       type: 'faceVisitor/delVisitor',
       payload: {
         faceId: tableSelectedBean && tableSelectedBean._id || tableSelectedRows.map(item => item._id).join(','),
-        peopleType: '2',
+        peopleType: '3',
       },
     }).then(res => {
       if (res && res.res > 0) {
@@ -422,7 +423,7 @@ class Visitor extends Component {
           footer={null}
           onCancel={this.table_closeViewModal}
         >
-          <img src={tableSelectedBean.imgPath} alt="" style={{ width: '100%', height: '100%' }} />
+          <img src={`${tableSelectedBean.imgPath}?t=${Date.now()}`} alt="" style={{ width: '100%', height: '100%' }} />
         </Modal>
         <TableAddOrModifyModal
           visible={tableAddOrModifyVisible}

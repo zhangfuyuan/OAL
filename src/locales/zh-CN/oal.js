@@ -515,7 +515,7 @@ export default {
   'oal.face.batchAddExplainTips3': `3-分别将照片与人员数据文件上传到对应区域内`,
   'oal.face.IncorrectFileFormat': `文件格式不正确`,
   'oal.face.uploadAbort': `异常中断`,
-  'oal.face.addedNumPeopleSuccessfully': `添加成功 {num} 个人员`,
+  'oal.face.addedNumPeopleSuccessfully': `添加/修改成功 {num} 个人员`,
   'oal.face.inImport': `正在导入`,
   'oal.face.inImportTips': `正在导入人员数据，请勿关闭页面`,
   'oal.face.underAnalysis': `正在解析`,

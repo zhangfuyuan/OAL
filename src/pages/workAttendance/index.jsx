@@ -90,11 +90,11 @@ class AttendanceList extends Component {
     const cl = [
       {
         title: formatMessage({ id: 'oal.work-rule.workRule' }),
-        key: 'name',
-        dataIndex: 'name',
+        key: 'ruleName',
+        dataIndex: 'ruleName',
         render: (_text, record) => (
           <span>
-            {record && record.name || '-'}
+            {record && record.ruleName || '-'}
           </span>
         ),
       },
@@ -107,7 +107,7 @@ class AttendanceList extends Component {
             {
               record &&
               record.workAttendanceTimes &&
-              record.workAttendanceTimes.map(item => `${item.workAttendanceStartTime}~${item.workAttendanceEndTime}`).join('、') ||
+              record.workAttendanceTimes.map(item => `${item.workAttendanceStartTime} ~ ${item.workAttendanceEndTime}`).join('、') ||
               '-'
             }
           </span>
@@ -241,6 +241,7 @@ class AttendanceList extends Component {
       if (res && res.res > 0) {
         message.success(formatMessage({ id: 'oal.work-rule.relateSuccessfully' }));
         this.closeRelateModal();
+        this.loadDeviceList();
         this.loadAttendList();
       }
     });

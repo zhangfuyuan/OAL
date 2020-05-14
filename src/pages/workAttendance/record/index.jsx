@@ -198,7 +198,7 @@ class AttendanceRecord extends Component {
         dataIndex: 'workTime',
         sorter: (a, b) => a.workRule - b.workRule,
         sortOrder: columnKey === 'workTime' && order,
-        render: (text, record) => <span>{record.workRule && `${record.workRule.workStartTime}~${record.workRule.workEndTime}` || '9:00-18:00'}</span>,
+        render: (text, record) => <span>{record.workRule && `${record.workRule.workStartTime} ~ ${record.workRule.workEndTime}` || '9:00-18:00'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.work-rule.workStartTime' }),

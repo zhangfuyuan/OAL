@@ -117,7 +117,7 @@ const TableAddOrModifyModal = props => {
         isEdit,
         startDate: validity[0].format('YYYY-MM-DD'),
         endDate: validity[1].format('YYYY-MM-DD'),
-        peopleType: '2',
+        peopleType: '3',
       }
 
       isEdit && (params.faceId = bean._id);
@@ -219,7 +219,7 @@ const TableAddOrModifyModal = props => {
       data.faceId = faceId
       data.staffname = staffname;
       data.staffid = staffid;
-      data.peopleType = '2';
+      data.peopleType = '3';
     });
 
     uploader.on('uploadProgress', (file, percentage) => {
@@ -328,7 +328,7 @@ const TableAddOrModifyModal = props => {
                 validator: checkMobile,
               },
             ],
-            initialValue: bean && bean.contact && bean.contact.mobile,
+            initialValue: bean && bean.mobile || '',
           })(<Input placeholder={formatMessage({ id: 'oal.common.phoneNumber' })} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.face-visitor.validity' })}>
@@ -358,7 +358,7 @@ const TableAddOrModifyModal = props => {
           />)}
         </Form.Item>
         <div style={{ position: 'relative', width: 155, height: 155, margin: '0 0 24px 25%', }}>
-          <img src={imageUrl || (isEdit ? bean.imgPath : imgNull)} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: 5, objectFit: 'contain', }} />
+          <img src={imageUrl || (isEdit ? `${bean.imgPath}?t=${Date.now()}` : imgNull)} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: 5, objectFit: 'contain', }} />
           {
             uploadProgress > 0 ?
               (<div className="oal-progress" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 5, }}>

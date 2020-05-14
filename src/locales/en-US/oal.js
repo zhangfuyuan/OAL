@@ -515,7 +515,7 @@ export default {
   'oal.face.batchAddExplainTips3': `3- Upload photos and personnel data files to corresponding areas`,
   'oal.face.IncorrectFileFormat': `Incorrect file format`,
   'oal.face.uploadAbort': `Abort`,
-  'oal.face.addedNumPeopleSuccessfully': `Added {num} people successfully`,
+  'oal.face.addedNumPeopleSuccessfully': `Added / Modified {num} people successfully`,
   'oal.face.inImport': `In import`,
   'oal.face.inImportTips': `Please do not close the page while importing personnel data`,
   'oal.face.underAnalysis': `Under analysis`,

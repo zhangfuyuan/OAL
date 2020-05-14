@@ -6,7 +6,7 @@ import { post, get } from '@/utils/ajax';
  * @returns {Promise<*>}
  */
 export async function ajaxRuleById(data) {
-  return post(`/guard-web/a/attendance/getRuleById`, data);
+  return post(`/guard-web/a/attendance/getAttendanceRules`, data);
 }
 
 /**
@@ -15,7 +15,7 @@ export async function ajaxRuleById(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxEditRule(data) {
-  return post(`/guard-web/a/attendance/editRule`, data);
+  return post(`/guard-web/a/attendance/saveAttendanceRules`, data);
 }
 
 /**
