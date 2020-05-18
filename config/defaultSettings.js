@@ -11,7 +11,7 @@ export default {
   menu: {
     locale: true,
   },
-  title: 'LangoAI',
+  title: ' ', // 默认系统名称
   pwa: false,
   iconfontUrl: '',
 };

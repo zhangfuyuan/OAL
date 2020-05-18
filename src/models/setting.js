@@ -81,10 +81,12 @@ const SettingModel = {
     changeSettingInfo(state = defaultSettings, { payload }) {
       // console.log('changeSettingName---->', payload);
       const { logo } = payload;
+      const res = { ...state, ...payload };
 
-      if (logo) payload.logo = `${logo}?t=${Date.now()}`;
+      if (logo) res.logo = `${logo}?t=${Date.now()}`;
+      else delete res.logo;
 
-      return { ...state, ...payload };
+      return res;
     },
   },
 };

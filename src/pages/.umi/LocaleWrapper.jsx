@@ -29,8 +29,7 @@ const useLocalStorage = true;
 
 import { LocaleProvider, version } from 'antd';
 import moment from 'moment';
-import 'moment/locale/zh-cn';
-let defaultAntd = require('antd/lib/locale-provider/zh_CN');
+let defaultAntd = require('antd/lib/locale-provider/en_US');
 defaultAntd = defaultAntd.default || defaultAntd;
 
 const localeInfo = {
@@ -74,14 +73,14 @@ const localeInfo = {
 
 class LocaleWrapper extends React.Component{
   state = {
-    locale: 'zh-CN',
+    locale: 'en-US',
   };
   getAppLocale(){
     let appLocale = {
-      locale: 'zh-CN',
+      locale: 'en-US',
       messages: {},
-      data: require('react-intl/locale-data/zh'),
-      momentLocale: 'zh-cn',
+      data: require('react-intl/locale-data/en'),
+      momentLocale: '',
     };
 
     const runtimeLocale = require('umi/_runtimePlugin').mergeConfig('locale') || {};
@@ -102,7 +101,7 @@ class LocaleWrapper extends React.Component{
     } else if(localeInfo[runtimeLocaleDefault]){
       appLocale = localeInfo[runtimeLocaleDefault];
     } else {
-      appLocale = localeInfo['zh-CN'] || appLocale;
+      appLocale = localeInfo['en-US'] || appLocale;
     }
     window.g_lang = appLocale.locale;
     window.g_langSeparator = baseSeparator || '-';

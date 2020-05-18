@@ -83,12 +83,7 @@ class Login extends Component {
           errorHandler: (err) => {
             console.log(err);
 
-            if (
-              err &&
-              err.toString &&
-              err.toString() === 'TypeError: Failed to fetch' &&
-              document.cookie.indexOf('loginTryAgain=1') > -1
-            ) {
+            if (err && document.cookie.indexOf('loginTryAgain=1') > -1) {
               // 重定向处理
               console.log('自动登录两次╮(╯▽╰)╭');
               dispatch({

@@ -13,7 +13,8 @@ import RightContent from '@/components/GlobalHeader/RightContent';
 import SettingPassword from '@/components/SettingPassword';
 import SettingSaasInfo from '@/components/SettingSaasInfo';
 import { DEFAULT_SYS_NAME } from '@/utils/constants';
-import logo from '../assets/logo.svg';
+import logo from '../assets/logo.png';
+import styles from './BasicLayout.less';
 
 const footerRender = (_, defaultDom) => {
   return <div></div>;

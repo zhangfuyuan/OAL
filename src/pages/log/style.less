@@ -133,13 +133,23 @@
   }
 }
 
-
 :global {
+  .oal-selected-list {
+    .ant-list-item:hover {
+      background-color: #E6F7FF;
+    }
+  }
+
   .oal-user-list {
     border-left: @border-width-base @border-style-base @border-color-split;
 
-    .ant-list-item:hover {
-      background-color: #E6F7FF;
+    .ant-checkbox-wrapper {
+      display: block;
+      margin: 5px 0;
+
+      &:hover {
+        background-color: #E6F7FF;
+      }
     }
   }
 }

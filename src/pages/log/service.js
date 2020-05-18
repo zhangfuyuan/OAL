@@ -46,6 +46,15 @@ export async function ajaxGroupTree(data) {
 }
 
 /**
+ * （人员-认证-分组1）获取用户分组树
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxGroupAllTree(data) {
+  return post('/guard-web/a/group/fetchGroupAllTree', data);
+}
+
+/**
  * （通行-授权5）根据分组ID获取所有人员/访客信息
  * @param data
  * @returns {Promise<*>}

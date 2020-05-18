@@ -1,4 +1,13 @@
-import { getDevInfo, applyDevAccount, resetSecret } from './service';
+import {
+  getDevInfo,
+  applyDevAccount,
+  resetSecret,
+  ajaxAlarmSendSettings,
+  ajaxAlarmReceiveSettings,
+  ajaxAlarmEvents,
+  ajaxAlarmContent,
+  ajaxGetAlarmSet,
+} from './service';
 import { getSysConfig, setSysConfig } from '@/services/sys';
 
 const Model = {
@@ -65,6 +74,36 @@ const Model = {
           payload: data,
         });
       }
+      return Promise.resolve(response);
+    },
+    // 告警设置-发送设置
+    *alarmSendSettings({ payload }, { call, put }) {
+      const response = yield call(ajaxAlarmSendSettings, payload);
+
+      return Promise.resolve(response);
+    },
+    // 告警设置-接收设置
+    *alarmReceiveSettings({ payload }, { call, put }) {
+      const response = yield call(ajaxAlarmReceiveSettings, payload);
+
+      return Promise.resolve(response);
+    },
+    // 告警设置-告警事件
+    *alarmEvents({ payload }, { call, put }) {
+      const response = yield call(ajaxAlarmEvents, payload);
+
+      return Promise.resolve(response);
+    },
+    // 告警设置-告警内容
+    *alarmContent({ payload }, { call, put }) {
+      const response = yield call(ajaxAlarmContent, payload);
+
+      return Promise.resolve(response);
+    },
+    // 获取告警设置
+    *getAlarmSet({ payload }, { call, put }) {
+      const response = yield call(ajaxGetAlarmSet, payload);
+
       return Promise.resolve(response);
     },
   },

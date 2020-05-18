@@ -7,9 +7,13 @@ import { connect } from 'dva';
 import BaseView from './components/BaseView';
 import SecurityView from './components/SecurityView';
 import SystemView from './components/SystemView';
+import AlarmView from './components/AlarmView';
 import DeveloperView from './components/DeveloperView';
 import ModifyPswModal from './components/ModifyPswModal';
 import ModifySysName from './components/ModifySysName';
+import ModifyAlarmSendSettings from './components/ModifyAlarmSendSettings';
+import ModifyAlarmReceiveSettings from './components/ModifyAlarmReceiveSettings';
+import ModifyAlarmEvents from './components/ModifyAlarmEvents';
 // import ModifySysIcons from './components/ModifySysIcons';
 import FaceKey from './components/FaceKey';
 import FaceKeyModal from './components/FaceKeyModal';
@@ -34,6 +38,10 @@ const { Item } = Menu;
   modifyPasswordLoading: loading.effects['user/modifyPassword'],
   modifySaasInfoLoading: loading.effects['user/modifySaasInfo'],
   baseViewLoading: loading.effects['user/modifyUser'],
+  alarmSendSettingsLoading: loading.effects['settingInfo/alarmSendSettings'],
+  alarmReceiveSettingsLoading: loading.effects['settingInfo/alarmReceiveSettings'],
+  alarmEventsLoading: loading.effects['settingInfo/alarmEvents'],
+  // alarmContentLoading: loading.effects['settingInfo/alarmContent'],
 }))
 class Settings extends Component {
   constructor(props) {
@@ -42,6 +50,7 @@ class Settings extends Component {
       base: formatMessage({ id: 'oal.settings.menu-base' }),
       security: formatMessage({ id: 'oal.settings.menu-security' }),
       system: formatMessage({ id: 'oal.settings.menu-system' }),
+      alarm: formatMessage({ id: 'oal.settings.menu-alarm' }),
       // developer: formatMessage({ id: 'oal.settings.menu-developer' }),
       // faceKey: formatMessage({ id: 'oal.settings.menu-faceKey' }),
       // faceLibrary: formatMessage({ id: 'oal.settings.menu-faceLibrary' }),
@@ -52,10 +61,53 @@ class Settings extends Component {
       selectKey: 'base',
       modifyPswVisible: false,
       modifySysNameVisible: false,
+      modifyAlarmSendSettingsVisible: false,
+      modifyAlarmReceiveSettingsVisible: false,
+      modifyAlarmEventsVisible: false,
       // modifySysIconsVisible: false,
       faceKeyVisible: false,
       selectedFaceKey: {},
     };
+  }
+
+  componentDidMount() {
+    const { dispatch, currentUser } = this.props;
+
+    if (currentUser && currentUser.org && currentUser.org._id) {
+      dispatch({
+        type: 'settingInfo/getAlarmSet',
+        payload: {
+          orgId: currentUser.org._id,
+        },
+      }).then(res => {
+        if (res && res.res > 0 && res.data) {
+          dispatch({
+            type: 'user/modifySaasAlarmSet',
+            payload: res.data,
+          });
+        }
+      });
+    } else {
+      dispatch({
+        type: 'user/fetchCurrent',
+      }).then(res => {
+        if (res && res.res > 0 && res.data && res.data.user && res.data.user.org && res.data.user.org._id) {
+          dispatch({
+            type: 'settingInfo/getAlarmSet',
+            payload: {
+              orgId: res.data.user.org._id,
+            },
+          }).then(res => {
+            if (res && res.res > 0 && res.data) {
+              dispatch({
+                type: 'user/modifySaasAlarmSet',
+                payload: res.data,
+              });
+            }
+          });
+        }
+      });
+    }
   }
 
   loadDevInfo = () => {
@@ -83,7 +135,7 @@ class Settings extends Component {
     const { menuMap } = this.state;
     return Object.keys(menuMap).map(item => {
       // if (!isAdmin && item === 'faceKey') return null;
-      if (!isAdmin && item === 'system') return null;
+      if (!isAdmin && (item === 'system' || item === 'alarm')) return null;
       return <Item key={item}>{menuMap[item]}</Item>
     });
   };
@@ -230,6 +282,150 @@ class Settings extends Component {
     })
   };
 
+  // 告警-发送设置
+  openModifyAlarmSendSettings = () => {
+    this.setState({ modifyAlarmSendSettingsVisible: true });
+  };
+
+  closeModifyAlarmSendSettings = () => {
+    this.setState({ modifyAlarmSendSettingsVisible: false });
+  };
+
+  submitAlarmSendSettings = values => {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'settingInfo/alarmSendSettings',
+      payload: values,
+    }).then(res => {
+      if (res && res.res > 0 && res.data) {
+        message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+        this.closeModifyAlarmSendSettings();
+        dispatch({
+          type: 'user/modifySaasAlarmSet',
+          payload: res.data,
+        });
+      }
+    });
+  };
+
+  deleteAlarmSendSettings = () => {
+    const { dispatch, currentUser } = this.props;
+
+    dispatch({
+      type: 'settingInfo/alarmSendSettings',
+      payload: {
+        orgId: currentUser && currentUser.org && currentUser.org._id || '',
+        username: '',
+        password: '',
+        smtpServer: '',
+        port: '',
+        ssl: '1',
+      },
+    }).then(res => {
+      if (res && res.res > 0 && res.data) {
+        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+        dispatch({
+          type: 'user/modifySaasAlarmSet',
+          payload: res.data,
+        });
+      }
+    });
+  };
+
+  // 告警-接受设置
+  openModifyAlarmReceiveSettings = () => {
+    this.setState({ modifyAlarmReceiveSettingsVisible: true });
+  };
+
+  closeModifyAlarmReceiveSettings = () => {
+    this.setState({ modifyAlarmReceiveSettingsVisible: false });
+  };
+
+  submitAlarmReceiveSettings = values => {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'settingInfo/alarmReceiveSettings',
+      payload: values,
+    }).then(res => {
+      if (res && res.res > 0 && res.data) {
+        message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+        this.closeModifyAlarmReceiveSettings();
+        dispatch({
+          type: 'user/modifySaasAlarmSet',
+          payload: res.data,
+        });
+      }
+    });
+  };
+
+  deleteAlarmReceiveSettings = () => {
+    const { dispatch, currentUser } = this.props;
+
+    dispatch({
+      type: 'settingInfo/alarmReceiveSettings',
+      payload: {
+        orgId: currentUser && currentUser.org && currentUser.org._id || '',
+        receiveMail: '',
+      },
+    }).then(res => {
+      if (res && res.res > 0 && res.data) {
+        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+        dispatch({
+          type: 'user/modifySaasAlarmSet',
+          payload: res.data,
+        });
+      }
+    });
+  };
+
+  // 告警-告警事件
+  openModifyAlarmEvents = () => {
+    this.setState({ modifyAlarmEventsVisible: true });
+  };
+
+  closeModifyAlarmEvents = () => {
+    this.setState({ modifyAlarmEventsVisible: false });
+  };
+
+  submitAlarmEvents = values => {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'settingInfo/alarmEvents',
+      payload: values,
+    }).then(res => {
+      if (res && res.res > 0 && res.data) {
+        message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+        this.closeModifyAlarmEvents();
+        dispatch({
+          type: 'user/modifySaasAlarmSet',
+          payload: res.data,
+        });
+      }
+    });
+  };
+
+  // 告警-告警内容
+  submitAlarmContent = (values, callback) => {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'settingInfo/alarmContent',
+      payload: values,
+    }).then(res => {
+      if (res && res.res > 0 && res.data) {
+        message.success(formatMessage({ id: 'oal.common.modifySuccessfully' }));
+        callback && callback();
+        dispatch({
+          type: 'user/modifySaasAlarmSet',
+          payload: res.data,
+        });
+      }
+    });
+  };
+
   // setFaceKeyModal = flag => {
   //   this.setState({ faceKeyVisible: !!flag });
   // };
@@ -354,6 +550,17 @@ class Settings extends Component {
       //     data={sysConfigs}
       //     toEdit={this.toEditConfigs}
       //   />
+      case 'alarm':
+        return <AlarmView
+          currentUser={currentUser}
+          orgId={currentUser && currentUser.org && currentUser.org._id || ''}
+          openSendSettingsModal={this.openModifyAlarmSendSettings}
+          deleteAlarmSendSettings={this.deleteAlarmSendSettings}
+          openReceiveSettingsModal={this.openModifyAlarmReceiveSettings}
+          deleteAlarmReceiveSettings={this.deleteAlarmReceiveSettings}
+          openEventsModal={this.openModifyAlarmEvents}
+          updateAlarmContent={this.submitAlarmContent}
+        />;
       default:
         break;
     }
@@ -373,6 +580,9 @@ class Settings extends Component {
       addFaceKeyLoading,
       modifyPasswordLoading,
       modifySaasInfoLoading,
+      alarmSendSettingsLoading,
+      alarmReceiveSettingsLoading,
+      alarmEventsLoading,
     } = this.props;
     const { type } = currentUser;
     const {
@@ -380,6 +590,9 @@ class Settings extends Component {
       selectKey,
       modifyPswVisible,
       modifySysNameVisible,
+      modifyAlarmSendSettingsVisible,
+      modifyAlarmReceiveSettingsVisible,
+      modifyAlarmEventsVisible,
       // modifySysIconsVisible,
       faceKeyVisible,
       selectedFaceKey,
@@ -437,6 +650,27 @@ class Settings extends Component {
           setOptionVisible={() => this.setOptionVisible(true)}
           faceKey={selectedFaceKey}
         /> */}
+        <ModifyAlarmSendSettings
+          visible={modifyAlarmSendSettingsVisible}
+          currentUser={currentUser}
+          confirmLoading={alarmSendSettingsLoading}
+          handleCancel={this.closeModifyAlarmSendSettings}
+          handleSubmit={this.submitAlarmSendSettings}
+        />
+        <ModifyAlarmReceiveSettings
+          visible={modifyAlarmReceiveSettingsVisible}
+          currentUser={currentUser}
+          confirmLoading={alarmReceiveSettingsLoading}
+          handleCancel={this.closeModifyAlarmReceiveSettings}
+          handleSubmit={this.submitAlarmReceiveSettings}
+        />
+        <ModifyAlarmEvents
+          visible={modifyAlarmEventsVisible}
+          currentUser={currentUser}
+          confirmLoading={alarmEventsLoading}
+          handleCancel={this.closeModifyAlarmEvents}
+          handleSubmit={this.submitAlarmEvents}
+        />
       </PageHeaderWrapper>
     )
   }

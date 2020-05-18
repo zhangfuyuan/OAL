@@ -18,8 +18,8 @@ const plugins = [
       locale: {
         // default false
         enable: true,
-        // default zh-CN
-        default: 'zh-CN',
+        // default zh-CN or en-US
+        default: 'en-US',
         // default true, when it is true, will use `navigator.language` overwrite default
         baseNavigator: true,
       },
@@ -144,10 +144,12 @@ export default {
     },
     '/guard-web/': {
       target: 'http://192.168.14.74/',
+      // target: 'http://guard.lango-tech.com/',
       changeOrigin: true,
     },
     '/guardFile/': {
       target: 'http://192.168.14.74/',
+      // target: 'http://guard.lango-tech.com/',
       changeOrigin: true,
     },
   },

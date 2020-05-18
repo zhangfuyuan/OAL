@@ -31,6 +31,7 @@ import { SYSTEM_PATH } from '@/utils/constants';
 import styles from './style.less';
 import TableDelModal from './components/TableDelModal';
 import TableAddAuthoryModal from './components/TableAddAuthoryModal';
+import { toTree } from '@/utils/utils';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -50,6 +51,8 @@ const peopleTypeMap = {
   logListLoading: loading.effects['log/fetchLog'],
   delAuthoryLoading: loading.effects['log/delAuthory'],
   addAuthoryLoading: loading.effects['log/addAuthory'],
+  fetchGroupAllTreeLoading: loading.effects['log/fetchGroupAllTree'],
+  fetchGroupTreeLoading: loading.effects['log/fetchGroupTree'],
 }))
 class Log extends Component {
 
@@ -74,24 +77,26 @@ class Log extends Component {
     tableDelVisible: false,
     tableAddAuthoryVisible: false,
     peopleTotal: 0,
+    groupTreeData: [],
   };
 
   componentDidMount() {
     this.list_loadData();
-    this.props.dispatch({
-      type: 'log/fetchPeopleTotal',
-      payload: {},
-    }).then(res => {
-      if (res && res.res > 0 && res.data) {
-        this.setState({
-          peopleTotal: res.data.num || 0,
-        });
-      } else {
-        console.log(res);
-      }
-    }).catch(err => {
-      console.log(err);
-    });
+
+    // this.props.dispatch({
+    //   type: 'log/fetchPeopleTotal',
+    //   payload: {},
+    // }).then(res => {
+    //   if (res && res.res > 0 && res.data) {
+    //     this.setState({
+    //       peopleTotal: res.data.num || 0,
+    //     });
+    //   } else {
+    //     console.log(res);
+    //   }
+    // }).catch(err => {
+    //   console.log(err);
+    // });
   }
 
   componentWillUnmount() {
@@ -101,12 +106,39 @@ class Log extends Component {
 
   list_loadData = () => {
     const { dispatch } = this.props;
+
     dispatch({
       type: 'log/getDeviceList',
       payload: {},
     }).then(res => {
       if (res && res.res > 0 && res.data.length > 0) {
-        this.list_handleClickItem(null, res.data[0]);
+        const _firstSelectedBean = res.data[0];
+
+        this.list_handleClickItem(null, _firstSelectedBean);
+        dispatch({
+          type: 'log/fetchGroupTree',
+          payload: {
+            groupId: '',
+            deviceId: _firstSelectedBean._id,
+          },
+        }).then(res => {
+          if (res && res.res > 0 && res.data) {
+            const _visitorGroup = res.data.filter(item => !item.isPeople && item.type === '3');
+
+            dispatch({
+              type: 'log/fetchGroupAllTree',
+              payload: {},
+            }).then(res => {
+              if (res && res.res > 0 && res.data) {
+                const _treeData = toTree(res.data) || [];
+
+                this.setState({
+                  groupTreeData: [..._visitorGroup, ..._treeData],
+                });
+              }
+            });
+          }
+        });
       } else {
         console.log(res);
       }
@@ -240,6 +272,8 @@ class Log extends Component {
   table_renderSimpleForm = () => {
     const { form, deviceListLoading, logListLoading } = this.props;
     const { getFieldDecorator } = form;
+    const { listSelectedBean } = this.state;
+
     return (
       <Form layout="inline">
         <Row
@@ -276,7 +310,13 @@ class Log extends Component {
           </Col>
           <Col xxl={6} lg={6} md={6} sm={12}>
             <span className={styles.submitButtons}>
-              <Button onClick={this.table_handleSearch} type="primary" htmlType="submit" loading={logListLoading || deviceListLoading}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={logListLoading || deviceListLoading}
+                disabled={!listSelectedBean || !listSelectedBean._id}
+                onClick={this.table_handleSearch}
+              >
                 <FormattedMessage id="oal.face.search" />
               </Button>
               <Button
@@ -284,6 +324,7 @@ class Log extends Component {
                   marginLeft: 8,
                 }}
                 loading={logListLoading || deviceListLoading}
+                disabled={!listSelectedBean || !listSelectedBean._id}
                 onClick={this.table_handleFormReset}
               >
                 <FormattedMessage id="oal.common.reset" />
@@ -405,6 +446,8 @@ class Log extends Component {
       delAuthoryLoading,
       dispatch,
       addAuthoryLoading,
+      fetchGroupAllTreeLoading,
+      fetchGroupTreeLoading,
     } = this.props;
     const {
       tableSelectedRows,
@@ -414,6 +457,7 @@ class Log extends Component {
       viewVisible,
       tableAddAuthoryVisible,
       peopleTotal,
+      groupTreeData,
     } = this.state;
 
     logList && logList.pagination && (logList.pagination.showTotal = (total, range) => (formatMessage({
@@ -454,7 +498,8 @@ class Log extends Component {
                   type="primary"
                   icon="plus"
                   style={{ marginRight: '8px', }}
-                  loading={logListLoading || deviceListLoading}
+                  loading={logListLoading || fetchGroupAllTreeLoading || fetchGroupTreeLoading}
+                  disabled={!listSelectedBean || !listSelectedBean._id}
                   onClick={this.table_showTableAddAuthoryModal}
                 >
                   <FormattedMessage id="oal.face.add" />
@@ -499,6 +544,7 @@ class Log extends Component {
         />
         <TableAddAuthoryModal
           visible={tableAddAuthoryVisible}
+          groupTreeData={groupTreeData}
           curDeviceId={listSelectedBean._id}
           peopleTotal={peopleTotal}
           dispatch={dispatch}

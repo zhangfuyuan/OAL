@@ -181,7 +181,7 @@ class Face extends Component {
               </div>) : ''
           }
           {
-            level < 5 ?
+            level < 2 ?
               (<div style={{ alignSelf: 'center', marginLeft: 10, cursor: 'pointer', }} onClick={this.tree_showTreeAddModal}>
                 <Tooltip placement="bottom" title={formatMessage({ id: 'oal.common.addItems' })}>
                   <Icon type='plus-circle-o' />

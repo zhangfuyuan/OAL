@@ -99,6 +99,14 @@ const UserModel = {
 
       return Promise.resolve();
     },
+    *modifySaasAlarmSet({ payload }, { call, put }) {
+      yield put({
+        type: 'setAlarmSet',
+        payload,
+      });
+
+      return Promise.resolve();
+    },
   },
   reducers: {
     saveCurrentUser(state, action) {
@@ -154,6 +162,11 @@ const UserModel = {
           unreadCount: action.payload.unreadCount,
         },
       };
+    },
+    setAlarmSet(state, action) {
+      const { currentUser } = state;
+      currentUser.alarmSet = action.payload.alarmSet;
+      return { ...state, currentUser }
     },
   },
 };

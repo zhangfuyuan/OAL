@@ -7,6 +7,7 @@ import {
   ajaxDelAuthory,
   ajaxPeopleByGroupId,
   ajaxPeopleTotal,
+  ajaxGroupAllTree,
 } from './service';
 
 const Model = {
@@ -42,9 +43,15 @@ const Model = {
 
       return Promise.resolve(response);
     },
-    // 获取分组树的数据
+    // 懒加载获取分组树的数据
     *fetchGroupTree({ payload }, { call, put, select }) {
       const response = yield call(ajaxGroupTree, payload);
+
+      return Promise.resolve(response);
+    },
+    // 获取认证人员所有分组的数据
+    *fetchGroupAllTree({ payload }, { call, put, select }) {
+      const response = yield call(ajaxGroupAllTree, payload);
 
       return Promise.resolve(response);
     },

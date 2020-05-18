@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { List, Button, Result, message, Popconfirm, Avatar, Upload, notification, Spin } from 'antd';
-import logo from '@/assets/logo.svg';
+import logo from '@/assets/logo.png';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import defaultSettings from '../../../../config/defaultSettings';
 
