@@ -97,12 +97,32 @@ class Face extends Component {
     this.setState({ treeData: [] });
     dispatch({
       type: 'face/fetchGroupTree',
-      payload: {},
+      payload: {
+        faceType: '0',
+      },
     }).then(res => {
       if (res && res.res > 0 && res.data) {
-        this.tree_originalData = res.data;
-        const treeData = toTree(res.data) || [];
+        let _rootNum = 0;
+        let _rootIndex = -1;
+        this.tree_originalData = [];
 
+        res.data.forEach((item, index) => {
+          if (item.type === '0') {
+            if (item.pid === '1') {
+              // 认证人员分组的根节点
+              _rootIndex = index;
+            }
+
+            _rootNum += item.num;
+            this.tree_originalData.push(item);
+          }
+        });
+
+        if (_rootIndex > -1) {
+          this.tree_originalData[_rootIndex].num = _rootNum;
+        }
+
+        const treeData = toTree(this.tree_originalData) || [];
         this.setState({
           treeData,
           selectedKeys: [(selectedKeys[0] || (treeData[0] && treeData[0]._id) || '0')],
@@ -119,12 +139,22 @@ class Face extends Component {
     data.map(item => {
       if (item.children && item.children.length > 0) {
         return (
-          <TreeNode key={item._id} title={`${item.name} (${item.num || 0})`} dataRef={item}>
+          <TreeNode
+            {...item}
+            key={item._id}
+            title={`${item.name} (${item.num || 0})`}
+            dataRef={item}
+          >
             {this.tree_renderNodes(item.children)}
           </TreeNode>
         );
       }
-      return <TreeNode key={item._id} title={`${item.name} (${item.num || 0})`} {...item} dataRef={item} />;
+      return <TreeNode
+        {...item}
+        key={item._id}
+        title={`${item.name} (${item.num || 0})`}
+        dataRef={item}
+      />;
     });
 
   tree_onMouseEnter = (e) => {
@@ -373,14 +403,14 @@ class Face extends Component {
 
   table_loadFaceList = () => {
     const { dispatch } = this.props;
-    const { tableSearchName, selectedKeys, tablePage, sortedInfo } = this.state;
+    const { tableSearchName, selectedKeys, tablePage, sortedInfo, treeData } = this.state;
     const { columnKey, order } = sortedInfo;
 
     dispatch({
       type: 'face/fetch',
       payload: {
         ...tablePage,
-        groupId: selectedKeys[0],
+        groupId: selectedKeys[0] === treeData[0]._id ? this.tree_originalData.map(item => item._id).join(',') : selectedKeys[0],
         // columnKey,
         // order,
         name: tableSearchName.trim(),

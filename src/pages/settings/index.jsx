@@ -320,7 +320,7 @@ class Settings extends Component {
         password: '',
         smtpServer: '',
         port: '',
-        ssl: '1',
+        isSsl: '1', 
       },
     }).then(res => {
       if (res && res.res > 0 && res.data) {

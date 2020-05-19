@@ -13,6 +13,10 @@ const formItemLayout = {
     sm: { span: 16 },
   },
 };
+const defaultAlarmValue = {
+  '0': '37.3℃',
+  '1': '100.4℉',
+};
 
 const RenameModal = props => {
   const { form, bean, visible, handleSubmit, confirmLoading, handleCancel } = props;
@@ -67,9 +71,9 @@ const RenameModal = props => {
     const { value } = e.target;
     const alarmValue = form.getFieldValue('alarmValue');
 
-    if (value && !checkAlarmValueIsError(alarmValue) && /((℃)|(℉))$/.test(alarmValue)) {
+    if (value && alarmValue) {
       form.setFieldsValue({
-        alarmValue: `${alarmValue.replace(/((℃)|(℉))$/, '')}${value === '1' ? '℉' : '℃'}`,
+        alarmValue: bean && bean.alarmValue && bean.temperatureUnit === value ? (bean.alarmValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultAlarmValue[value || '0'],
       });
     }
   };
@@ -88,7 +92,7 @@ const RenameModal = props => {
     let isError = false;
 
     if (value) {
-      if (/^[\d]{2,3}\.[\d]{1}$/.test(value.replace(/((℃)|(℉))$/, ''))) {
+      if (/^[\d]{2,3}(\.[\d]{1})?$/.test(value.replace(/((℃)|(℉))$/, ''))) {
         let _val = parseFloat(value);
 
         if (_val < 34 || _val > 120) {
@@ -106,8 +110,10 @@ const RenameModal = props => {
     const { value } = e.target;
 
     if (value && !checkAlarmValueIsError(value)) {
+      let _val = parseFloat(value).toFixed(1);
+
       form.setFieldsValue({
-        alarmValue: `${value.replace(/((℃)|(℉))$/, '')}${form.getFieldValue('temperatureUnit') === '1' ? '℉' : '℃'}`,
+        alarmValue: `${_val}${form.getFieldValue('temperatureUnit') === '1' ? '℉' : '℃'}`,
       });
     }
   };
@@ -123,10 +129,10 @@ const RenameModal = props => {
     let isError = false;
 
     if (value) {
-      if (/^[\d]{2,3}$/.test(value.replace(/s$/, ''))) {
+      if (/^[\d]{1,3}$/.test(value.replace(/s$/, ''))) {
         let _val = parseFloat(value);
 
-        if (_val < 10 || _val > 120) {
+        if (_val < 3 || _val > 120) {
           isError = true;
         }
       } else {
@@ -244,7 +250,7 @@ const RenameModal = props => {
                     validator: checkAlarmValue,
                   },
                 ],
-                initialValue: bean && bean.alarmValue ? `${bean.alarmValue}${form.getFieldValue('temperatureUnit') === '1' ? '℉' : '℃'}` : '',
+                initialValue: bean && bean.alarmValue && bean.temperatureUnit === form.getFieldValue('temperatureUnit') ? (bean.alarmValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultAlarmValue[form.getFieldValue('temperatureUnit') || '0'],
               })(<Input placeholder="34.0-120.0（℃/℉）" onFocus={handleAlarmValueFocus} onBlur={handleAlarmValueBlur} />)}
             </Form.Item>) : ''
         }
@@ -273,7 +279,7 @@ const RenameModal = props => {
                   },
                 ],
                 initialValue: bean && bean.waitShutdownTime ? `${bean.waitShutdownTime}s` : '',
-              })(<Input placeholder="10-120（s）" onFocus={handleWaitShutdownTimeFocus} onBlur={handleWaitShutdownTimeBlur} />)}
+              })(<Input placeholder="3-120（s）" onFocus={handleWaitShutdownTimeFocus} onBlur={handleWaitShutdownTimeBlur} />)}
             </Form.Item>) : ''
         }
         <Form.Item label={formatMessage({ id: 'oal.device.recognitionMode' })}>

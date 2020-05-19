@@ -24,6 +24,10 @@ const ModifyAlarmEvents = props => {
         alarmEvents: fieldsValue && fieldsValue.alarmEvents.join(',') || '',
       };
       if (currentUser && currentUser.org) params.orgId = currentUser.org._id;
+      params.alarmEventsTranslation = {
+        temperatureAnomalies: formatMessage({ id: 'oal.settings.temperatureAnomalies' }),
+        notWearMask: formatMessage({ id: 'oal.settings.notWearMask' }),
+      }
       handleSubmit(params);
     });
   };

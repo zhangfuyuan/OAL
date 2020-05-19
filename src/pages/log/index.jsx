@@ -116,29 +116,60 @@ class Log extends Component {
 
         this.list_handleClickItem(null, _firstSelectedBean);
         dispatch({
-          type: 'log/fetchGroupTree',
+          type: 'log/fetchGroupAllTree',
           payload: {
-            groupId: '',
-            deviceId: _firstSelectedBean._id,
+            faceType: '0,3',
           },
         }).then(res => {
           if (res && res.res > 0 && res.data) {
-            const _visitorGroup = res.data.filter(item => !item.isPeople && item.type === '3');
+            const tree_originalData = res.data;
+            let _rootNum = 0;
+            let _rootIndex = -1;
 
-            dispatch({
-              type: 'log/fetchGroupAllTree',
-              payload: {},
-            }).then(res => {
-              if (res && res.res > 0 && res.data) {
-                const _treeData = toTree(res.data) || [];
+            tree_originalData.forEach((item, index) => {
+              if (item.type === '0') {
+                if (item.pid === '1') {
+                  // 认证人员分组的根节点
+                  _rootIndex = index;
+                }
 
-                this.setState({
-                  groupTreeData: [..._visitorGroup, ..._treeData],
-                });
+                _rootNum += item.num;
               }
+            });
+
+            if (_rootIndex > -1) {
+              tree_originalData[_rootIndex].num = _rootNum;
+            }
+
+            this.setState({
+              groupTreeData: (toTree(tree_originalData) || []).reverse(),
             });
           }
         });
+        // dispatch({
+        //   type: 'log/fetchGroupTree',
+        //   payload: {
+        //     groupId: '',
+        //     deviceId: _firstSelectedBean._id,
+        //   },
+        // }).then(res => {
+        //   if (res && res.res > 0 && res.data) {
+        //     const _visitorGroup = res.data.filter(item => !item.isPeople && item.type === '3');
+
+        //     dispatch({
+        //       type: 'log/fetchGroupAllTree',
+        //       payload: {},
+        //     }).then(res => {
+        //       if (res && res.res > 0 && res.data) {
+        //         const _treeData = toTree(res.data) || [];
+
+        //         this.setState({
+        //           groupTreeData: [..._visitorGroup, ..._treeData],
+        //         });
+        //       }
+        //     });
+        //   }
+        // });
       } else {
         console.log(res);
       }

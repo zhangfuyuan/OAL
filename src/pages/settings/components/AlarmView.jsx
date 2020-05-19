@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { List, Button, Result, message, Popconfirm, Avatar, Upload, notification, Spin, Form, Input, Tooltip } from 'antd';
 import logo from '@/assets/logo.png';
-import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import { FormattedMessage, formatMessage, getLocale } from 'umi-plugin-react/locale';
 
 const { TextArea } = Input;
 const alarmEventsMap = {
@@ -33,6 +33,7 @@ class AlarmView extends Component {
         if (err) return;
         const params = fieldsValue;
         if (currentUser && currentUser.org) params.orgId = currentUser.org._id;
+        params.mailLanguage = getLocale();
         updateAlarmContent(params, () => {
           this.setState({
             isModifyAlarmContent: false,

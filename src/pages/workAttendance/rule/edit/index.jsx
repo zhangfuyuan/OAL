@@ -247,8 +247,8 @@ class WorkAttendanceRuleEdit extends Component {
     const endTime = getFieldValue(`times[${k + '-2'}]`);
     const attendanceEndTime = getFieldValue(`times[${k + '-3'}]`);
     let eH = -1;
-    let eM = attendanceStartTime && attendanceStartTime.minute() || 0;
-    let oM = -1;
+    let eM = -1;
+    let oM = attendanceStartTime && attendanceStartTime.minute() || 0;
     let startSliceIndex = 0;
     let endSliceIndex = 24;
 
@@ -264,7 +264,7 @@ class WorkAttendanceRuleEdit extends Component {
     }
 
     if (eH > -1 && eM > -1) {
-      endSliceIndex = oM > eM ? eH : eH + 1;
+      endSliceIndex = oM < eM ? eH + 1 : eH;
     }
 
     return [...Hours.slice(0, startSliceIndex), ...Hours.slice(endSliceIndex, 24)];
@@ -283,16 +283,22 @@ class WorkAttendanceRuleEdit extends Component {
     let endSliceIndex = 60;
 
     if (startTime) {
-      if (h >= startTime.hour()) {
+      if (h == startTime.hour()) {
         eM = startTime.minute();
+      } else if (h > startTime.hour()) {
+        eM = startSliceIndex;
       }
     } else if (endTime) {
-      if (h >= endTime.hour()) {
+      if (h == endTime.hour()) {
         eM = endTime.minute();
+      } else if (h > endTime.hour()) {
+        eM = startSliceIndex;
       }
     } else if (attendanceEndTime) {
-      if (h >= attendanceEndTime.hour()) {
+      if (h == attendanceEndTime.hour()) {
         eM = attendanceEndTime.minute();
+      } else if (h > attendanceEndTime.hour()) {
+        eM = startSliceIndex;
       }
     }
 
@@ -355,8 +361,10 @@ class WorkAttendanceRuleEdit extends Component {
     let endSliceIndex = 60;
 
     if (attendanceStartTime) {
-      if (h <= attendanceStartTime.hour()) {
+      if (h == attendanceStartTime.hour()) {
         sM = attendanceStartTime.minute();
+      } else if (h < attendanceStartTime.hour()) {
+        sM = endSliceIndex;
       }
     }
 
@@ -365,12 +373,16 @@ class WorkAttendanceRuleEdit extends Component {
     }
 
     if (endTime) {
-      if (h >= endTime.hour()) {
+      if (h == endTime.hour()) {
         eM = endTime.minute();
+      } else if (h > endTime.hour()) {
+        eM = startSliceIndex;
       }
     } else if (attendanceEndTime) {
-      if (h >= attendanceEndTime.hour()) {
+      if (h == attendanceEndTime.hour()) {
         eM = attendanceEndTime.minute();
+      } else if (h > attendanceEndTime.hour()) {
+        eM = startSliceIndex;
       }
     }
 
@@ -433,12 +445,16 @@ class WorkAttendanceRuleEdit extends Component {
     let endSliceIndex = 60;
 
     if (startTime) {
-      if (h <= startTime.hour()) {
+      if (h == startTime.hour()) {
         sM = startTime.minute();
+      } else if (h < startTime.hour()) {
+        sM = endSliceIndex;
       }
     } else if (attendanceStartTime) {
-      if (h <= attendanceStartTime.hour()) {
+      if (h == attendanceStartTime.hour()) {
         sM = attendanceStartTime.minute();
+      } else if (h < attendanceStartTime.hour()) {
+        sM = endSliceIndex;
       }
     }
 
@@ -447,8 +463,10 @@ class WorkAttendanceRuleEdit extends Component {
     }
 
     if (attendanceEndTime) {
-      if (h >= attendanceEndTime.hour()) {
+      if (h == attendanceEndTime.hour()) {
         eM = attendanceEndTime.minute();
+      } else if (h > attendanceEndTime.hour()) {
+        eM = startSliceIndex;
       }
     }
 
@@ -505,16 +523,22 @@ class WorkAttendanceRuleEdit extends Component {
     let endSliceIndex = 60;
 
     if (endTime) {
-      if (h <= endTime.hour()) {
+      if (h == endTime.hour()) {
         sM = endTime.minute();
+      } else if (h < endTime.hour()) {
+        sM = endSliceIndex;
       }
     } else if (startTime) {
-      if (h <= startTime.hour()) {
+      if (h == startTime.hour()) {
         sM = startTime.minute();
+      } else if (h < startTime.hour()) {
+        sM = endSliceIndex;
       }
     } else if (attendanceStartTime) {
-      if (h <= attendanceStartTime.hour()) {
+      if (h == attendanceStartTime.hour()) {
         sM = attendanceStartTime.minute();
+      } else if (h < attendanceStartTime.hour()) {
+        sM = endSliceIndex;
       }
     }
 

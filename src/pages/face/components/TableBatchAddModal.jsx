@@ -89,6 +89,7 @@ const TableBatchAddModal = props => {
       myImgList.push(file);
       setImgListLen(myImgList.length);
     } else {
+      message.destroy();
       message.error(formatMessage({ id: 'oal.face.IncorrectFileFormat' }));
     }
 

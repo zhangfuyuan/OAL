@@ -14,7 +14,7 @@ let myCurGroupSearchRelateDevicePeopleIdList = []; // 当前分组已关联设�
 let myCurSelectedAllPeopleIdList = []; // 当前已选所有人员id集
 
 // const getPidFn = (pid, list, res = []) => {
-//   const index = findIndex(list, item => item._id === pid);
+//   let index = findIndex(list, item => item._id === pid);
 
 //   if (index > -1) {
 //     return getPidFn(list[index].pid, list, res.concat(pid));
@@ -81,7 +81,7 @@ const TableAddAuthoryModal = props => {
 
   const renderNodes = data =>
     data.map(item => {
-      const _isVisitorGroup = !item.isPeople && item.type === '3';
+      let _isVisitorGroup = !item.isPeople && item.type === '3';
       delete item.isLeaf;
 
       if (item.children && item.children.length > 0) {
@@ -105,10 +105,9 @@ const TableAddAuthoryModal = props => {
     });
 
   const removeUser = (e, user) => {
-    console.time('移除用时');
-    const _checkedValue = checkboxChecked.filter(item => item !== user._id);
-    const _checkedValueLen = _checkedValue.length;
-    const _curSelectedAllPeople = [];
+    let _checkedValue = checkboxChecked.filter(item => item !== user._id);
+    let _checkedValueLen = _checkedValue.length;
+    let _curSelectedAllPeople = [];
     myCurSelectedAllPeopleIdList = [];
 
     curSelectedAllPeople.forEach(item => {
@@ -122,14 +121,12 @@ const TableAddAuthoryModal = props => {
     setCheckboxIndeterminate(!!_checkedValueLen && _checkedValueLen < myCurGroupSearchPeopleIdListLen);
     setCheckboxCheckAll(_checkedValueLen === myCurGroupSearchPeopleIdListLen);
     setCurSelectedAllPeople(_curSelectedAllPeople);
-    console.timeEnd('移除用时');
   };
 
   const handleCheckboxChange = checkedValue => {
-    console.time('单选用时');
-    const _checkedValueLen = checkedValue.length;
-    const _curSelectedAllPeople = [];
-    const _changeIdList = [];
+    let _checkedValueLen = checkedValue.length;
+    let _curSelectedAllPeople = [];
+    let _changeIdList = [];
 
     if (_checkedValueLen > checkboxChecked.length) {
       // 新增勾选
@@ -140,7 +137,7 @@ const TableAddAuthoryModal = props => {
       });
 
       _changeIdList.forEach(item => {
-        const index = findIndex(myCurGroupSearchPeopleList, ite => ite._id === item);
+        let index = findIndex(myCurGroupSearchPeopleList, ite => ite._id === item);
 
         _curSelectedAllPeople.unshift(myCurGroupSearchPeopleList[index]);
         myCurSelectedAllPeopleIdList.push(item);
@@ -168,20 +165,13 @@ const TableAddAuthoryModal = props => {
     setCheckboxIndeterminate(!!_checkedValueLen && _checkedValueLen < myCurGroupSearchPeopleIdListLen);
     setCheckboxCheckAll(_checkedValueLen === myCurGroupSearchPeopleIdListLen);
     setCurSelectedAllPeople(_curSelectedAllPeople);
-    console.timeEnd('单选用时');
-    // const _curGroupPeopleIdList = curGroupPeople.map(item => item._id);
-    // setCurSelectedAllPeople([
-    //   ...curSelectedAllPeople.filter(item => !~_curGroupPeopleIdList.indexOf(item._id)),
-    //   ...curGroupPeople.filter(item => checkedValue.indexOf(item._id) > -1 && !item.isRelateDevice),
-    // ]);
   };
 
   const handleCheckAllChange = e => {
-    console.time('全选用时');
-    const _isCheckedAll = e.target.checked;
-    const _checkedValue = _isCheckedAll ? myCurGroupSearchPeopleIdList : myCurGroupSearchRelateDevicePeopleIdList;
-    const _checkedValueLen = _checkedValue.length;
-    const _curSelectedAllPeople = [];
+    let _isCheckedAll = e.target.checked;
+    let _checkedValue = _isCheckedAll ? myCurGroupSearchPeopleIdList : myCurGroupSearchRelateDevicePeopleIdList;
+    let _checkedValueLen = _checkedValue.length;
+    let _curSelectedAllPeople = [];
 
     setCheckboxChecked(_checkedValue);
     setCheckboxIndeterminate(!!_checkedValueLen && _checkedValueLen < myCurGroupSearchPeopleIdListLen);
@@ -207,11 +197,6 @@ const TableAddAuthoryModal = props => {
     }
 
     setCurSelectedAllPeople(_curSelectedAllPeople);
-    console.timeEnd('全选用时');
-    // setCurSelectedAllPeople([
-    //   ...curSelectedAllPeople.filter(item => !~myCurGroupSearchPeopleIdList.indexOf(item._id)),
-    //   ...curGroupPeople.filter(item => _checkedValue.indexOf(item._id) > -1 && !item.isRelateDevice),
-    // ]);
   };
 
   const handleTreeSelect = selectedKeys => {
@@ -228,25 +213,51 @@ const TableAddAuthoryModal = props => {
       if (!visible) return;
 
       if (res && res.res > 0 && res.data) {
-        const _type = selectedKeys.indexOf(groupTreeData[0] && groupTreeData[0]._id || '') > -1 ? '3' : '0';
+        let _type = selectedKeys.indexOf(groupTreeData[0] && groupTreeData[0]._id || '') > -1 ? '3' : '0';
         myCurGroupPeople = [];
         myCurGroupSearchPeopleList = [];
         myCurGroupSearchPeopleIdList = [];
         myCurGroupSearchPeopleIdListLen = 0;
         myCurGroupSearchRelateDevicePeopleIdList = [];
-        const _data = []; // 符合搜索条件的人员集
+        let _data = []; // 符合搜索条件的人员集
         let _dataLen = 0;
-        const _checkedValue = []; // 已选的人员集
+        let _checkedValue = []; // 已选的人员集
         let _checkedValueLen = 0;
+        let noNamePeopleList = []; // 无名战士
+        const _searchVal = searchVal;
 
-        console.time('过滤用时');
         res.data.forEach(item => {
           if (item.type === _type) {
             // 对应分组
             myCurGroupPeople.push(item);
 
-            if (!searchVal || (searchVal && (item.name && item.name.indexOf(searchVal) > -1) || !item.name)) {
-              // 符合搜索条件
+            if (!_searchVal) {
+              // 无搜索条件
+              if (!item.name) {
+                // 无名
+                noNamePeopleList.push(item);
+              } else {
+                // 有名
+                _data.push(item);
+              }
+
+              myCurGroupSearchPeopleList.push(item);
+              myCurGroupSearchPeopleIdList.push(item._id);
+              myCurGroupSearchPeopleIdListLen++;
+              _dataLen++;
+
+              if (item.isRelateDevice || myCurSelectedAllPeopleIdList.indexOf(item._id) > -1) {
+                // 已选的
+                _checkedValue.push(item._id);
+                _checkedValueLen++;
+              }
+
+              if (item.isRelateDevice) {
+                // 已关联
+                myCurGroupSearchRelateDevicePeopleIdList.push(item._id);
+              }
+            } else if (item.name && item.name.indexOf(_searchVal) > -1) {
+              // 有名且符合搜索条件
               myCurGroupSearchPeopleList.push(item);
               myCurGroupSearchPeopleIdList.push(item._id);
               myCurGroupSearchPeopleIdListLen++;
@@ -266,12 +277,10 @@ const TableAddAuthoryModal = props => {
             }
           }
         });
-        console.timeEnd('过滤用时');
 
-        console.time('排序用时');
         _data.sort(function (a, b) {
-          const v1 = a.name;
-          const v2 = b.name;
+          let v1 = a.name;
+          let v2 = b.name;
 
           if (/[\u4e00-\u9fa5]/.test(v1) && /[\u4e00-\u9fa5]/.test(v2)) { // 实现中文按拼音排序
             return v1.localeCompare(v2, 'zh'); // 这里的参数 'zh' 很重要
@@ -285,7 +294,7 @@ const TableAddAuthoryModal = props => {
             }
           }
         });
-        console.timeEnd('排序用时');
+        _data = _data.concat(noNamePeopleList);
 
         setCurGroupPeople(_data);
         setCheckboxChecked(_checkedValue);
@@ -300,63 +309,92 @@ const TableAddAuthoryModal = props => {
     });
   };
 
-  const handleSearch = value => {
-    setSearchVal(value);
-    myCurGroupSearchPeopleList = [];
-    myCurGroupSearchPeopleIdList = [];
-    myCurGroupSearchPeopleIdListLen = 0;
-    myCurGroupSearchRelateDevicePeopleIdList = [];
-    const _data = []; // 符合搜索条件的人员集
-    let _dataLen = 0;
-    const _checkedValue = []; // 已选的人员集
-    let _checkedValueLen = 0;
+  const handleSearch = searchVal => {
+    setModalLoading(true);
+    setTimeout(() => {
+      myCurGroupSearchPeopleList = [];
+      myCurGroupSearchPeopleIdList = [];
+      myCurGroupSearchPeopleIdListLen = 0;
+      myCurGroupSearchRelateDevicePeopleIdList = [];
+      let _data = []; // 符合搜索条件的人员集
+      let _dataLen = 0;
+      let _checkedValue = []; // 已选的人员集
+      let _checkedValueLen = 0;
+      let noNamePeopleList = []; // 无名战士
+      const _searchVal = searchVal;
 
-    console.time('过滤用时');
-    myCurGroupPeople.forEach(item => {
-      if (!searchVal || (searchVal && (item.name && item.name.indexOf(value) > -1) || !item.name)) {
-        // 符合搜索条件
-        myCurGroupSearchPeopleList.push(item);
-        myCurGroupSearchPeopleIdList.push(item._id);
-        myCurGroupSearchPeopleIdListLen++;
-        _data.push(item);
-        _dataLen++;
+      myCurGroupPeople.forEach(item => {
+        if (!_searchVal) {
+          // 无搜索条件
+          if (!item.name) {
+            // 无名
+            noNamePeopleList.push(item);
+          } else {
+            // 有名
+            _data.push(item);
+          }
 
-        if (item.isRelateDevice || myCurSelectedAllPeopleIdList.indexOf(item._id) > -1) {
-          // 已选的
-          _checkedValue.push(item._id);
-          _checkedValueLen++;
+          myCurGroupSearchPeopleList.push(item);
+          myCurGroupSearchPeopleIdList.push(item._id);
+          myCurGroupSearchPeopleIdListLen++;
+          _dataLen++;
+
+          if (item.isRelateDevice || myCurSelectedAllPeopleIdList.indexOf(item._id) > -1) {
+            // 已选的
+            _checkedValue.push(item._id);
+            _checkedValueLen++;
+          }
+
+          if (item.isRelateDevice) {
+            // 已关联
+            myCurGroupSearchRelateDevicePeopleIdList.push(item._id);
+          }
+        } else if (item.name && item.name.indexOf(_searchVal) > -1) {
+          // 有名且符合搜索条件
+          myCurGroupSearchPeopleList.push(item);
+          myCurGroupSearchPeopleIdList.push(item._id);
+          myCurGroupSearchPeopleIdListLen++;
+          _data.push(item);
+          _dataLen++;
+
+          if (item.isRelateDevice || myCurSelectedAllPeopleIdList.indexOf(item._id) > -1) {
+            // 已选的
+            _checkedValue.push(item._id);
+            _checkedValueLen++;
+          }
+
+          if (item.isRelateDevice) {
+            // 已关联
+            myCurGroupSearchRelateDevicePeopleIdList.push(item._id);
+          }
         }
+      });
 
-        if (item.isRelateDevice) {
-          // 已关联
-          myCurGroupSearchRelateDevicePeopleIdList.push(item._id);
-        }
-      }
-    });
+      _data.sort(function (a, b) {
+        let v1 = a.name;
+        let v2 = b.name;
 
-    console.time('排序用时');
-    _data.sort(function (a, b) {
-      const v1 = a.name;
-      const v2 = b.name;
-
-      if (/[\u4e00-\u9fa5]/.test(v1) && /[\u4e00-\u9fa5]/.test(v2)) { // 实现中文按拼音排序
-        return v1.localeCompare(v2, 'zh'); // 这里的参数 'zh' 很重要
-      } else {
-        if (v1 > v2) {
-          return 1;
-        } else if (v1 == v2) {
-          return 0;
+        if (/[\u4e00-\u9fa5]/.test(v1) && /[\u4e00-\u9fa5]/.test(v2)) { // 实现中文按拼音排序
+          return v1.localeCompare(v2, 'zh'); // 这里的参数 'zh' 很重要
         } else {
-          return -1;
+          if (v1 > v2) {
+            return 1;
+          } else if (v1 == v2) {
+            return 0;
+          } else {
+            return -1;
+          }
         }
-      }
-    });
-    console.timeEnd('排序用时');
+      });
+      _data = _data.concat(noNamePeopleList);
 
-    setCurGroupPeople(_data);
-    setCheckboxChecked(_checkedValue);
-    setCheckboxIndeterminate(!!_checkedValueLen && _checkedValueLen < _dataLen);
-    setCheckboxCheckAll(_dataLen === _checkedValueLen);
+      setSearchVal(searchVal);
+      setCurGroupPeople(_data);
+      setCheckboxChecked(_checkedValue);
+      setCheckboxIndeterminate(!!_checkedValueLen && _checkedValueLen < _dataLen);
+      setCheckboxCheckAll(_dataLen === _checkedValueLen);
+      setModalLoading(false);
+    }, 50);
   };
 
   return (
@@ -372,7 +410,7 @@ const TableAddAuthoryModal = props => {
     >
       <Spin spinning={modalLoading} size="large">
         <div style={{ height: '60vh', display: 'flex', position: 'relative', flexDirection: 'column', }}>
-          <div className="oal-selected-list" style={{ overflow: 'auto', flex: 2, }}>
+          <div className="oal-selected-list" style={{ overflow: 'auto', flex: 1, }}>
             <List
               grid={{ column: 6 }}
               dataSource={curSelectedAllPeople}
@@ -394,7 +432,7 @@ const TableAddAuthoryModal = props => {
 
           <Divider />
 
-          <div style={{ display: 'flex', overflow: 'auto', flex: 3, }}>
+          <div style={{ display: 'flex', overflow: 'auto', flex: 2, }}>
             <div style={{ height: '100%', overflow: 'auto', flex: 1, }}>
               <Tree
                 blockNode
@@ -416,7 +454,7 @@ const TableAddAuthoryModal = props => {
                 curGroupPeople && curGroupPeople.length > 0 ?
                   (<div>
                     <Checkbox
-                      style={{ marginBottom: '10px' }}
+                      style={{ marginBottom: '10px', fontWeight: 'bold', }}
                       indeterminate={checkboxIndeterminate}
                       onChange={handleCheckAllChange}
                       checked={checkboxCheckAll}

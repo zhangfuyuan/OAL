@@ -382,7 +382,7 @@ const TableAddOrModifyModal = props => {
           })(
             <Upload
               name="userPhotos"
-              accept="image/*"
+              accept=".png, .jpg, .jpeg"
               listType="picture"
               showUploadList={false}
               action="/guard-web/a/face/uploadFace"

@@ -94,7 +94,7 @@ class SystemView extends Component {
         actions: [
           <Upload
             name="saasIcons"
-            accept="image/*"
+            accept=".png, .jpg, .jpeg"
             showUploadList={false}
             action="/guard-web/a/fileResource/upload"
             withCredentials
