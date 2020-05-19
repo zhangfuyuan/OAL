@@ -557,4 +557,7 @@ export default {
   'oal.log.wearMask': `佩戴口罩`,
   'oal.log.notWearMask': `未佩戴口罩`,
   'oal.settings.encrypt': `加密`,
+  'oal.face.batchAddExplainTips4': `4-人員數據文件大小不超過2MB;人員照片總大小不超過200MB`,
+  'oal.face.personnelDataFileTooLarge': `人員數據文件過大`,
+  'oal.face.staffPhotoFileTooLarge': `人員照片文件過大`,
 };

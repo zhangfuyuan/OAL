@@ -557,4 +557,7 @@ export default {
   'oal.log.wearMask': `Wear mask`,
   'oal.log.notWearMask': `Not wear mask`,
   'oal.settings.encrypt': `Encrypt`,
+  'oal.face.batchAddExplainTips4': `4- The size of personnel data file should not exceed 2MB; The total size of staff photo should not exceed 200MB`,
+  'oal.face.personnelDataFileTooLarge': `The personnel data file is too large`,
+  'oal.face.staffPhotoFileTooLarge': `The staff photo file is too large`,
 };

@@ -410,7 +410,7 @@ class Face extends Component {
       type: 'face/fetch',
       payload: {
         ...tablePage,
-        groupId: selectedKeys[0] === treeData[0]._id ? this.tree_originalData.map(item => item._id).join(',') : selectedKeys[0],
+        groupId: treeData[0] && selectedKeys[0] === treeData[0]._id ? this.tree_originalData.map(item => item._id).join(',') : selectedKeys[0],
         // columnKey,
         // order,
         name: tableSearchName.trim(),

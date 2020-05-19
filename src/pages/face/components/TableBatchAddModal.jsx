@@ -12,6 +12,7 @@ let myUploadAllSuccessNum = 0;
 let taskId = '';
 let myUploadLoading = false;
 let myImgTotal = 0; // 含文件格式不正确
+let myLegalImgTotalSize = 0;
 
 const userImportTemplateLinkMap = {
   'zh-CN': '/guardFile/model/users-cn-rZH/users.xls',
@@ -55,6 +56,7 @@ const TableBatchAddModal = props => {
     taskId = '';
     myUploadLoading = false;
     myImgTotal = 0;
+    myLegalImgTotalSize = 0;
   };
 
   const handleUploadAbort = (unNotification) => {
@@ -85,12 +87,15 @@ const TableBatchAddModal = props => {
     const isJpgOrPng = fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/jpg';
     const isLt240KB = file.size / 1024 < 240;
 
+    if (!isLt240KB) {
+      message.destroy();
+      message.error(formatMessage({ id: 'oal.face.staffPhotoFileTooLarge' }));
+    }
+
     if (isJpgOrPng && isLt240KB) {
       myImgList.push(file);
       setImgListLen(myImgList.length);
-    } else {
-      message.destroy();
-      message.error(formatMessage({ id: 'oal.face.IncorrectFileFormat' }));
+      myLegalImgTotalSize += file.size;
     }
 
     myImgTotal++;
@@ -109,18 +114,28 @@ const TableBatchAddModal = props => {
   };
 
   const handleModalOk = () => {
-    if (xlsFile && myImgList && myImgList.length > 0) {
+    if (!xlsFile || !myImgList || myImgList.length === 0) {
+      notification.error({
+        message: formatMessage({ id: 'oal.face.failToUpload' }),
+        description: formatMessage({ id: 'oal.face.pleaseUploadFile' }),
+      });
+    } else if (xlsFile.size > 1024 * 1024 * 2) {
+      notification.error({
+        message: formatMessage({ id: 'oal.face.failToUpload' }),
+        description: formatMessage({ id: 'oal.face.personnelDataFileTooLarge' }),
+      });
+    } else if (myLegalImgTotalSize > 1024 * 1024 * 200) {
+      notification.error({
+        message: formatMessage({ id: 'oal.face.failToUpload' }),
+        description: formatMessage({ id: 'oal.face.staffPhotoFileTooLarge' }),
+      });
+    } else {
       if (window.WebUploader && dispatch) {
         setUploadLoading(true);
         submit1_getBatchAddTaskId();
       } else {
         handleUploadAbort();
       }
-    } else {
-      notification.error({
-        message: formatMessage({ id: 'oal.face.failToUpload' }),
-        description: formatMessage({ id: 'oal.face.pleaseUploadFile' }),
-      });
     }
   };
 
@@ -319,6 +334,7 @@ const TableBatchAddModal = props => {
     myImgList = [];
     setImgListLen(0);
     myImgTotal = 0;
+    myLegalImgTotalSize = 0;
     setImgTotal(0);
   };
 
@@ -461,6 +477,9 @@ const TableBatchAddModal = props => {
           </p>
           <p>
             <FormattedMessage id="oal.face.batchAddExplainTips3" />
+          </p>
+          <p>
+            <FormattedMessage id="oal.face.batchAddExplainTips4" />
           </p>
         </div>
       </div>
