@@ -71,8 +71,8 @@ class logQuery extends Component {
       pageSize: 10,
     },
     sortedInfo: {
-      columnKey: '',
-      order: '', // ascend（正序）、descend（倒序）
+      columnKey: 'time',
+      order: 'descend', // ascend（正序）、descend（倒序）
     },
     tableSelectedBean: {},
     viewVisible: false,
@@ -160,7 +160,7 @@ class logQuery extends Component {
         dataIndex: 'name',
         // sorter: (a, b) => a.name - b.name,
         // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
-        render: (text, record) => <span>{(record.peopleType === '4' && formatMessage({ id: wearMaskMap[record.wearMask] })) || (record.peopleType === '99' && formatMessage({ id: peopleTypeMap[record.peopleType] })) || record.name || '-'}</span>,
+        render: (text, record) => <span>{(record.peopleType === '4' && record.wearMask && formatMessage({ id: wearMaskMap[record.wearMask] })) || (record.peopleType === '99' && formatMessage({ id: peopleTypeMap[record.peopleType] })) || record.name || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.face.staffid' }),

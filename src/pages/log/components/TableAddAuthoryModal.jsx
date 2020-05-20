@@ -1,6 +1,6 @@
 import { Modal, Tree, message, List, Icon, Spin, Divider, Checkbox, Row, Col, Empty, Input } from 'antd';
 import React, { useState, useEffect } from 'react';
-import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import { FormattedMessage, formatMessage, getLocale } from 'umi-plugin-react/locale';
 import { findIndex } from 'lodash';
 import { toTree } from '@/utils/utils';
 
@@ -9,6 +9,7 @@ const { Search } = Input;
 let myCurGroupPeople = []; // 缓存对应分组所有人员集
 let myCurGroupSearchPeopleList = [];  // 当前分组符合搜索条件的人员集
 let myCurGroupSearchPeopleIdList = []; // 当前分组符合搜索条件的人员id集
+let myCurGroupSearchStatePeopleIdList = []; // 当前分组符合搜索条件的非禁用的人员id集
 let myCurGroupSearchPeopleIdListLen = 0; // 当前分组符合搜索条件的人员id集长度
 let myCurGroupSearchRelateDevicePeopleIdList = []; // 当前分组已关联设备的人员id集
 let myCurSelectedAllPeopleIdList = []; // 当前已选所有人员id集
@@ -42,6 +43,7 @@ const TableAddAuthoryModal = props => {
   const [checkboxCheckAll, setCheckboxCheckAll] = useState(false);
   const [curSelectedAllPeople, setCurSelectedAllPeople] = useState([]); //  当前收集器的所有人员集
   const [searchVal, setSearchVal] = useState(''); //  当前收集器的所有人员集
+  const language = getLocale();
 
   // 建议：每次 Modal 关闭时重置
   useEffect(() => {
@@ -64,6 +66,7 @@ const TableAddAuthoryModal = props => {
     myCurGroupPeople = [];
     myCurGroupSearchPeopleList = [];
     myCurGroupSearchPeopleIdList = [];
+    myCurGroupSearchStatePeopleIdList = [];
     myCurGroupSearchPeopleIdListLen = 0;
     myCurGroupSearchRelateDevicePeopleIdList = [];
     myCurSelectedAllPeopleIdList = [];
@@ -169,7 +172,7 @@ const TableAddAuthoryModal = props => {
 
   const handleCheckAllChange = e => {
     let _isCheckedAll = e.target.checked;
-    let _checkedValue = _isCheckedAll ? myCurGroupSearchPeopleIdList : myCurGroupSearchRelateDevicePeopleIdList;
+    let _checkedValue = _isCheckedAll ? myCurGroupSearchStatePeopleIdList : myCurGroupSearchRelateDevicePeopleIdList;
     let _checkedValueLen = _checkedValue.length;
     let _curSelectedAllPeople = [];
 
@@ -179,7 +182,7 @@ const TableAddAuthoryModal = props => {
 
     if (_isCheckedAll) {
       myCurGroupSearchPeopleList.forEach(item => {
-        if (!~myCurSelectedAllPeopleIdList.indexOf(item._id) && !item.isRelateDevice) {
+        if (!~myCurSelectedAllPeopleIdList.indexOf(item._id) && !item.isRelateDevice && !!item.state) {
           _curSelectedAllPeople.unshift(item);
           myCurSelectedAllPeopleIdList.push(item._id);
         }
@@ -217,6 +220,7 @@ const TableAddAuthoryModal = props => {
         myCurGroupPeople = [];
         myCurGroupSearchPeopleList = [];
         myCurGroupSearchPeopleIdList = [];
+        myCurGroupSearchStatePeopleIdList = [];
         myCurGroupSearchPeopleIdListLen = 0;
         myCurGroupSearchRelateDevicePeopleIdList = [];
         let _data = []; // 符合搜索条件的人员集
@@ -243,6 +247,7 @@ const TableAddAuthoryModal = props => {
 
               myCurGroupSearchPeopleList.push(item);
               myCurGroupSearchPeopleIdList.push(item._id);
+              if (!!item.state || item.isRelateDevice) myCurGroupSearchStatePeopleIdList.push(item._id);
               myCurGroupSearchPeopleIdListLen++;
               _dataLen++;
 
@@ -260,6 +265,7 @@ const TableAddAuthoryModal = props => {
               // 有名且符合搜索条件
               myCurGroupSearchPeopleList.push(item);
               myCurGroupSearchPeopleIdList.push(item._id);
+              if (!!item.state || item.isRelateDevice) myCurGroupSearchStatePeopleIdList.push(item._id);
               myCurGroupSearchPeopleIdListLen++;
               _data.push(item);
               _dataLen++;
@@ -278,22 +284,7 @@ const TableAddAuthoryModal = props => {
           }
         });
 
-        _data.sort(function (a, b) {
-          let v1 = a.name;
-          let v2 = b.name;
-
-          if (/[\u4e00-\u9fa5]/.test(v1) && /[\u4e00-\u9fa5]/.test(v2)) { // 实现中文按拼音排序
-            return v1.localeCompare(v2, 'zh'); // 这里的参数 'zh' 很重要
-          } else {
-            if (v1 > v2) {
-              return 1;
-            } else if (v1 == v2) {
-              return 0;
-            } else {
-              return -1;
-            }
-          }
-        });
+        _data.sort((a, b) => a.name && b.name && a.name.localeCompare(b.name, language) || 1);
         _data = _data.concat(noNamePeopleList);
 
         setCurGroupPeople(_data);
@@ -314,6 +305,7 @@ const TableAddAuthoryModal = props => {
     setTimeout(() => {
       myCurGroupSearchPeopleList = [];
       myCurGroupSearchPeopleIdList = [];
+      myCurGroupSearchStatePeopleIdList = [];
       myCurGroupSearchPeopleIdListLen = 0;
       myCurGroupSearchRelateDevicePeopleIdList = [];
       let _data = []; // 符合搜索条件的人员集
@@ -336,6 +328,7 @@ const TableAddAuthoryModal = props => {
 
           myCurGroupSearchPeopleList.push(item);
           myCurGroupSearchPeopleIdList.push(item._id);
+          if (!!item.state || item.isRelateDevice) myCurGroupSearchStatePeopleIdList.push(item._id);
           myCurGroupSearchPeopleIdListLen++;
           _dataLen++;
 
@@ -353,6 +346,7 @@ const TableAddAuthoryModal = props => {
           // 有名且符合搜索条件
           myCurGroupSearchPeopleList.push(item);
           myCurGroupSearchPeopleIdList.push(item._id);
+          if (!!item.state || item.isRelateDevice) myCurGroupSearchStatePeopleIdList.push(item._id);
           myCurGroupSearchPeopleIdListLen++;
           _data.push(item);
           _dataLen++;
@@ -370,22 +364,23 @@ const TableAddAuthoryModal = props => {
         }
       });
 
-      _data.sort(function (a, b) {
-        let v1 = a.name;
-        let v2 = b.name;
+      // _data.sort(function (a, b) {
+      //   let v1 = a.name;
+      //   let v2 = b.name;
 
-        if (/[\u4e00-\u9fa5]/.test(v1) && /[\u4e00-\u9fa5]/.test(v2)) { // 实现中文按拼音排序
-          return v1.localeCompare(v2, 'zh'); // 这里的参数 'zh' 很重要
-        } else {
-          if (v1 > v2) {
-            return 1;
-          } else if (v1 == v2) {
-            return 0;
-          } else {
-            return -1;
-          }
-        }
-      });
+      //   if (/[\u4e00-\u9fa5]/.test(v1) && /[\u4e00-\u9fa5]/.test(v2)) { // 实现中文按拼音排序
+      //     return v1.localeCompare(v2, 'zh'); // 这里的参数 'zh' 很重要
+      //   } else {
+      //     if (v1 > v2) {
+      //       return 1;
+      //     } else if (v1 == v2) {
+      //       return 0;
+      //     } else {
+      //       return -1;
+      //     }
+      //   }
+      // });
+      _data.sort((a, b) => a.name && b.name && a.name.localeCompare(b.name, language) || 1);
       _data = _data.concat(noNamePeopleList);
 
       setSearchVal(searchVal);
@@ -472,7 +467,7 @@ const TableAddAuthoryModal = props => {
                           <Col span={24}>
                             <Checkbox
                               value={item._id}
-                              disabled={item.isRelateDevice}
+                              disabled={item.isRelateDevice || !item.state}
                             >
                               {item.name || '-'}
                             </Checkbox>

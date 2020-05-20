@@ -78,7 +78,15 @@ const TableBatchAddModal = props => {
   };
 
   const beforeUploadXls = file => {
-    setXlsFile(file);
+    if (file.size > 1024 * 1024 * 2) {
+      notification.error({
+        message: formatMessage({ id: 'oal.face.failToUpload' }),
+        description: formatMessage({ id: 'oal.face.personnelDataFileTooLarge' }),
+      });
+    } else {
+      setXlsFile(file);
+    }
+
     return false;
   };
 
@@ -87,12 +95,19 @@ const TableBatchAddModal = props => {
     const isJpgOrPng = fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/jpg';
     const isLt240KB = file.size / 1024 < 240;
 
-    if (!isLt240KB) {
-      message.destroy();
-      message.error(formatMessage({ id: 'oal.face.staffPhotoFileTooLarge' }));
-    }
-
-    if (isJpgOrPng && isLt240KB) {
+    if (!isJpgOrPng) {
+      notification.destroy();
+      notification.error({
+        message: formatMessage({ id: 'oal.face.failToUpload' }),
+        description: formatMessage({ id: 'oal.face.IncorrectFileFormat' }),
+      });
+    } else if (!isLt240KB || myLegalImgTotalSize > 1024 * 1024 * 200) {
+      notification.destroy();
+      notification.error({
+        message: formatMessage({ id: 'oal.face.failToUpload' }),
+        description: formatMessage({ id: 'oal.face.staffPhotoFileTooLarge' }),
+      });
+    } else {
       myImgList.push(file);
       setImgListLen(myImgList.length);
       myLegalImgTotalSize += file.size;

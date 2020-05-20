@@ -200,6 +200,7 @@ class Log extends Component {
         ...formValues,
         deviceId: listSelectedBean._id,
         peopleType: formValues && formValues.peopleType || '',
+        state: 1,
       },
     });
   };

@@ -81,7 +81,6 @@ const TableAddOrModifyModal = props => {
 
     if (value && len > 0) {
       const curFile = value[len - 1].originFileObj;
-      console.log('图片信息：', curFile.type, curFile.size, curFile.name);
 
       const fileType = curFile.type;
       const isJpgOrPng = fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/jpg';
@@ -111,50 +110,105 @@ const TableAddOrModifyModal = props => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       const { name, mobile, validity, userPhotos } = fieldsValue;
+      const _userPhotosLen = userPhotos && userPhotos.length || 0;
       const params = {
+        faceId: isEdit && bean && bean._id || '',
         name,
         mobile,
         isEdit,
         startDate: validity[0].format('YYYY-MM-DD'),
         endDate: validity[1].format('YYYY-MM-DD'),
         peopleType: '3',
+        isUpdateImg: _userPhotosLen > 0 ? '1' : '0',
       }
 
-      isEdit && (params.faceId = bean._id);
-      setUploadLoading(true);
-      dispatch({
-        type: 'faceVisitor/addOrEditInfo',
-        payload: params,
-      }).then(res => {
-        if (!visible) return;
+      if (isEdit && _userPhotosLen === 0) {
+        // 编辑且不修改图片
+        setUploadLoading(true);
+        dispatch({
+          type: 'faceVisitor/addOrEditInfo',
+          payload: params,
+        }).then(res => {
+          if (!visible) return;
 
-        if (res && res.res > 0 && res.data) {
-          const len = userPhotos && userPhotos.length || 0;
-
-          if (window.WebUploader && len > 0) {
-            const _originFileObj = userPhotos[len - 1].originFileObj;
-            const { _id, name: _name, staffid: _staffid } = res.data;
-
-            _originFileObj.faceId = _id;
-            _originFileObj._name = _name;
-            _originFileObj._staffid = _staffid;
-            wuInit([_originFileObj]);
-          } else if (isEdit) {
+          if (res && res.res > 0) {
             // 编辑，可不修改图片直接结束
             handleSubmit(isEdit);
             resetAllVar();
           } else {
-            console.log(userPhotos);
+            console.log(res);
+            notification.error({
+              message: formatMessage({ id: 'oal.face.failToUpload' }),
+              description: formatMessage({ id: 'oal.face.pleaseUploadFileAgain' }),
+            });
             setUploadLoading(false);
           }
-        } else {
-          console.log(res);
+        }).catch(err => {
+          console.log(err);
+          notification.error({
+            message: formatMessage({ id: 'oal.face.failToUpload' }),
+            description: formatMessage({ id: 'oal.face.pleaseUploadFileAgain' }),
+          });
           setUploadLoading(false);
-        }
-      }).catch(err => {
-        console.log(err);
-        setUploadLoading(false);
-      });
+        });
+      } else if (window.WebUploader && _userPhotosLen > 0) {
+        // 含图片（添加/编辑）
+        const _originFileObj = userPhotos[_userPhotosLen - 1].originFileObj;
+        const { faceId, name, mobile, isEdit, startDate, endDate, peopleType, isUpdateImg } = params || {};
+
+        faceId && (_originFileObj.faceId = faceId);
+        _originFileObj.staffname = name;
+        _originFileObj.mobile = mobile;
+        _originFileObj.isEdit = isEdit;
+        _originFileObj.startDate = startDate;
+        _originFileObj.endDate = endDate;
+        _originFileObj.peopleType = peopleType;
+        _originFileObj.isUpdateImg = isUpdateImg;
+        setUploadLoading(true);
+        wuInit([_originFileObj]);
+      } else {
+        console.log(userPhotos);
+        notification.error({
+          message: formatMessage({ id: 'oal.face.failToUpload' }),
+          description: formatMessage({ id: 'oal.face.pleaseUploadFileAgain' }),
+        });
+      }
+
+      // isEdit && (params.faceId = bean._id);
+      // setUploadLoading(true);
+      // dispatch({
+      //   type: 'faceVisitor/addOrEditInfo',
+      //   payload: params,
+      // }).then(res => {
+      //   if (!visible) return;
+
+      //   if (res && res.res > 0 && res.data) {
+      //     const len = userPhotos && userPhotos.length || 0;
+
+      //     if (window.WebUploader && len > 0) {
+      //       const _originFileObj = userPhotos[len - 1].originFileObj;
+      //       const { _id, name: _name, staffid: _staffid } = res.data;
+
+      //       _originFileObj.faceId = _id;
+      //       _originFileObj._name = _name;
+      //       _originFileObj._staffid = _staffid;
+      //       wuInit([_originFileObj]);
+      //     } else if (isEdit) {
+      //       // 编辑，可不修改图片直接结束
+      //       handleSubmit(isEdit);
+      //       resetAllVar();
+      //     } else {
+      //       console.log(userPhotos);
+      //       setUploadLoading(false);
+      //     }
+      //   } else {
+      //     console.log(res);
+      //     setUploadLoading(false);
+      //   }
+      // }).catch(err => {
+      //   console.log(err);
+      //   setUploadLoading(false);
+      // });
     });
   };
 
@@ -191,11 +245,16 @@ const TableAddOrModifyModal = props => {
     newFileList.forEach((item, index) => {
       let wuFile = new window.WebUploader.Lib.File(window.WebUploader.guid('rt_'), item);
       let newfile = new window.WebUploader.File(wuFile);
+      const { faceId, staffname, mobile, isEdit, startDate, endDate, peopleType, isUpdateImg } = item || {};
 
+      faceId && (newfile.faceId = faceId);
+      newfile.staffname = staffname;
+      newfile.mobile = mobile;
       newfile.isEdit = isEdit;
-      newfile.faceId = item.faceId;
-      newfile.staffname = item._name;
-      newfile.staffid = item._staffid;
+      newfile.startDate = startDate;
+      newfile.endDate = endDate;
+      newfile.peopleType = peopleType;
+      newfile.isUpdateImg = isUpdateImg;
       uploader.addFiles(newfile);
       wuFile = null;
       newfile = null;
@@ -212,14 +271,17 @@ const TableAddOrModifyModal = props => {
 
     uploader.on('uploadBeforeSend', (block, data) => {
       if (!visible) return;
-      const { file: { md5, isEdit, faceId, staffname, staffid } } = block;
+      const { file: { md5, faceId, staffname, mobile, isEdit, startDate, endDate, peopleType, isUpdateImg } } = block || { file: {} };
 
       data.md5 = md5;
-      data.isEdit = isEdit;
-      data.faceId = faceId
+      faceId && (data.faceId = faceId);
       data.staffname = staffname;
-      data.staffid = staffid;
-      data.peopleType = '3';
+      data.mobile = mobile;
+      data.isEdit = isEdit;
+      data.startDate = startDate;
+      data.endDate = endDate;
+      data.peopleType = peopleType;
+      data.isUpdateImg = isUpdateImg;
     });
 
     uploader.on('uploadProgress', (file, percentage) => {
@@ -241,14 +303,14 @@ const TableAddOrModifyModal = props => {
 
     uploader.on('uploadSuccess', (file, response) => {
       if (!visible) return;
-      const { res, errcode, msg } = response;
+      const { res, errcode, msg } = response || {};
 
       if (res > 0) {
         handleSubmit(isEdit);
         resetAllVar();
       } else if (res === 0) {
         // 分片文件上传成功时返回，啥也不做
-      } else if (res < 0 || errcode === 500 || /false/i.test(msg)) {
+      } else if (!response || res < 0 || errcode === 500 || /false/i.test(msg)) {
         notification.error({
           message: formatMessage({ id: 'oal.face.failToUpload' }),
           description: formatMessage({ id: 'oal.face.pleaseUploadFileAgain' }),
@@ -313,9 +375,6 @@ const TableAddOrModifyModal = props => {
               {
                 max: 20,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
-              },
-              {
-                validator: checkIllegalCharacter,
               },
             ],
             initialValue: bean && bean.name || '',
