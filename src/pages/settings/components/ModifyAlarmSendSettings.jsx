@@ -93,7 +93,7 @@ const ModifyAlarmSendSettings = props => {
               },
             ],
             initialValue: currentUser && currentUser.alarmSet && currentUser.alarmSet.password || '',
-          })(<Input placeholder={formatMessage({ id: 'oal.settings.passwordOrCode' })} />)}
+          })(<Input.Password placeholder={formatMessage({ id: 'oal.settings.passwordOrCode' })} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.settings.SMTPServer' })}>
           {getFieldDecorator('smtpServer', {
@@ -139,7 +139,7 @@ const ModifyAlarmSendSettings = props => {
         <Form.Item label={formatMessage({ id: 'oal.settings.encrypt' })}>
           {getFieldDecorator('isSsl', {
             valuePropName: 'checked',
-            initialValue: currentUser && currentUser.alarmSet && currentUser.alarmSet.isSsl === '1' || true,
+            initialValue: currentUser && currentUser.alarmSet && currentUser.alarmSet.isSsl === '0' ? false : true,
           })(<Checkbox>SSL</Checkbox>)}
         </Form.Item>
         {/* <Form.Item label={formatMessage({ id: 'oal.settings.username' })}>

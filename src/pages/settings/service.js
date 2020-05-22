@@ -45,6 +45,24 @@ export async function ajaxGetAlarmSet(data) {
   return post(`/guard-web/a/alarmSet/getAlarmSet`, data);
 }
 
+/**
+ * （设置-）检测授权环境
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxAuthorizationEnvironment(data) {
+  return post(`/guard-web/a/alarmSet/**`, data);
+}
+
+/**
+ * （设置-）获取设备码
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxDeviceCode(data) {
+  return post(`/guard-web/a/alarmSet/**`, data);
+}
+
 
 /**
  * 获取自己的开发者账号

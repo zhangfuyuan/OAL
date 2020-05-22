@@ -35,13 +35,13 @@ const DetailModal = props => {
       ]}
     >
       <div className="oal-descriptions">
-        <Descriptions>
+        <Descriptions column={2}>
           <Descriptions.Item label={formatMessage({ id: 'oal.device.deviceName' })}>{bean.name || '-'}</Descriptions.Item>
           <Descriptions.Item label={formatMessage({ id: 'oal.device.deviceId' })}>{bean.deviceUuid || '-'}</Descriptions.Item>
           <Descriptions.Item label={formatMessage({ id: 'oal.device.regtime' })}>{moment(bean.createAt).format('YYYY-MM-DD HH:mm') || '-'}</Descriptions.Item>
           <Descriptions.Item label={formatMessage({ id: 'oal.device.recentlyLaunched' })}>{moment(bean.heartbeatAt).format('YYYY-MM-DD HH:mm') || '-'}</Descriptions.Item>
           <Descriptions.Item label="IP">{bean.ip || '-'}</Descriptions.Item>
-          <Descriptions.Item label={formatMessage({ id: 'oal.device.mac' })}>{bean.mac || '-'}</Descriptions.Item>
+          {/* <Descriptions.Item label={formatMessage({ id: 'oal.device.mac' })}>{bean.mac || '-'}</Descriptions.Item> */}
           <Descriptions.Item label={formatMessage({ id: 'oal.device.firmwareVersion' })}>{bean.firmwareVersion || '-'}</Descriptions.Item>
           <Descriptions.Item label={formatMessage({ id: 'oal.device.softwareRelease' })}>{bean.deviceVersion || '-'}</Descriptions.Item>
           <Descriptions.Item label={formatMessage({ id: 'oal.device.recognitionMode' })}>{recognitionModeType[bean.recognitionMode] ? formatMessage({ id: recognitionModeType[bean.recognitionMode] }) : '-'}</Descriptions.Item>

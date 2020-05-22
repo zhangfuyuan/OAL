@@ -48,7 +48,7 @@ export default {
   'menu.editor.mind': '腦圖編輯器',
   'menu.editor.koni': '拓撲編輯器',
   'menu.orgManger': `組織管理`,
-  'menu.userManagement': `賬號管理`,
+  'menu.userManagement': `代理管理`,
   'menu.settings': `設置`,
   'menu.dashboard2': `首頁`,
   'menu.device': `設備管理`,

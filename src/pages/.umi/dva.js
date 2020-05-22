@@ -25,19 +25,6 @@ app.model({ namespace: 'global', ...(require('E:/web/guarderClient/guarderClient
 app.model({ namespace: 'login', ...(require('E:/web/guarderClient/guarderClient/src/models/login.js').default) });
 app.model({ namespace: 'setting', ...(require('E:/web/guarderClient/guarderClient/src/models/setting.js').default) });
 app.model({ namespace: 'user', ...(require('E:/web/guarderClient/guarderClient/src/models/user.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/org/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/userManagement/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/settings/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/dashboard/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/device/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/face/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/face/blacklist/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/face/visitor/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/log/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/log/query/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/workAttendance/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/workAttendance/rule/add/model.js').default) });
-app.model({ namespace: 'model', ...(require('E:/web/guarderClient/guarderClient/src/pages/workAttendance/rule/edit/model.js').default) });
   return app;
 }
 

@@ -251,12 +251,12 @@ class Device extends Component {
         // sorter: (a, b) => a.networkState - b.networkState,
         // sortOrder: this.state.sortedInfo.columnKey === 'networkState' && this.state.sortedInfo.order,
       },
-      {
-        title: formatMessage({ id: 'oal.device.mac' }),
-        key: 'mac',
-        dataIndex: 'mac',
-        render: text => text || '-',
-      },
+      // {
+      //   title: formatMessage({ id: 'oal.device.mac' }),
+      //   key: 'mac',
+      //   dataIndex: 'mac',
+      //   render: text => text || '-',
+      // },
       {
         title: 'IP',
         key: 'ip',

@@ -7,6 +7,8 @@ import {
   ajaxAlarmEvents,
   ajaxAlarmContent,
   ajaxGetAlarmSet,
+  ajaxAuthorizationEnvironment,
+  ajaxDeviceCode,
 } from './service';
 import { getSysConfig, setSysConfig } from '@/services/sys';
 
@@ -103,6 +105,18 @@ const Model = {
     // 获取告警设置
     *getAlarmSet({ payload }, { call, put }) {
       const response = yield call(ajaxGetAlarmSet, payload);
+
+      return Promise.resolve(response);
+    },
+    // 检测授权环境
+    *fetchAuthorizationEnvironment({ payload }, { call, put }) {
+      const response = yield call(ajaxAuthorizationEnvironment, payload);
+
+      return Promise.resolve(response);
+    },
+    // 获取设备码
+    *fetchDeviceCode({ payload }, { call, put }) {
+      const response = yield call(ajaxDeviceCode, payload);
 
       return Promise.resolve(response);
     },

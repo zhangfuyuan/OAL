@@ -107,6 +107,14 @@ const UserModel = {
 
       return Promise.resolve();
     },
+    *modifyAuthorizedPoints({ payload }, { call, put }) {
+      yield put({
+        type: 'setAuthorizedPoints',
+        payload,
+      });
+
+      return Promise.resolve();
+    },
   },
   reducers: {
     saveCurrentUser(state, action) {
@@ -166,6 +174,11 @@ const UserModel = {
     setAlarmSet(state, action) {
       const { currentUser } = state;
       currentUser.alarmSet = action.payload.alarmSet;
+      return { ...state, currentUser }
+    },
+    setAuthorizedPoints(state, action) {
+      const { currentUser } = state;
+      currentUser.authorizedPoints = action.payload && action.payload.authorizedPoints || {};
       return { ...state, currentUser }
     },
   },

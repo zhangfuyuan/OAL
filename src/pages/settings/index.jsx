@@ -1,19 +1,22 @@
 import React, { Component } from 'react';
 import { GridContent } from '@ant-design/pro-layout';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Menu, message } from 'antd';
+import { Menu, message, notification } from 'antd';
 import { connect } from 'dva';
 // import CryptoJS from 'crypto-js';
 import BaseView from './components/BaseView';
 import SecurityView from './components/SecurityView';
 import SystemView from './components/SystemView';
 import AlarmView from './components/AlarmView';
+import AuthorizedPoints from './components/AuthorizedPoints';
 import DeveloperView from './components/DeveloperView';
 import ModifyPswModal from './components/ModifyPswModal';
 import ModifySysName from './components/ModifySysName';
 import ModifyAlarmSendSettings from './components/ModifyAlarmSendSettings';
 import ModifyAlarmReceiveSettings from './components/ModifyAlarmReceiveSettings';
 import ModifyAlarmEvents from './components/ModifyAlarmEvents';
+import AuthorizedPointsLoading from './components/AuthorizedPointsLoading';
+import AuthorizedPointsUpload from './components/AuthorizedPointsUpload';
 // import ModifySysIcons from './components/ModifySysIcons';
 import FaceKey from './components/FaceKey';
 import FaceKeyModal from './components/FaceKeyModal';
@@ -51,6 +54,7 @@ class Settings extends Component {
       security: formatMessage({ id: 'oal.settings.menu-security' }),
       system: formatMessage({ id: 'oal.settings.menu-system' }),
       alarm: formatMessage({ id: 'oal.settings.menu-alarm' }),
+      authorized: formatMessage({ id: 'oal.settings.menu-authorized' }),
       // developer: formatMessage({ id: 'oal.settings.menu-developer' }),
       // faceKey: formatMessage({ id: 'oal.settings.menu-faceKey' }),
       // faceLibrary: formatMessage({ id: 'oal.settings.menu-faceLibrary' }),
@@ -64,6 +68,9 @@ class Settings extends Component {
       modifyAlarmSendSettingsVisible: false,
       modifyAlarmReceiveSettingsVisible: false,
       modifyAlarmEventsVisible: false,
+      authorizedPointsLoadingVisible: false,
+      authorizedPointsUploadVisible: false,
+      authorizedPointsUploadWay: 'net',
       // modifySysIconsVisible: false,
       faceKeyVisible: false,
       selectedFaceKey: {},
@@ -131,10 +138,12 @@ class Settings extends Component {
     });
   }
 
-  getMenu = (isAdmin = false) => {
+  getMenu = (isAdmin = false, isAdminOrg = false) => {
     const { menuMap } = this.state;
     return Object.keys(menuMap).map(item => {
-      // if (!isAdmin && item === 'faceKey') return null;
+      // admin 账号且 admin 组织才显示 "授权点数" 栏
+      if ((!isAdmin || !isAdminOrg) && item === 'authorized') return null;
+      // 非 admin 账号不显示 "系统信息" 和 "告警设置" 栏
       if (!isAdmin && (item === 'system' || item === 'alarm')) return null;
       return <Item key={item}>{menuMap[item]}</Item>
     });
@@ -320,7 +329,7 @@ class Settings extends Component {
         password: '',
         smtpServer: '',
         port: '',
-        isSsl: '1', 
+        isSsl: '1',
       },
     }).then(res => {
       if (res && res.res > 0 && res.data) {
@@ -426,6 +435,94 @@ class Settings extends Component {
     });
   };
 
+  // 授权点数 - 检测授权环境
+  openAuthorizedPointsLoading = () => {
+    this.setState({
+      authorizedPointsLoadingVisible: true
+    }, () => {
+      this.submitAuthorizedPointsLoading();
+    });
+  };
+
+  closeAuthorizedPointsLoading = () => {
+    this.setState({ authorizedPointsLoadingVisible: false });
+  };
+
+  submitAuthorizedPointsLoading = () => {
+    const { dispatch } = this.props;
+
+    // 8126TODO 对接检测授权环境接口
+    dispatch({
+      type: 'settingInfo/fetchAuthorizationEnvironment',
+      payload: {},
+    }).then(res => {
+      if (!this.state.authorizedPointsLoadingVisible) return;
+
+      if (res && res.res > 0) {
+        this.closeAuthorizedPointsLoading();
+
+        if (res.data === '0') {
+          // 在线认证（默认）
+          this.openAuthorizedPointsUpload('net');
+        } else if (res.data === '1') {
+          // 离线认证
+          this.openAuthorizedPointsUpload('local');
+        } else {
+          notification.error({
+            message: formatMessage({ id: 'oal.face.authorizationFailure' }),
+            description: formatMessage({ id: 'oal.face.uploadAbort' }),
+          });
+        }
+      } else if (res && res.res === 0) {
+        setTimeout(() => {
+          if (!this.state.authorizedPointsLoadingVisible) return;
+
+          this.submitAuthorizedPointsLoading();
+        }, 2000);
+      } else {
+        // notification.error({
+        //   message: formatMessage({ id: 'oal.face.authorizationFailure' }),
+        //   description: formatMessage({ id: 'oal.face.uploadAbort' }),
+        // });
+        // this.closeAuthorizedPointsLoading();
+        this.closeAuthorizedPointsLoading();
+        this.openAuthorizedPointsUpload(Math.random() > .5 ? 'net' : 'local');
+      }
+    }).catch(err => {
+      console.log(err);
+      if (!this.state.authorizedPointsLoadingVisible) return;
+      notification.error({
+        message: formatMessage({ id: 'oal.face.authorizationFailure' }),
+        description: formatMessage({ id: 'oal.face.uploadAbort' }),
+      });
+      this.closeAuthorizedPointsLoading();
+    });
+  };
+
+  // 授权点数 - 导入授权文件
+  openAuthorizedPointsUpload = way => {
+    this.setState({
+      authorizedPointsUploadVisible: true,
+      authorizedPointsUploadWay: way,
+    });
+  };
+
+  closeAuthorizedPointsUpload = () => {
+    this.setState({
+      authorizedPointsUploadVisible: false,
+      authorizedPointsUploadWay: 'net',
+    });
+  };
+
+  submitAuthorizedPointsUpload = payload => {
+    message.success(formatMessage({ id: 'oal.settings.authorizeSuccessfully' }));
+    this.closeAuthorizedPointsUpload();
+    this.props.dispatch({
+      type: 'user/modifyAuthorizedPoints',
+      payload,
+    });
+  };
+
   // setFaceKeyModal = flag => {
   //   this.setState({ faceKeyVisible: !!flag });
   // };
@@ -508,7 +605,17 @@ class Settings extends Component {
   };
 
   renderChildren = () => {
-    const { currentUser, devInfo, devInfoLoading, faceKeyList, faceKeyListLoading, sysConfigs, systemVersion, baseViewLoading } = this.props;
+    const {
+      currentUser,
+      devInfo,
+      devInfoLoading,
+      faceKeyList,
+      faceKeyListLoading,
+      sysConfigs,
+      systemVersion,
+      baseViewLoading,
+      dispatch,
+    } = this.props;
     const { selectKey } = this.state;
     switch (selectKey) {
       case 'base':
@@ -561,6 +668,12 @@ class Settings extends Component {
           openEventsModal={this.openModifyAlarmEvents}
           updateAlarmContent={this.submitAlarmContent}
         />;
+      case 'authorized':
+        return <AuthorizedPoints
+          currentUser={currentUser && currentUser.authorizedPoints || {}}
+          dispatch={dispatch}
+          openAuthorizedPointsLoading={this.openAuthorizedPointsLoading}
+        />;
       default:
         break;
     }
@@ -583,8 +696,10 @@ class Settings extends Component {
       alarmSendSettingsLoading,
       alarmReceiveSettingsLoading,
       alarmEventsLoading,
+      dispatch,
     } = this.props;
     const { type } = currentUser;
+    const { type: orgType } = currentUser && currentUser.org || {};
     const {
       mode,
       selectKey,
@@ -593,6 +708,9 @@ class Settings extends Component {
       modifyAlarmSendSettingsVisible,
       modifyAlarmReceiveSettingsVisible,
       modifyAlarmEventsVisible,
+      authorizedPointsLoadingVisible,
+      authorizedPointsUploadVisible,
+      authorizedPointsUploadWay,
       // modifySysIconsVisible,
       faceKeyVisible,
       selectedFaceKey,
@@ -613,7 +731,7 @@ class Settings extends Component {
               selectedKeys={[selectKey]}
               onClick={this.switchMenu}
             >
-              {this.getMenu(Boolean(type === 0))}
+              {this.getMenu(Boolean(type === 0), Boolean(orgType === 0))}
             </Menu>
           </div>
           <div className={styles.right}>
@@ -670,6 +788,17 @@ class Settings extends Component {
           confirmLoading={alarmEventsLoading}
           handleCancel={this.closeModifyAlarmEvents}
           handleSubmit={this.submitAlarmEvents}
+        />
+        <AuthorizedPointsLoading
+          visible={authorizedPointsLoadingVisible}
+          handleCancel={this.closeAuthorizedPointsLoading}
+        />
+        <AuthorizedPointsUpload
+          visible={authorizedPointsUploadVisible}
+          dispatch={dispatch}
+          authorizedPointsUploadWay={authorizedPointsUploadWay}
+          handleCancel={this.closeAuthorizedPointsUpload}
+          handleSubmit={this.submitAuthorizedPointsUpload}
         />
       </PageHeaderWrapper>
     )

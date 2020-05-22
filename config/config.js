@@ -23,11 +23,11 @@ const plugins = [
         // default true, when it is true, will use `navigator.language` overwrite default
         baseNavigator: true,
       },
-      // dynamicImport: {
-      //   loadingComponent: './components/PageLoading/index',
-      //   webpackChunkName: true,
-      //   level: 3,
-      // },
+      dynamicImport: {
+        loadingComponent: './components/PageLoading/index',
+        webpackChunkName: true,
+        level: 3,
+      },
       pwa: pwa
         ? {
           workboxPluginMode: 'InjectManifest',
@@ -143,13 +143,13 @@ export default {
       changeOrigin: true,
     },
     '/guard-web/': {
-      target: 'http://192.168.14.74/',
-      // target: 'http://guard.lango-tech.com/',
+      // target: 'http://192.168.14.74/',
+      target: 'http://guard.lango-tech.com/',
       changeOrigin: true,
     },
     '/guardFile/': {
-      target: 'http://192.168.14.74/',
-      // target: 'http://guard.lango-tech.com/',
+      // target: 'http://192.168.14.74/',
+      target: 'http://guard.lango-tech.com/',
       changeOrigin: true,
     },
   },

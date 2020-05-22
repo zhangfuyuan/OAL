@@ -48,7 +48,7 @@ export default {
   'menu.editor.mind': 'Mind Editor',
   'menu.editor.koni': 'Koni Editor',
   'menu.orgManger': `orgManger`,
-  'menu.userManagement': `accountManagement`,
+  'menu.userManagement': `agentManagement`,
   'menu.settings': `settings`,
   'menu.dashboard2': `home`,
   'menu.device': `device`,

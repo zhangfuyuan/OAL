@@ -48,7 +48,7 @@ export default {
   'menu.editor.mind': '脑图编辑器',
   'menu.editor.koni': '拓扑编辑器',
   'menu.orgManger': `组织管理`,
-  'menu.userManagement': `账号管理`,
+  'menu.userManagement': `代理管理`,
   'menu.settings': `设置`,
   'menu.dashboard2': `首页`,
   'menu.device': `设备管理`,
