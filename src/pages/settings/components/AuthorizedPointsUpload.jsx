@@ -1,6 +1,6 @@
 import { Modal, Upload, Icon, message, Progress, notification, Button } from 'antd';
 import React, { useState, useEffect, Fragment } from 'react';
-import { FormattedMessage, formatMessage, getLocale } from 'umi-plugin-react/locale';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import defaultSettings from '../../../../config/defaultSettings';
 
 const { publicPath } = defaultSettings;
@@ -14,26 +14,22 @@ const AuthorizedPointsUpload = props => {
   const [licenseFile, setLicenseFile] = useState(null);
   const [deviceCode, setDeviceCode] = useState('');
 
-  const selectedLang = getLocale();
-
   // 建议：每次 Modal 关闭时重置
   useEffect(() => {
     if (visible === true) {
-      if (authorizedPointsUploadWay === 'local') {
+      if (authorizedPointsUploadWay === 'offline') {
         // 离线认证获取设备码
-        // 8126TODO 对接获取设备码
         dispatch({
           type: 'settingInfo/fetchDeviceCode',
           payload: {},
         }).then(res => {
           if (res && res.res > 0 && res.data) {
-            setDeviceCode(res.data.code);
+            setDeviceCode(res.data.equipmentCode);
           } else {
-            // notification.error({
-            //   message: formatMessage({ id: 'oal.face.authorizationFailure' }),
-            //   description: formatMessage({ id: 'oal.face.uploadAbort' }),
-            // });
-            setDeviceCode('0YmZlYmZiZmYwMDA0MDY1MTAwMDBjZjZkMjRjNjk4MmEyMDYzOTk4ZDIxMGM4MDg4MzY3ZA==');
+            notification.error({
+              message: formatMessage({ id: 'oal.face.authorizationFailure' }),
+              description: formatMessage({ id: 'oal.face.uploadAbort' }),
+            });
           }
         });
       }
@@ -66,7 +62,7 @@ const AuthorizedPointsUpload = props => {
   };
 
   const beforeUploadLicenseFile = file => {
-    if (file.name && file.name.indexOf(authorizedPointsUploadWay === 'local' ? '.local' : '.net') > -1) {
+    if (file.name && file.name.indexOf(authorizedPointsUploadWay === 'offline' ? '.offline' : '.net') > -1) {
       setLicenseFile(file);
     } else {
       notification.error({
@@ -105,7 +101,7 @@ const AuthorizedPointsUpload = props => {
 
     uploader = window.WebUploader.create({
       swf: (process.env === 'production' ? publicPath : '/') + 'lib/webuploader/Uploader.swf', // 请根据实际项目部署路径配置swf文件路径
-      server: '/guard-web/a/face/import', // 8126TODO 对接
+      server: authorizedPointsUploadWay === 'offline' ? '/guard-web/a/sys/office/offlineLicenseNeedFile' : '/guard-web/a/sys/office/onlineLicenseNeedFile',
       thumb: false, // 不生成缩略图
       compress: false, // 如果此选项为false, 则图片在上传前不进行压缩
       prepareNextFile: true, // 是否允许在文件传输时提前把下一个文件准备好
@@ -162,13 +158,7 @@ const AuthorizedPointsUpload = props => {
         });
         handleUploadAbort(true);
       } else {
-        // handleUploadAbort();
-        handleSubmit({
-          authorizedPoints: {
-            terminalTotal: 100,
-            terminalAssigned: 5,
-          }
-        });
+        handleUploadAbort();
       }
     });
 
@@ -225,8 +215,8 @@ const AuthorizedPointsUpload = props => {
     >
       <div>
         <Dragger
-          accept={authorizedPointsUploadWay === 'local' ? '.local' : '.net'}
-          action="/guard-web/a/face/import"
+          accept={authorizedPointsUploadWay === 'offline' ? '.offline' : '.net'}
+          action={authorizedPointsUploadWay === 'offline' ? '/guard-web/a/sys/office/offlineLicenseNeedFile' : '/guard-web/a/sys/office/onlineLicenseNeedFile'}
           withCredentials
           showUploadList={false}
           beforeUpload={beforeUploadLicenseFile}
@@ -238,7 +228,7 @@ const AuthorizedPointsUpload = props => {
             <div style={{ textAlign: 'left', paddingLeft: '30px' }}>
               <p style={{ fontSize: '24px', }}>
                 <FormattedMessage id="oal.settings.licenseFile" />
-                ({authorizedPointsUploadWay === 'local' ? '.local' : '.net'})
+                ({authorizedPointsUploadWay === 'offline' ? '.offline' : '.net'})
               </p>
               <p>
                 <FormattedMessage id="oal.face.batchAddPersonnelDataDragtips2" />
@@ -283,7 +273,7 @@ const AuthorizedPointsUpload = props => {
 
         <div style={{ marginTop: '30px', color: '#999', }}>
           {
-            authorizedPointsUploadWay === 'local' ?
+            authorizedPointsUploadWay === 'offline' ?
               (<Fragment>
                 <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', }}>
                   <FormattedMessage id="oal.settings.machineCode" />

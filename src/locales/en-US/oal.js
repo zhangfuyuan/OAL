@@ -573,7 +573,7 @@ export default {
   'oal.settings.licenseFile': `License file`,
   'oal.settings.machineCode': `Machine code`,
   'oal.settings.copySuccessfully': `Copied to clipboard`,
-  'oal.settings.authorizedPointsUploadTips1': `Please provide the machine code to your service provider to obtain the .local format authorization file`,
+  'oal.settings.authorizedPointsUploadTips1': `Please provide the machine code to your service provider to obtain the .offline format authorization file`,
   'oal.settings.authorizedPointsUploadTips2': `Please contact your service provider for a .net format authorization file`,
   'oal.ajax.6009': `Invalid file`,
 };

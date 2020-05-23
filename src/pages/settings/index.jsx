@@ -451,7 +451,6 @@ class Settings extends Component {
   submitAuthorizedPointsLoading = () => {
     const { dispatch } = this.props;
 
-    // 8126TODO 对接检测授权环境接口
     dispatch({
       type: 'settingInfo/fetchAuthorizationEnvironment',
       payload: {},
@@ -461,12 +460,12 @@ class Settings extends Component {
       if (res && res.res > 0) {
         this.closeAuthorizedPointsLoading();
 
-        if (res.data === '0') {
+        if (res.data.state === '0') {
+          // 离线认证
+          this.openAuthorizedPointsUpload('offline');
+        } else if (res.data.state === '1') {
           // 在线认证（默认）
           this.openAuthorizedPointsUpload('net');
-        } else if (res.data === '1') {
-          // 离线认证
-          this.openAuthorizedPointsUpload('local');
         } else {
           notification.error({
             message: formatMessage({ id: 'oal.face.authorizationFailure' }),
@@ -480,13 +479,11 @@ class Settings extends Component {
           this.submitAuthorizedPointsLoading();
         }, 2000);
       } else {
-        // notification.error({
-        //   message: formatMessage({ id: 'oal.face.authorizationFailure' }),
-        //   description: formatMessage({ id: 'oal.face.uploadAbort' }),
-        // });
-        // this.closeAuthorizedPointsLoading();
+        notification.error({
+          message: formatMessage({ id: 'oal.face.authorizationFailure' }),
+          description: formatMessage({ id: 'oal.face.uploadAbort' }),
+        });
         this.closeAuthorizedPointsLoading();
-        this.openAuthorizedPointsUpload(Math.random() > .5 ? 'net' : 'local');
       }
     }).catch(err => {
       console.log(err);
@@ -673,6 +670,7 @@ class Settings extends Component {
           currentUser={currentUser && currentUser.authorizedPoints || {}}
           dispatch={dispatch}
           openAuthorizedPointsLoading={this.openAuthorizedPointsLoading}
+          openAuthorizedPointsUpload={this.openAuthorizedPointsUpload}
         />;
       default:
         break;

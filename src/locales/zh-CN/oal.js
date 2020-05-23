@@ -573,7 +573,7 @@ export default {
   'oal.settings.licenseFile': `授权文件`,
   'oal.settings.machineCode': `机器码`,
   'oal.settings.copySuccessfully': `已复制至剪切板`,
-  'oal.settings.authorizedPointsUploadTips1': `请提供机器码给您的服务商获取.local格式授权文件`,
+  'oal.settings.authorizedPointsUploadTips1': `请提供机器码给您的服务商获取.offline格式授权文件`,
   'oal.settings.authorizedPointsUploadTips2': `请联系您的服务商获取.net格式授权文件`,
   'oal.ajax.6009': `无效文件`,
 };
