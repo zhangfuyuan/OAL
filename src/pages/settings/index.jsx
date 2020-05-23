@@ -50,14 +50,14 @@ class Settings extends Component {
   constructor(props) {
     super(props);
     const menuMap = {
-      base: formatMessage({ id: 'oal.settings.menu-base' }),
-      security: formatMessage({ id: 'oal.settings.menu-security' }),
-      system: formatMessage({ id: 'oal.settings.menu-system' }),
-      alarm: formatMessage({ id: 'oal.settings.menu-alarm' }),
-      authorized: formatMessage({ id: 'oal.settings.menu-authorized' }),
-      // developer: formatMessage({ id: 'oal.settings.menu-developer' }),
-      // faceKey: formatMessage({ id: 'oal.settings.menu-faceKey' }),
-      // faceLibrary: formatMessage({ id: 'oal.settings.menu-faceLibrary' }),
+      base: 'oal.settings.menu-base',
+      security: 'oal.settings.menu-security',
+      system: 'oal.settings.menu-system',
+      alarm: 'oal.settings.menu-alarm',
+      authorized: 'oal.settings.menu-authorized',
+      // developer: 'oal.settings.menu-developer',
+      // faceKey: 'oal.settings.menu-faceKey',
+      // faceLibrary: 'oal.settings.menu-faceLibrary',
     };
     this.state = {
       mode: 'inline',
@@ -145,13 +145,13 @@ class Settings extends Component {
       if ((!isAdmin || !isAdminOrg) && item === 'authorized') return null;
       // 非 admin 账号不显示 "系统信息" 和 "告警设置" 栏
       if (!isAdmin && (item === 'system' || item === 'alarm')) return null;
-      return <Item key={item}>{menuMap[item]}</Item>
+      return <Item key={item}>{menuMap[item] && formatMessage({ id: menuMap[item] }) || '-'}</Item>
     });
   };
 
   getRightTitle = () => {
     const { selectKey, menuMap } = this.state;
-    return menuMap[selectKey];
+    return menuMap[selectKey] && formatMessage({ id: menuMap[selectKey] }) || '-';
   };
 
   selectKey = key => {
