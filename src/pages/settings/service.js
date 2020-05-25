@@ -51,7 +51,7 @@ export async function ajaxGetAlarmSet(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxAuthorizationEnvironment(data) {
-  return post(`/guard-web/a/alarmSet/**`, data);
+  return post(`/guard-web/a/sys/office/checkService`, data);
 }
 
 /**
@@ -60,7 +60,7 @@ export async function ajaxAuthorizationEnvironment(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxDeviceCode(data) {
-  return post(`/guard-web/a/alarmSet/**`, data);
+  return post(`/guard-web/a/sys/office/equipmentCode`, data);
 }
 
 

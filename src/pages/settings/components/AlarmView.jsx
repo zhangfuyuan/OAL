@@ -133,7 +133,7 @@ class AlarmView extends Component {
         title: formatMessage({ id: 'oal.settings.alarmEvents' }),
         description: (
           <Fragment>
-            {alarmInfo && alarmInfo.alarmEvents && alarmInfo.alarmEvents.split(',').map(item => formatMessage({ id: alarmEventsMap[item] })).join('、') || formatMessage({ id: 'oal.common.unset' })}
+            {alarmInfo && alarmInfo.alarmEvents && alarmInfo.alarmEvents.split(',').map(item => formatMessage({ id: alarmEventsMap[item] || 'oal.common.unset' })).join('、') || formatMessage({ id: 'oal.common.unset' })}
           </Fragment>
         ),
         actions: [

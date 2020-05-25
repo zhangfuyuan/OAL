@@ -450,7 +450,7 @@ class Face extends Component {
       {
         title: formatMessage({ id: 'oal.common.handle' }),
         key: 'handle',
-        width: 200,
+        // width: 200,
         render: (text, record) => (
           <Fragment>
             <a key="edit" onClick={() => this.table_showTableAddOrModifyModal(record)}><FormattedMessage id="oal.common.modify" /></a>

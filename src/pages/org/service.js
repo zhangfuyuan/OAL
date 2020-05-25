@@ -38,3 +38,10 @@ export async function resetPsw(data) {
 export async function handleState(data) {
   return post(`/guard-web/a/sys/office/disableEnableOffice`, data);
 }
+
+/**
+ * （组织）分配授权点
+ */
+export async function ajaxAssign(data) {
+  return post(`/guard-web/a/sys/office/**`, data);
+}

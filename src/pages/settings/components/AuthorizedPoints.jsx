@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Button, Upload, notification, Spin } from 'antd';
 import logo from '@/assets/logo.png';
-import { FormattedMessage, formatMessage, getLocale } from 'umi-plugin-react/locale';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 class AuthorizedPoints extends Component {
 
@@ -9,6 +9,7 @@ class AuthorizedPoints extends Component {
     const {
       currentUser,
       openAuthorizedPointsLoading,
+      openAuthorizedPointsUpload,
     } = this.props;
 
     return (
@@ -37,6 +38,12 @@ class AuthorizedPoints extends Component {
         <Button size="large" onClick={openAuthorizedPointsLoading}>
           <FormattedMessage id="oal.settings.increase" />
         </Button>
+
+        <div style={{ color: '#fff', textAlign: 'right' }}>
+          {/* 留条后路 */}
+          <span onClick={() => openAuthorizedPointsUpload('offline')} style={{ marginRight: '10px' }}>offline</span>
+          <span onClick={() => openAuthorizedPointsUpload('net')}>net</span>
+        </div>
       </div>
     );
   }

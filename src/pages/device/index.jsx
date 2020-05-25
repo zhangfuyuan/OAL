@@ -45,7 +45,8 @@ const deviceType = [
 const statusMap = ['error', 'success'];
 const status = ['oal.device.offline', 'oal.device.online'];
 
-@connect(({ device, loading, user }) => ({
+@connect(({ user: { currentUser }, device, loading, user }) => ({
+  currentUser,
   device,
   loginUser: user,
   deviceListLoading: loading.effects['device/fetch'],
@@ -180,12 +181,18 @@ class Device extends Component {
         deviceId: bean && bean.map(item => item._id).join(',') || ''
       },
     }).then(res => {
-      if (res && res.res > 0) {
+      if (res && res.res > 0 && res.data) {
         message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
         this.loadData();
         this.closeDelModal();
         this.setState({
           selectedRows: [],
+        });
+        dispatch({
+          type: 'user/modifyAuthorizedPoints',
+          payload: {
+            authorizedPoints: res.data.authorizedPoints || {},
+          },
         });
       } else {
         message.success(formatMessage({ id: 'oal.ajax.5004' }));
@@ -282,7 +289,7 @@ class Device extends Component {
       {
         title: formatMessage({ id: 'oal.common.handle' }),
         dataIndex: 'action',
-        width: 200,
+        // width: 200,
         render: (text, record) => (
           <Fragment>
             <a key="view" onClick={() => this.openDetailModal(record)}><FormattedMessage id="oal.common.view" /></a>
@@ -437,7 +444,9 @@ class Device extends Component {
       loginUser,
       renameLoading,
       deleteLoading,
+      currentUser,
     } = this.props;
+    const authorizedPoints = currentUser && currentUser.authorizedPoints || {};
     let deviceTableData = null;
     const { modalVisible, deviceBean, alertVisible, page, delBean, detailModalVisible, delModalVisible, selectedRows } = this.state;
 
@@ -464,10 +473,34 @@ class Device extends Component {
         <Card bordered={false}>
           <div className={styles.tableList}>
             {/* <div className={styles.tableListForm}>{this.renderSimpleForm()}</div> */}
-            <div className={styles.tableListOperator}>
+            <div
+              className={styles.tableListOperator}
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
               <Button type="danger" onClick={this.handleBatchDelete} disabled={!selectedRows || selectedRows.length === 0}>
                 <FormattedMessage id="oal.common.delete" />
               </Button>
+
+              <div>
+                <span>
+                  <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+                    <FormattedMessage id="oal.settings.totalAuthorizationPoints" /> :
+                </span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal || '0'}</span>
+                </span>
+                <span>
+                  <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+                    <FormattedMessage id="oal.settings.available" /> :
+                 </span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal - authorizedPoints.terminalAssigned || '0'}</span>
+                </span>
+                <span>
+                  <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+                    <FormattedMessage id="oal.settings.assigned" /> :
+                </span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalAssigned || '0'}</span>
+                </span>
+              </div>
             </div>
             <StandardTable
               // eslint-disable-next-line no-underscore-dangle

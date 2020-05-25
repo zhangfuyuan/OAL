@@ -70,6 +70,7 @@ const AddOrUpdateOrg = props => {
       destroyOnClose
       title={title}
       visible={visible}
+      width="50%"
       onOk={handleOk}
       confirmLoading={confirmLoading}
       onCancel={handleCancel}
@@ -87,9 +88,9 @@ const AddOrUpdateOrg = props => {
                 max: 40,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '40' }),
               },
-              {
-                validator: checkIllegalCharacter,
-              },
+              // {
+              //   validator: checkIllegalCharacter,
+              // },
             ],
             initialValue: orgBean && orgBean.name || '',
           })(<Input placeholder={formatMessage({ id: 'oal.org.orgName' })} />)}
@@ -105,9 +106,9 @@ const AddOrUpdateOrg = props => {
                 max: 40,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
               },
-              {
-                validator: checkIllegalCharacter,
-              },
+              // {
+              //   validator: checkIllegalCharacter,
+              // },
             ],
             initialValue: orgBean && orgBean.saasName || '',
           })(<Input placeholder={formatMessage({ id: 'oal.settings.sysname' })} />)}
@@ -119,9 +120,9 @@ const AddOrUpdateOrg = props => {
                 max: 20,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
               },
-              {
-                validator: checkIllegalCharacter,
-              },
+              // {
+              //   validator: checkIllegalCharacter,
+              // },
             ],
             initialValue: orgBean && orgBean.contact && orgBean.contact.nickName || '',
           })(<Input placeholder={formatMessage({ id: 'oal.org.contactName' })} />)}

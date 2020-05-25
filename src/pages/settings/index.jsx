@@ -50,14 +50,14 @@ class Settings extends Component {
   constructor(props) {
     super(props);
     const menuMap = {
-      base: formatMessage({ id: 'oal.settings.menu-base' }),
-      security: formatMessage({ id: 'oal.settings.menu-security' }),
-      system: formatMessage({ id: 'oal.settings.menu-system' }),
-      alarm: formatMessage({ id: 'oal.settings.menu-alarm' }),
-      authorized: formatMessage({ id: 'oal.settings.menu-authorized' }),
-      // developer: formatMessage({ id: 'oal.settings.menu-developer' }),
-      // faceKey: formatMessage({ id: 'oal.settings.menu-faceKey' }),
-      // faceLibrary: formatMessage({ id: 'oal.settings.menu-faceLibrary' }),
+      base: 'oal.settings.menu-base',
+      security: 'oal.settings.menu-security',
+      system: 'oal.settings.menu-system',
+      alarm: 'oal.settings.menu-alarm',
+      authorized: 'oal.settings.menu-authorized',
+      // developer: 'oal.settings.menu-developer',
+      // faceKey: 'oal.settings.menu-faceKey',
+      // faceLibrary: 'oal.settings.menu-faceLibrary',
     };
     this.state = {
       mode: 'inline',
@@ -145,13 +145,13 @@ class Settings extends Component {
       if ((!isAdmin || !isAdminOrg) && item === 'authorized') return null;
       // 非 admin 账号不显示 "系统信息" 和 "告警设置" 栏
       if (!isAdmin && (item === 'system' || item === 'alarm')) return null;
-      return <Item key={item}>{menuMap[item]}</Item>
+      return <Item key={item}>{menuMap[item] && formatMessage({ id: menuMap[item] }) || '-'}</Item>
     });
   };
 
   getRightTitle = () => {
     const { selectKey, menuMap } = this.state;
-    return menuMap[selectKey];
+    return menuMap[selectKey] && formatMessage({ id: menuMap[selectKey] }) || '-';
   };
 
   selectKey = key => {
@@ -451,7 +451,6 @@ class Settings extends Component {
   submitAuthorizedPointsLoading = () => {
     const { dispatch } = this.props;
 
-    // 8126TODO 对接检测授权环境接口
     dispatch({
       type: 'settingInfo/fetchAuthorizationEnvironment',
       payload: {},
@@ -461,12 +460,12 @@ class Settings extends Component {
       if (res && res.res > 0) {
         this.closeAuthorizedPointsLoading();
 
-        if (res.data === '0') {
+        if (res.data.state === '0') {
+          // 离线认证
+          this.openAuthorizedPointsUpload('offline');
+        } else if (res.data.state === '1') {
           // 在线认证（默认）
           this.openAuthorizedPointsUpload('net');
-        } else if (res.data === '1') {
-          // 离线认证
-          this.openAuthorizedPointsUpload('local');
         } else {
           notification.error({
             message: formatMessage({ id: 'oal.face.authorizationFailure' }),
@@ -480,13 +479,11 @@ class Settings extends Component {
           this.submitAuthorizedPointsLoading();
         }, 2000);
       } else {
-        // notification.error({
-        //   message: formatMessage({ id: 'oal.face.authorizationFailure' }),
-        //   description: formatMessage({ id: 'oal.face.uploadAbort' }),
-        // });
-        // this.closeAuthorizedPointsLoading();
+        notification.error({
+          message: formatMessage({ id: 'oal.face.authorizationFailure' }),
+          description: formatMessage({ id: 'oal.face.uploadAbort' }),
+        });
         this.closeAuthorizedPointsLoading();
-        this.openAuthorizedPointsUpload(Math.random() > .5 ? 'net' : 'local');
       }
     }).catch(err => {
       console.log(err);
@@ -673,6 +670,7 @@ class Settings extends Component {
           currentUser={currentUser && currentUser.authorizedPoints || {}}
           dispatch={dispatch}
           openAuthorizedPointsLoading={this.openAuthorizedPointsLoading}
+          openAuthorizedPointsUpload={this.openAuthorizedPointsUpload}
         />;
       default:
         break;

@@ -39,6 +39,7 @@ const ModifyAlarmReceiveSettings = props => {
       destroyOnClose
       title={formatMessage({ id: 'oal.settings.receiveSettings' })}
       visible={visible}
+      width="50%"
       onOk={handleOk}
       confirmLoading={confirmLoading}
       onCancel={handleCancel}
@@ -60,9 +61,9 @@ const ModifyAlarmReceiveSettings = props => {
                 type: 'email',
                 message: formatMessage({ id: 'oal.device.incorrectFormat' }),
               },
-              {
-                validator: checkIllegalCharacter,
-              },
+              // {
+              //   validator: checkIllegalCharacter,
+              // },
             ],
             initialValue: currentUser && currentUser.alarmSet && currentUser.alarmSet.receiveMail || '',
           })(<Input placeholder={formatMessage({ id: 'oal.settings.receiveMail' })} />)}

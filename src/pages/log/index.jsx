@@ -40,6 +40,7 @@ const peopleTypeMap = {
   '0': 'oal.common.certifiedPeople',
   '2': 'oal.common.blacklist',
   '3': 'oal.common.visitor',
+  '4': 'oal.device.maskMode',
   '99': 'oal.common.unregistered',
 }
 
@@ -248,7 +249,7 @@ class Log extends Component {
       },
       {
         title: formatMessage({ id: 'oal.common.handle' }),
-        width: 150,
+        // width: 150,
         key: 'handle',
         render: (text, record) => (
           <Fragment>
@@ -311,11 +312,11 @@ class Log extends Component {
         <Row
           gutter={{
             md: 4,
-            lg: 24,
-            xl: 48,
+            lg: 12,
+            xl: 24,
           }}
         >
-          <Col xxl={6} xl={6} lg={6} md={6} sm={24}>
+          <Col xxl={6} xl={8} lg={8} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.type' })}>
               {getFieldDecorator('peopleType', {
                 initialValue: '',
@@ -335,7 +336,7 @@ class Log extends Component {
               )}
             </FormItem>
           </Col>
-          <Col xxl={8} xl={8} lg={8} md={8} sm={24}>
+          <Col xxl={8} xl={9} lg={9} md={9} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.fullName' })}>
               {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
             </FormItem>

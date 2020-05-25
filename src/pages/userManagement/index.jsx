@@ -23,6 +23,7 @@ import StandardTable from '../../components/StandardTable';
 import AddOrUpdateUser from './components/AddOrUpdateUser';
 import UserResetModal from './components/UserResetModal';
 import UserDelModal from './components/UserDelModal';
+import AssignModal from './components/AssignModal';
 import styles from './style.less';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import Link from 'umi/link';
@@ -39,12 +40,14 @@ const { Option } = Select;
   modifyLoading: loading.effects['userManagement/modify'],
   handleStateLoading: loading.effects['userManagement/handleState'],
   resetPswLoading: loading.effects['userManagement/resetPsw'],
+  assignLoading: loading.effects['userManagement/assign'],
 }))
 class UserManagement extends Component {
   state = {
     modalVisible: false,
     resetVisible: false,
     delVisible: false,
+    assignVisible: false,
     formValues: {},
     selectedRows: [],
     selectedUser: {},
@@ -73,6 +76,18 @@ class UserManagement extends Component {
         <span>
           {record && record.profile && record.profile.nickName || '-'}
         </span>
+      ),
+    },
+    {
+      title: formatMessage({ id: 'oal.common.authorizedPoints' }),
+      key: 'authorizedPoints',
+      dataIndex: 'authorizedPoints',
+      render: (text, record) => (
+        <Tooltip title={formatMessage({ id: 'oal.common.terminalAssigned/terminalTotal' })}>
+          <span>
+            {record && record.terminalAssigned || '0'}/{record && record.terminalTotal || '0'}
+          </span>
+        </Tooltip>
       ),
     },
     {
@@ -109,11 +124,13 @@ class UserManagement extends Component {
     // },
     {
       title: formatMessage({ id: 'oal.common.handle' }),
-      width: 200,
+      // width: 250,
       key: 'handle',
       render: (text, record) => (
         <Fragment>
           <a onClick={() => this.handleUpdateModalVisible(record)}><FormattedMessage id="oal.common.modify" /></a>
+          <Divider type="vertical" />
+          <a onClick={() => this.openAssignModal(record)}><FormattedMessage id="oal.common.assign" /></a>
           <Divider type="vertical" />
           <a onClick={() => this.openResetModal(record)}><FormattedMessage id="oal.user-manage.resetPassword" /></a>
           <Divider type="vertical" />
@@ -298,6 +315,42 @@ class UserManagement extends Component {
     }
   };
 
+  // 分配授权点
+  openAssignModal = bean => {
+    this.setState({ assignVisible: true, selectedUser: bean });
+  };
+
+  closeAssignModal = () => {
+    this.setState({ assignVisible: false, selectedUser: {} });
+  };
+
+  submitAssignModal = (values, callback) => {
+    const { dispatch, currentUser } = this.props;
+    const { terminalTotal: oldTerminalTotal, terminalAssigned: oldTerminalAssigned } = currentUser.authorizedPoints || {};
+    const { points, diff } = values;
+
+    dispatch({
+      type: 'userManagement/assign',
+      payload: values,
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.common.assignSuccessfully' }));
+        this.closeAssignModal();
+        this.loadUserList();
+        callback && callback();
+        dispatch({
+          type: 'user/modifyAuthorizedPoints',
+          payload: {
+            authorizedPoints: {
+              terminalTotal: oldTerminalTotal,
+              terminalAssigned: oldTerminalAssigned + diff || 0,
+            }
+          },
+        });
+      }
+    });
+  };
+
   renderSimpleForm = () => {
     const { form, userListLoading } = this.props;
     const { getFieldDecorator } = form;
@@ -310,7 +363,7 @@ class UserManagement extends Component {
             xl: 48,
           }}
         >
-          <Col xxl={6} xl={7} lg={8} md={8} sm={24}>
+          <Col xxl={6} xl={10} lg={10} md={10} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.user-manage.accountName' })}>
               {getFieldDecorator('userName')(<Input placeholder={formatMessage({ id: 'oal.user-manage.enterAccountNameTips' })} />)}
             </FormItem>
@@ -381,18 +434,44 @@ class UserManagement extends Component {
       handleStateLoading,
       currentUser,
       resetPswLoading,
+      assignLoading,
     } = this.props;
+    const authorizedPoints = currentUser && currentUser.authorizedPoints || {};
     userList && userList.pagination && (userList.pagination.showTotal = this.user_showTotal);
-    const { selectedRows, modalVisible, selectedUser, resetVisible, delVisible } = this.state;
+    const { selectedRows, modalVisible, selectedUser, resetVisible, delVisible, assignVisible } = this.state;
     return (
       <PageHeaderWrapper className={styles.myPageHeaderWrapper}>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
-            <div className={styles.tableListOperator}>
+            <div
+              className={styles.tableListOperator}
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
               <Button icon="plus" type="primary" onClick={() => this.toAdd()}>
                 <FormattedMessage id="oal.face.add" />
               </Button>
+
+              <div>
+                <span>
+                  <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+                    <FormattedMessage id="oal.settings.totalAuthorizationPoints" /> :
+                </span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal || '0'}</span>
+                </span>
+                <span>
+                  <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+                    <FormattedMessage id="oal.settings.available" /> :
+                 </span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal - authorizedPoints.terminalAssigned || '0'}</span>
+                </span>
+                <span>
+                  <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+                    <FormattedMessage id="oal.settings.assigned" /> :
+                </span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalAssigned || '0'}</span>
+                </span>
+              </div>
             </div>
             <StandardTable
               // eslint-disable-next-line no-underscore-dangle
@@ -428,6 +507,14 @@ class UserManagement extends Component {
           confirmLoading={handleStateLoading}
           handleCancel={this.closeDelModal}
           handleSubmit={this.deleteUser}
+        />
+        <AssignModal
+          visible={assignVisible}
+          bean={selectedUser}
+          currentUser={currentUser}
+          confirmLoading={assignLoading}
+          handleCancel={this.closeAssignModal}
+          handleSubmit={this.submitAssignModal}
         />
       </PageHeaderWrapper>
     );

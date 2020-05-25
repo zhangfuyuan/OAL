@@ -12,6 +12,7 @@ import {
   Dropdown,
   Menu,
   Icon,
+  Tooltip,
 } from 'antd';
 import React, { Component, Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -20,6 +21,7 @@ import StandardTable from '../../components/StandardTable';
 import AddOrUpdateOrg from './components/AddOrUpdateOrg';
 import OrgDetailModal from './components/OrgDetailModal';
 import OrgResetModal from './components/OrgResetModal';
+import AssignModal from './components/AssignModal';
 import styles from './style.less';
 import defaultSettings from '../../../config/defaultSettings';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
@@ -33,18 +35,21 @@ const statusMap = ['error', 'success'];
 const status = ['oal.common.disable', 'oal.common.enable'];
 const { publicPath } = defaultSettings;
 
-@connect(({ org, loading }) => ({
+@connect(({ user: { currentUser }, org, loading }) => ({
+  currentUser,
   org,
   orgListLoading: loading.effects['org/fetch'],
   addOrgLoading: loading.effects['org/add'],
   updateOrgLoading: loading.effects['org/update'],
   resetPswLoading: loading.effects['org/resetPsw'],
+  assignLoading: loading.effects['org/assign'],
 }))
 class OrgList extends Component {
   state = {
     detailVisible: false,
     resetVisible: false,
     modalVisible: false,
+    assignVisible: false,
     formValues: {
       creator: getPageQuery().creator,
     },
@@ -126,14 +131,28 @@ class OrgList extends Component {
       //   render: (text, record) => <span>{text || '-'}</span>,
       // },
       {
+        title: formatMessage({ id: 'oal.common.authorizedPoints' }),
+        key: 'authorizedPoints',
+        dataIndex: 'authorizedPoints',
+        render: (text, record) => (
+          <Tooltip title={formatMessage({ id: 'oal.common.terminalAssigned/terminalTotal' })}>
+            <span>
+              {record && record.terminalAssigned || '0'}/{record && record.terminalTotal || '0'}
+            </span>
+          </Tooltip>
+        ),
+      },
+      {
         title: formatMessage({ id: 'oal.common.handle' }),
-        width: 250,
+        // width: 250,
         key: 'handle',
         render: (text, record) => (
           <Fragment>
             <a key="view" onClick={() => this.openDetailModal(record)}><FormattedMessage id="oal.common.view" /></a>
             <Divider type="vertical" />
             <a key="modify" onClick={() => this.moreAction('modify', record)}><FormattedMessage id="oal.common.modify" /></a>
+            <Divider type="vertical" />
+            <a onClick={() => this.openAssignModal(record)}><FormattedMessage id="oal.common.assign" /></a>
             <Divider type="vertical" />
             <a key="resetPassword" onClick={() => this.openResetModal(record)}><FormattedMessage id="oal.org.resetPassword" /></a>
             <Divider type="vertical" />
@@ -310,6 +329,42 @@ class OrgList extends Component {
     }
   };
 
+  // 分配授权点
+  openAssignModal = bean => {
+    this.setState({ assignVisible: true, selectedOrg: bean });
+  };
+
+  closeAssignModal = () => {
+    this.setState({ assignVisible: false, selectedOrg: {} });
+  };
+
+  submitAssignModal = (values, callback) => {
+    const { dispatch, currentUser } = this.props;
+    const { terminalTotal: oldTerminalTotal, terminalAssigned: oldTerminalAssigned } = currentUser.authorizedPoints || {};
+    const { points, diff } = values;
+
+    dispatch({
+      type: 'org/assign',
+      payload: values,
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.common.assignSuccessfully' }));
+        this.closeAssignModal();
+        this.loadOrgList();
+        callback && callback();
+        dispatch({
+          type: 'user/modifyAuthorizedPoints',
+          payload: {
+            authorizedPoints: {
+              terminalTotal: oldTerminalTotal,
+              terminalAssigned: oldTerminalAssigned + diff || 0,
+            }
+          },
+        });
+      }
+    });
+  };
+
   renderSimpleForm = () => {
     const { form, orgListLoading } = this.props;
     const { formValues } = this.state;
@@ -319,11 +374,11 @@ class OrgList extends Component {
         <Row
           gutter={{
             md: 4,
-            lg: 24,
-            xl: 48,
+            lg: 12,
+            xl: 24,
           }}
         >
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
+          <Col xxl={5} xl={7} lg={10} md={10} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.org.orgName' })}>
               {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.org.enterOrgName' })} />)}
             </FormItem>
@@ -340,7 +395,7 @@ class OrgList extends Component {
               })(<Input placeholder={formatMessage({ id: 'oal.org.enterCreator' })} />)}
             </FormItem>
           </Col> */}
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
+          <Col xxl={4} xl={5} lg={5} md={5} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.status' })}>
               {getFieldDecorator('state', {
                 initialValue: '',
@@ -410,18 +465,45 @@ class OrgList extends Component {
       addOrgLoading,
       updateOrgLoading,
       resetPswLoading,
+      assignLoading,
+      currentUser,
     } = this.props;
+    const authorizedPoints = currentUser && currentUser.authorizedPoints || {};
     orgList && orgList.pagination && (orgList.pagination.showTotal = this.org_showTotal);
-    const { selectedRows, modalVisible, selectedOrg, detailVisible, resetVisible } = this.state;
+    const { selectedRows, modalVisible, selectedOrg, detailVisible, resetVisible, assignVisible } = this.state;
     return (
       <PageHeaderWrapper className={styles.myPageHeaderWrapper}>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
-            <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.toAdd()}>
-                <FormattedMessage id="oal.face.add" />
+            <div
+              className={styles.tableListOperator}
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
+              <Button type="primary" onClick={() => this.toAdd()}>
+                <FormattedMessage id="oal.org.addOrg" />
               </Button>
+
+              <div>
+                <span>
+                  <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+                    <FormattedMessage id="oal.settings.totalAuthorizationPoints" /> :
+                </span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal || '0'}</span>
+                </span>
+                <span>
+                  <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+                    <FormattedMessage id="oal.settings.available" /> :
+                 </span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal - authorizedPoints.terminalAssigned || '0'}</span>
+                </span>
+                <span>
+                  <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+                    <FormattedMessage id="oal.settings.assigned" /> :
+                </span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalAssigned || '0'}</span>
+                </span>
+              </div>
             </div>
             <StandardTable
               // eslint-disable-next-line no-underscore-dangle
@@ -455,6 +537,14 @@ class OrgList extends Component {
           confirmLoading={resetPswLoading}
           handleCancel={this.closeResetModal}
           handleSubmit={this.submitReset}
+        />
+        <AssignModal
+          visible={assignVisible}
+          bean={selectedOrg}
+          currentUser={currentUser}
+          confirmLoading={assignLoading}
+          handleCancel={this.closeAssignModal}
+          handleSubmit={this.submitAssignModal}
         />
       </PageHeaderWrapper>
     );

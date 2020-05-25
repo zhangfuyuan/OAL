@@ -40,6 +40,13 @@ export async function ajaxSetState(data) {
 }
 
 /**
+ * （账号）分配授权点
+ */
+export async function ajaxAssign(data) {
+  return post(`/guard-web/a/sys/user/**`, data);
+}
+
+/**
  * 操作用户
  * action：delete，resetPsw
  */

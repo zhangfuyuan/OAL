@@ -56,9 +56,9 @@ const TreeAddModal = props => {
                 max: 40,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '40' }),
               },
-              {
-                validator: checkIllegalCharacter,
-              },
+              // {
+              //   validator: checkIllegalCharacter,
+              // },
             ],
             initialValue: '',
           })(<Input placeholder={formatMessage({ id: 'oal.face.groupName' })} />)}

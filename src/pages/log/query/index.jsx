@@ -160,7 +160,7 @@ class logQuery extends Component {
         dataIndex: 'name',
         // sorter: (a, b) => a.name - b.name,
         // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
-        render: (text, record) => <span>{(record.peopleType === '4' && record.wearMask && formatMessage({ id: wearMaskMap[record.wearMask] })) || (record.peopleType === '99' && formatMessage({ id: peopleTypeMap[record.peopleType] })) || record.name || '-'}</span>,
+        render: (text, record) => <span>{(record.peopleType === '4' && wearMaskMap[record.wearMask] && formatMessage({ id: wearMaskMap[record.wearMask] })) || (record.peopleType === '99' && peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] })) || record.name || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.face.staffid' }),
@@ -267,7 +267,7 @@ class logQuery extends Component {
             xl: 24,
           }}
         >
-          <Col xxl={6} xl={6} lg={6} md={8} sm={24}>
+          <Col xxl={6} xl={8} lg={9} md={10} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.type' })}>
               {getFieldDecorator('peopleType', {
                 initialValue: '',
@@ -297,7 +297,7 @@ class logQuery extends Component {
                 </FormItem>
               </Col>) : ''
           } */}
-          <Col xxl={6} xl={6} lg={8} md={8} sm={24}>
+          <Col xxl={6} xl={8} lg={9} md={10} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.fullName' })}>
               {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
             </FormItem>
@@ -466,7 +466,7 @@ class logQuery extends Component {
         </Card>
 
         <Modal
-          title={tableSelectedBean.name}
+          title={(tableSelectedBean.peopleType === '4' && wearMaskMap[tableSelectedBean.wearMask] && formatMessage({ id: wearMaskMap[tableSelectedBean.wearMask] })) || (tableSelectedBean.peopleType === '99' && peopleTypeMap[tableSelectedBean.peopleType] && formatMessage({ id: peopleTypeMap[tableSelectedBean.peopleType] })) || tableSelectedBean.name || '-'}
           visible={viewVisible}
           footer={null}
           onCancel={this.table_closeViewModal}
