@@ -56,9 +56,9 @@ const TreeModifyModal = props => {
                 max: 20,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
               },
-              {
-                validator: checkIllegalCharacter,
-              },
+              // {
+              //   validator: checkIllegalCharacter,
+              // },
             ],
             initialValue: bean && bean.name || '-',
           })(<Input placeholder={formatMessage({ id: 'oal.face.groupName' })} />)}

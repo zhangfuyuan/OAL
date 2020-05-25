@@ -146,7 +146,7 @@ class Visitor extends Component {
       },
       {
         title: formatMessage({ id: 'oal.common.handle' }),
-        width: 200,
+        // width: 200,
         render: (text, record) => (
           <Fragment>
             <a key="edit" onClick={() => this.table_showTableAddOrModifyModal(record)}><FormattedMessage id="oal.common.edit" /></a>
@@ -215,7 +215,7 @@ class Visitor extends Component {
             xl: 48,
           }}
         >
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
+          <Col xxl={5} xl={8} lg={8} md={8} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.fullName' })}>
               {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
             </FormItem>
@@ -236,7 +236,7 @@ class Visitor extends Component {
               </Button>
             </span>
           </Col>
-          <Col xxl={15} xl={14} lg={12} md={12} sm={12}>
+          <Col xxl={15} xl={12} lg={12} md={12} sm={12}>
             <div style={{ textAlign: 'right', }}>
               <Button
                 type="primary"

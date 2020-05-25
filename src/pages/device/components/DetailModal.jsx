@@ -4,9 +4,9 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import moment from 'moment';
 
 const recognitionModeType = {
-  '0': 'oal.device.attendanceMode',
-  '1': 'oal.device.standardMode',
-  '2': 'oal.device.maskMode',
+  '1': 'oal.device.faceAndTemperature',
+  '2': 'oal.device.maskAndTtemperature',
+  '3': 'oal.device.temperature',
 };
 
 const infraredThermometerType = {

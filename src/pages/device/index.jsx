@@ -282,7 +282,7 @@ class Device extends Component {
       {
         title: formatMessage({ id: 'oal.common.handle' }),
         dataIndex: 'action',
-        width: 200,
+        // width: 200,
         render: (text, record) => (
           <Fragment>
             <a key="view" onClick={() => this.openDetailModal(record)}><FormattedMessage id="oal.common.view" /></a>

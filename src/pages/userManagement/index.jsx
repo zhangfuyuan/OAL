@@ -109,7 +109,7 @@ class UserManagement extends Component {
     // },
     {
       title: formatMessage({ id: 'oal.common.handle' }),
-      width: 200,
+      // width: 200,
       key: 'handle',
       render: (text, record) => (
         <Fragment>
@@ -310,7 +310,7 @@ class UserManagement extends Component {
             xl: 48,
           }}
         >
-          <Col xxl={6} xl={7} lg={8} md={8} sm={24}>
+          <Col xxl={6} xl={10} lg={10} md={10} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.user-manage.accountName' })}>
               {getFieldDecorator('userName')(<Input placeholder={formatMessage({ id: 'oal.user-manage.enterAccountNameTips' })} />)}
             </FormItem>

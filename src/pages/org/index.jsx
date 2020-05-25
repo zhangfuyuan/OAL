@@ -127,7 +127,7 @@ class OrgList extends Component {
       // },
       {
         title: formatMessage({ id: 'oal.common.handle' }),
-        width: 250,
+        // width: 250,
         key: 'handle',
         render: (text, record) => (
           <Fragment>
@@ -319,11 +319,11 @@ class OrgList extends Component {
         <Row
           gutter={{
             md: 4,
-            lg: 24,
-            xl: 48,
+            lg: 12,
+            xl: 24,
           }}
         >
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
+          <Col xxl={5} xl={7} lg={10} md={10} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.org.orgName' })}>
               {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.org.enterOrgName' })} />)}
             </FormItem>
@@ -340,7 +340,7 @@ class OrgList extends Component {
               })(<Input placeholder={formatMessage({ id: 'oal.org.enterCreator' })} />)}
             </FormItem>
           </Col> */}
-          <Col xxl={5} xl={6} lg={8} md={8} sm={24}>
+          <Col xxl={4} xl={5} lg={5} md={5} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.status' })}>
               {getFieldDecorator('state', {
                 initialValue: '',

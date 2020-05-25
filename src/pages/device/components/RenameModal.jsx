@@ -29,7 +29,7 @@ const RenameModal = props => {
   useEffect(() => {
     if (visible === true) {
       setShowAlarm((bean && bean.alarm === '1') || false);
-      setShowWaitShutdownTime((bean && bean.relayOperationMode === '1') || false)
+      setShowWaitShutdownTime((bean && (bean.relayOperationMode === '1' || bean.relayOperationMode === '4')) || false)
     }
   }, [visible]);
 
@@ -37,10 +37,11 @@ const RenameModal = props => {
     form.validateFields((err, fieldsValue) => {
       //   console.log('---------fieldsValue----------', fieldsValue)
       if (err) return;
-      const { pwd, alarmValue, waitShutdownTime, alarm } = fieldsValue;
+      const { pwd, alarmValue, waitShutdownTime, alarm, isSaveRecord } = fieldsValue;
       const params = {
         ...fieldsValue,
         alarm: alarm ? '1' : '0',
+        isSaveRecord: isSaveRecord ? '1' : '0',
       };
 
       alarmValue && (params.alarmValue = alarmValue.replace(/((℃)|(℉))$/, ''));
@@ -176,6 +177,7 @@ const RenameModal = props => {
       title={title}
       visible={visible}
       onOk={handleOk}
+      width="50%"
       onCancel={handleCancel}
       confirmLoading={confirmLoading}
       maskClosable={false}
@@ -192,9 +194,9 @@ const RenameModal = props => {
                 max: 20,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
               },
-              {
-                validator: checkIllegalCharacter,
-              },
+              // {
+              //   validator: checkIllegalCharacter,
+              // },
             ],
             initialValue: bean && bean.name || '',
           })(<Input placeholder={formatMessage({ id: 'oal.device.deviceName' })} />)}
@@ -258,8 +260,9 @@ const RenameModal = props => {
           {getFieldDecorator('relayOperationMode', {
             initialValue: bean && bean.relayOperationMode || '1',
           })(
-            <Radio.Group onChange={e => setShowWaitShutdownTime(e.target.value === '1')} >
-              <Radio value="1"><FormattedMessage id="oal.device.identifyControl" /></Radio>
+            <Radio.Group onChange={e => setShowWaitShutdownTime(e.target.value === '1' || e.target.value === '4')} >
+              <Radio value="1"><FormattedMessage id="oal.device.openWhenVerifySuccessfully" /></Radio>
+              <Radio value="4"><FormattedMessage id="oal.device.openWhenVerifyFailed" /></Radio>
               <Radio value="2"><FormattedMessage id="oal.device.normallyOpen" /></Radio>
               <Radio value="3"><FormattedMessage id="oal.device.normallyClose" /></Radio>
             </Radio.Group>
@@ -284,22 +287,30 @@ const RenameModal = props => {
         }
         <Form.Item label={formatMessage({ id: 'oal.device.recognitionMode' })}>
           {getFieldDecorator('recognitionMode', {
-            initialValue: bean && bean.recognitionMode || '1',
+            initialValue: bean && bean.recognitionMode || '2',
           })(
             <Radio.Group>
-              <Radio value="0"><FormattedMessage id="oal.device.attendanceMode" /></Radio>
-              <Radio value="2">
+              <Radio value="1"><FormattedMessage id="oal.device.faceAndTemperature" /></Radio>
+              <Radio value="2"><FormattedMessage id="oal.device.maskAndTtemperature" /></Radio>
+              <Radio value="3"><FormattedMessage id="oal.device.temperature" /></Radio>
+              {/* <Radio value="2">
                 <FormattedMessage id="oal.device.maskMode" />
                 &nbsp;&nbsp;
                 <Tooltip title={formatMessage({ id: 'oal.device.maskModeTips' })}>
                   <Icon type="info-circle" theme="twoTone" style={{ fontSize: '18px' }} />
                 </Tooltip>
-              </Radio>
+              </Radio> */}
             </Radio.Group>
           )}
         </Form.Item>
+        <Form.Item label={formatMessage({ id: 'oal.device.identifyRecord' })}>
+          {getFieldDecorator('isSaveRecord', {
+            valuePropName: 'checked',
+            initialValue: bean && bean.isSaveRecord === '0' ? false : true,
+          })(<Switch />)}
+        </Form.Item>
       </Form>
-      <p style={{ textAlign: 'center', color: '#999', }}><FormattedMessage id="oal.device.deviceSetTips" /></p>
+      {/* <p style={{ textAlign: 'center', color: '#999', }}><FormattedMessage id="oal.device.deviceSetTips" /></p> */}
     </Modal>
   );
 };

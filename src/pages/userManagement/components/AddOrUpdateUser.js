@@ -92,9 +92,9 @@ const AddOrUpdateUser = props => {
                 max: 20,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
               },
-              {
-                validator: checkIllegalCharacter,
-              },
+              // {
+              //   validator: checkIllegalCharacter,
+              // },
             ],
             initialValue: isEdit ? userBean.profile && userBean.profile.nickName : '',
           })(<Input placeholder={formatMessage({ id: 'oal.common.nickname' })} disabled={isEdit} />)}

@@ -55,9 +55,9 @@ const ModifySysName = props => {
                 max: 20,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
               },
-              {
-                validator: checkIllegalCharacter,
-              },
+              // {
+              //   validator: checkIllegalCharacter,
+              // },
             ],
             initialValue: currentUser && currentUser.org && currentUser.org.saasName,
           })(<Input placeholder={formatMessage({ id: 'oal.settings.sysname' })} />)}

@@ -267,7 +267,7 @@ class logQuery extends Component {
             xl: 24,
           }}
         >
-          <Col xxl={6} xl={6} lg={6} md={8} sm={24}>
+          <Col xxl={6} xl={8} lg={9} md={10} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.type' })}>
               {getFieldDecorator('peopleType', {
                 initialValue: '',
@@ -297,7 +297,7 @@ class logQuery extends Component {
                 </FormItem>
               </Col>) : ''
           } */}
-          <Col xxl={6} xl={6} lg={8} md={8} sm={24}>
+          <Col xxl={6} xl={8} lg={9} md={10} sm={24}>
             <FormItem label={formatMessage({ id: 'oal.common.fullName' })}>
               {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'oal.face.enterFullName' })} />)}
             </FormItem>

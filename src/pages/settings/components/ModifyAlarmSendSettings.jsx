@@ -49,6 +49,7 @@ const ModifyAlarmSendSettings = props => {
       destroyOnClose
       title={formatMessage({ id: 'oal.settings.sendSettings' })}
       visible={visible}
+      width="50%"
       onOk={handleOk}
       confirmLoading={confirmLoading}
       onCancel={handleCancel}
@@ -70,9 +71,9 @@ const ModifyAlarmSendSettings = props => {
                 type: 'email',
                 message: formatMessage({ id: 'oal.device.incorrectFormat' }),
               },
-              {
-                validator: checkIllegalCharacter,
-              },
+              // {
+              //   validator: checkIllegalCharacter,
+              // },
             ],
             initialValue: currentUser && currentUser.alarmSet && currentUser.alarmSet.username || '',
           })(<Input placeholder={formatMessage({ id: 'oal.settings.sendMail' })} />)}
@@ -88,9 +89,9 @@ const ModifyAlarmSendSettings = props => {
                 max: 254,
                 message: formatMessage({ id: 'oal.common.maxLength' }, { num: '254' }),
               },
-              {
-                validator: checkIllegalCharacter,
-              },
+              // {
+              //   validator: checkIllegalCharacter,
+              // },
             ],
             initialValue: currentUser && currentUser.alarmSet && currentUser.alarmSet.password || '',
           })(<Input.Password placeholder={formatMessage({ id: 'oal.settings.passwordOrCode' })} />)}
@@ -110,9 +111,9 @@ const ModifyAlarmSendSettings = props => {
                 pattern: /.+[.].+/,
                 message: formatMessage({ id: 'oal.device.incorrectFormat' }),
               },
-              {
-                validator: checkIllegalCharacter,
-              },
+              // {
+              //   validator: checkIllegalCharacter,
+              // },
             ],
             initialValue: currentUser && currentUser.alarmSet && currentUser.alarmSet.smtpServer || '',
           })(<Input placeholder={formatMessage({ id: 'oal.settings.SMTPServer' })} />)}
