@@ -19,7 +19,14 @@ const InjectedWrapper = (() => {
   return sfc;
 })();
 
+import 'moment/locale/de';
+import 'moment/locale/es';
+import 'moment/locale/fr';
+import 'moment/locale/it';
+import 'moment/locale/ja';
+import 'moment/locale/ko';
 import 'moment/locale/pt-br';
+import 'moment/locale/ru';
 import 'moment/locale/zh-cn';
 import 'moment/locale/zh-tw';
 
@@ -33,6 +40,15 @@ let defaultAntd = require('antd/lib/locale-provider/en_US');
 defaultAntd = defaultAntd.default || defaultAntd;
 
 const localeInfo = {
+  'de-DE': {
+    messages: {
+      ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/de-DE.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/de-DE.js')),
+    },
+    locale: 'de-DE',
+    antd: require('antd/lib/locale-provider/de_DE'),
+    data: require('react-intl/locale-data/de'),
+    momentLocale: 'de',
+  },
   'en-US': {
     messages: {
       ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/en-US.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/en-US.js')),
@@ -42,14 +58,68 @@ const localeInfo = {
     data: require('react-intl/locale-data/en'),
     momentLocale: '',
   },
+  'es-ES': {
+    messages: {
+      ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/es-ES.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/es-ES.js')),
+    },
+    locale: 'es-ES',
+    antd: require('antd/lib/locale-provider/es_ES'),
+    data: require('react-intl/locale-data/es'),
+    momentLocale: 'es',
+  },
+  'fr-FR': {
+    messages: {
+      ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/fr-FR.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/fr-FR.js')),
+    },
+    locale: 'fr-FR',
+    antd: require('antd/lib/locale-provider/fr_FR'),
+    data: require('react-intl/locale-data/fr'),
+    momentLocale: 'fr',
+  },
+  'it-IT': {
+    messages: {
+      ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/it-IT.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/it-IT.js')),
+    },
+    locale: 'it-IT',
+    antd: require('antd/lib/locale-provider/it_IT'),
+    data: require('react-intl/locale-data/it'),
+    momentLocale: 'it',
+  },
+  'ja-JP': {
+    messages: {
+      ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/ja-JP.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/ja-JP.js')),
+    },
+    locale: 'ja-JP',
+    antd: require('antd/lib/locale-provider/ja_JP'),
+    data: require('react-intl/locale-data/ja'),
+    momentLocale: 'ja',
+  },
+  'ko-KR': {
+    messages: {
+      ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/ko-KR.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/ko-KR.js')),
+    },
+    locale: 'ko-KR',
+    antd: require('antd/lib/locale-provider/ko_KR'),
+    data: require('react-intl/locale-data/ko'),
+    momentLocale: 'ko',
+  },
   'pt-BR': {
     messages: {
-      ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/pt-BR.js')),
+      ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/pt-BR.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/pt-BR.js')),
     },
     locale: 'pt-BR',
     antd: require('antd/lib/locale-provider/pt_BR'),
     data: require('react-intl/locale-data/pt'),
     momentLocale: 'pt-br',
+  },
+  'ru-RU': {
+    messages: {
+      ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/ru-RU.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/ru-RU.js')),
+    },
+    locale: 'ru-RU',
+    antd: require('antd/lib/locale-provider/ru_RU'),
+    data: require('react-intl/locale-data/ru'),
+    momentLocale: 'ru',
   },
   'zh-CN': {
     messages: {

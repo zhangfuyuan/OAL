@@ -15,9 +15,17 @@ let myImgTotal = 0; // 含文件格式不正确
 let myLegalImgTotalSize = 0;
 
 const userImportTemplateLinkMap = {
+  'de-DE': '/guardFile/model/users-de/users.xls',
+  'en-US': '/guardFile/model/users-en/users.xls',
+  'es-ES': '/guardFile/model/users-es/users.xls',
+  'fr-FR': '/guardFile/model/users-fr/users.xls',
+  'it-IT': '/guardFile/model/users-it/users.xls',
+  'ja-JP': '/guardFile/model/users-ja/users.xls',
+  'ko-KR': '/guardFile/model/users-ko/users.xls',
+  'pt-BR': '/guardFile/model/users-pt/users.xls',
+  'ru-RU': '/guardFile/model/users-ru/users.xls',
   'zh-CN': '/guardFile/model/users-cn-rZH/users.xls',
   'zh-TW': '/guardFile/model/users-cn-rTW/users.xls',
-  'en-US': '/guardFile/model/users-en/users.xls',
 };
 
 const TableBatchAddModal = props => {
@@ -481,7 +489,7 @@ const TableBatchAddModal = props => {
           <p>
             <FormattedMessage id="oal.face.batchAddExplainTips1-1" />
             &nbsp;
-            <a href={userImportTemplateLinkMap[selectedLang] || 'http://lango-tech.com/XBH/lango19/data/users.zip'}>
+            <a href={userImportTemplateLinkMap[selectedLang] || '/guardFile/model/users-en/users.xls'}>
               <FormattedMessage id="oal.face.batchAddExplainTips1-2" />
             </a>
             &nbsp;
