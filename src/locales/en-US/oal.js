@@ -326,7 +326,7 @@ export default {
   'oal.org.loginAccount': `Login userName`,
   'oal.org.initialPassword': `Initial password`,
   'oal.org.resetSuccessfully': `Reset successfully`,
-  'oal.org.resetPasswordConfirm': `Restore password 123465 for admin account of {org} organization, do you want to reset it?`,
+  'oal.org.resetPasswordConfirm': `Restore password 123456 for admin account of {org} organization, do you want to reset it?`,
   'oal.user-manage.enterNickname': `Please enter a nickname`,
   'oal.common.account': `Account`,
   'oal.user-manage.orgNum': `Number of organizations`,
@@ -597,4 +597,8 @@ export default {
   'oal.ajax.6010': `Insufficient authorization points`,
   'oal.ajax.6011': `The number of authorization points does not change`,
   'oal.common.used': `Used`,
+  'oal.org.orgTotalPoints': `Organization points`,
+  'oal.user-manage.agentTotalPoints': `Agent points`,
+  'oal.org.totalNotLessAssign': `Cannot be less than used points`,
+  'oal.user-manage.totalNotLessAssign': `Cannot be less than the allocated points`,
 };

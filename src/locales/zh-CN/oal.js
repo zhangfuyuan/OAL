@@ -326,7 +326,7 @@ export default {
   'oal.org.loginAccount': `登录账号`,
   'oal.org.initialPassword': `初始密码`,
   'oal.org.resetSuccessfully': `重置成功`,
-  'oal.org.resetPasswordConfirm': `{org}组织的admin账号的密码恢复为123465，是否重置？`,
+  'oal.org.resetPasswordConfirm': `{org}组织的admin账号的密码恢复为123456，是否重置？`,
   'oal.user-manage.enterNickname': `请输入昵称`,
   'oal.common.account': `账号`,
   'oal.user-manage.orgNum': `组织数`,
@@ -597,4 +597,8 @@ export default {
   'oal.ajax.6010': `授权点数不足`,
   'oal.ajax.6011': `授权点数没有变化`,
   'oal.common.used': `已用`,
+  'oal.org.orgTotalPoints': `组织点数`,
+  'oal.user-manage.agentTotalPoints': `代理点数`,
+  'oal.org.totalNotLessAssign': `不能少于已用点数`,
+  'oal.user-manage.totalNotLessAssign': `不能少于已分配点数`,
 };

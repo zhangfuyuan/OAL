@@ -36,8 +36,8 @@ const AssignModal = props => {
       if (err) return;
       handleSubmit({
         userId: bean._id,
-        points: parseInt(fieldsValue.points) + beanTerminalAssigned || 0,
-        diff: parseInt(fieldsValue.points) - beanTerminalTotal + beanTerminalAssigned || 0,
+        points: parseInt(fieldsValue.points) || 0,
+        diff: parseInt(fieldsValue.points) - beanTerminalTotal || 0,
       });
     });
   };
@@ -45,10 +45,14 @@ const AssignModal = props => {
   const normalizeNum = value => value === '0' ? '0' : (value && value.replace && parseInt(value.replace(/[^\d]/g, '')) || '') + '';
 
   const checkPoints = (rule, value, callback) => {
-    if (value &&
-      value.replace &&
-      parseInt(value.replace(/[^\d]/g, '')) > (currentUserTerminalTotal - currentUserTerminalAssigned + beanTerminalTotal - beanTerminalAssigned || 0)) {
-      callback(formatMessage({ id: 'oal.common.insufficientPoints' }));
+    if (value && value.replace) {
+      const _val = parseInt(value.replace(/[^\d]/g, ''));
+
+      if (_val < beanTerminalAssigned) {
+        callback(formatMessage({ id: 'oal.user-manage.totalNotLessAssign' }));
+      } else if (_val > currentUserTerminalTotal - currentUserTerminalAssigned + beanTerminalTotal) {
+        callback(formatMessage({ id: 'oal.common.insufficientPoints' }));
+      }
     }
     callback();
   };
@@ -79,7 +83,7 @@ const AssignModal = props => {
       </div>
 
       <Form {...formItemLayout}>
-        <Form.Item label={formatMessage({ id: 'oal.user-manage.agentAvailablePoints' })}>
+        <Form.Item label={formatMessage({ id: 'oal.user-manage.agentTotalPoints' })}>
           {getFieldDecorator('points', {
             rules: [
               {
@@ -91,8 +95,8 @@ const AssignModal = props => {
               },
             ],
             normalize: normalizeNum,
-            initialValue: (beanTerminalTotal - beanTerminalAssigned || 0) + '',
-          })(<Input autoFocus placeholder={formatMessage({ id: 'oal.user-manage.agentAvailablePoints' })} />)}
+            initialValue: (beanTerminalTotal || 0) + '',
+          })(<Input autoFocus placeholder={formatMessage({ id: 'oal.user-manage.agentTotalPoints' })} />)}
         </Form.Item>
       </Form>
     </Modal>

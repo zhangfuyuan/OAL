@@ -57,7 +57,7 @@ class UserManagement extends Component {
     },
   };
 
-  columns = [
+  columns = () => [
     {
       title: formatMessage({ id: 'oal.user-manage.accountName' }),
       dataIndex: 'userName',
@@ -480,7 +480,7 @@ class UserManagement extends Component {
               selectedRows={selectedRows}
               loading={userListLoading}
               data={userList}
-              columns={this.columns}
+              columns={this.columns()}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
             />
