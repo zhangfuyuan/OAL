@@ -594,4 +594,7 @@ export default {
   'oal.org.orgPoints': `组织点数`,
   'oal.org.orgAvailablePoints': `组织可用点数`,
   'oal.org.addOrg': `新建组织`,
+  'oal.ajax.6010': `授权点数不足`,
+  'oal.ajax.6011': `授权点数没有变化`,
+  'oal.common.used': `已用`,
 };

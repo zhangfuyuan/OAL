@@ -594,4 +594,7 @@ export default {
   'oal.org.orgPoints': `Organization points`,
   'oal.org.orgAvailablePoints': `Organization available points`,
   'oal.org.addOrg': `New organization`,
+  'oal.ajax.6010': `Insufficient authorization points`,
+  'oal.ajax.6011': `The number of authorization points does not change`,
+  'oal.common.used': `Used`,
 };

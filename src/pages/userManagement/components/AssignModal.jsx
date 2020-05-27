@@ -13,17 +13,31 @@ const formItemLayout = {
   },
 };
 const AssignModal = props => {
-  const { form, visible, bean, currentUser, handleCancel, handleSubmit, confirmLoading } = props;
+  const {
+    form,
+    visible,
+    bean = {},
+    currentUserAuthorizedPoints: {
+      terminalTotal: currentUserTerminalTotal = 0,
+      terminalAssigned: currentUserTerminalAssigned = 0,
+    },
+    handleCancel,
+    handleSubmit,
+    confirmLoading
+  } = props;
+  const {
+    terminalTotal: beanTerminalTotal = 0,
+    terminalAssigned: beanTerminalAssigned = 0,
+  } = bean.authorizedPoints || {};
   const { getFieldDecorator } = form;
-  const authorizedPoints = currentUser.authorizedPoints || {};
 
   const handleOk = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       handleSubmit({
         userId: bean._id,
-        points: parseInt(fieldsValue.points) || 0,
-        diff: parseInt(fieldsValue.points) - bean.terminalTotal + bean.terminalAssigned || 0,
+        points: parseInt(fieldsValue.points) + beanTerminalAssigned || 0,
+        diff: parseInt(fieldsValue.points) - beanTerminalTotal + beanTerminalAssigned || 0,
       });
     });
   };
@@ -33,7 +47,7 @@ const AssignModal = props => {
   const checkPoints = (rule, value, callback) => {
     if (value &&
       value.replace &&
-      parseInt(value.replace(/[^\d]/g, '')) > (authorizedPoints.terminalTotal - authorizedPoints.terminalAssigned + bean.terminalTotal - bean.terminalAssigned || 0)) {
+      parseInt(value.replace(/[^\d]/g, '')) > (currentUserTerminalTotal - currentUserTerminalAssigned + beanTerminalTotal - beanTerminalAssigned || 0)) {
       callback(formatMessage({ id: 'oal.common.insufficientPoints' }));
     }
     callback();
@@ -54,13 +68,13 @@ const AssignModal = props => {
           <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
             <FormattedMessage id="oal.common.myAvailablePoints" /> :
                  </span>
-          <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal - authorizedPoints.terminalAssigned || 0}</span>
+          <span style={{ margin: '0 50px 0 10px' }}>{currentUserTerminalTotal - currentUserTerminalAssigned || 0}</span>
         </span>
         <span>
           <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
             <FormattedMessage id="oal.user-manage.agentPoints" /> :
                 </span>
-          <span style={{ margin: '0 50px 0 10px' }}>{bean && bean.terminalAssigned || 0}/{bean && bean.terminalTotal || 0}</span>
+          <span style={{ margin: '0 50px 0 10px' }}>{beanTerminalAssigned || 0}/{beanTerminalTotal || 0}</span>
         </span>
       </div>
 
@@ -77,7 +91,7 @@ const AssignModal = props => {
               },
             ],
             normalize: normalizeNum,
-            initialValue: (bean && bean.terminalTotal && bean.terminalAssigned && bean.terminalTotal - bean.terminalAssigned || 0) + '',
+            initialValue: (beanTerminalTotal - beanTerminalAssigned || 0) + '',
           })(<Input autoFocus placeholder={formatMessage({ id: 'oal.user-manage.agentAvailablePoints' })} />)}
         </Form.Item>
       </Form>

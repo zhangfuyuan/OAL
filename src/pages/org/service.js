@@ -43,5 +43,5 @@ export async function handleState(data) {
  * （组织）分配授权点
  */
 export async function ajaxAssign(data) {
-  return post(`/guard-web/a/sys/office/**`, data);
+  return post(`/guard-web/a/authorize/assignCreditsByOrg`, data);
 }

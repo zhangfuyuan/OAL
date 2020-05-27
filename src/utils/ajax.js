@@ -39,6 +39,8 @@ const errorCode = {
   6006: 'oal.ajax.6006',
   6007: 'oal.face.staffidRepeatTips',
   6008: 'oal.face.userNumLimit',
+  6010: 'oal.ajax.6010',
+  6011: 'oal.ajax.6011',
 };
 
 const errorMsg = {

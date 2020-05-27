@@ -137,7 +137,7 @@ class OrgList extends Component {
         render: (text, record) => (
           <Tooltip title={formatMessage({ id: 'oal.common.terminalAssigned/terminalTotal' })}>
             <span>
-              {record && record.terminalAssigned || '0'}/{record && record.terminalTotal || '0'}
+              {record.authorizedPoints && record.authorizedPoints.terminalAssigned || 0}/{record.authorizedPoints && record.authorizedPoints.terminalTotal || 0}
             </span>
           </Tooltip>
         ),
@@ -152,13 +152,13 @@ class OrgList extends Component {
             <Divider type="vertical" />
             <a key="modify" onClick={() => this.moreAction('modify', record)}><FormattedMessage id="oal.common.modify" /></a>
             <Divider type="vertical" />
-            <a onClick={() => this.openAssignModal(record)}><FormattedMessage id="oal.common.assign" /></a>
+            <a onClick={() => this.openAssignModal(record)} disabled={this.props.currentUser._id === record._id}><FormattedMessage id="oal.common.assign" /></a>
             <Divider type="vertical" />
             <a key="resetPassword" onClick={() => this.openResetModal(record)}><FormattedMessage id="oal.org.resetPassword" /></a>
             <Divider type="vertical" />
             {
               record.state === 1 ?
-                <a key="disable" onClick={() => this.moreAction('close', record)}><FormattedMessage id="oal.common.disable" /></a> :
+                <a key="disable" onClick={() => this.moreAction('close', record)} disabled={this.props.currentUser._id === record._id}><FormattedMessage id="oal.common.disable" /></a> :
                 <a key="enable" onClick={() => this.moreAction('open', record)}><FormattedMessage id="oal.common.enable" /></a>
             }
             {/* <MoreBtn item={record} /> */}
@@ -468,7 +468,7 @@ class OrgList extends Component {
       assignLoading,
       currentUser,
     } = this.props;
-    const authorizedPoints = currentUser && currentUser.authorizedPoints || {};
+    const currentUserAuthorizedPoints = currentUser && currentUser.authorizedPoints || {};
     orgList && orgList.pagination && (orgList.pagination.showTotal = this.org_showTotal);
     const { selectedRows, modalVisible, selectedOrg, detailVisible, resetVisible, assignVisible } = this.state;
     return (
@@ -489,19 +489,19 @@ class OrgList extends Component {
                   <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
                     <FormattedMessage id="oal.settings.totalAuthorizationPoints" /> :
                 </span>
-                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal || '0'}</span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{currentUserAuthorizedPoints.terminalTotal || 0}</span>
                 </span>
                 <span>
                   <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
                     <FormattedMessage id="oal.settings.available" /> :
                  </span>
-                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal - authorizedPoints.terminalAssigned || '0'}</span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{currentUserAuthorizedPoints.terminalTotal - currentUserAuthorizedPoints.terminalAssigned || 0}</span>
                 </span>
                 <span>
                   <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
                     <FormattedMessage id="oal.settings.assigned" /> :
                 </span>
-                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalAssigned || '0'}</span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{currentUserAuthorizedPoints.terminalAssigned || 0}</span>
                 </span>
               </div>
             </div>
@@ -541,7 +541,7 @@ class OrgList extends Component {
         <AssignModal
           visible={assignVisible}
           bean={selectedOrg}
-          currentUser={currentUser}
+          currentUserAuthorizedPoints={currentUserAuthorizedPoints}
           confirmLoading={assignLoading}
           handleCancel={this.closeAssignModal}
           handleSubmit={this.submitAssignModal}

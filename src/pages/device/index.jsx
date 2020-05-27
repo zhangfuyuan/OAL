@@ -446,7 +446,7 @@ class Device extends Component {
       deleteLoading,
       currentUser,
     } = this.props;
-    const authorizedPoints = currentUser && currentUser.authorizedPoints || {};
+    const authorizedPoints = currentUser && currentUser.org && currentUser.org.authorizedPoints || {};
     let deviceTableData = null;
     const { modalVisible, deviceBean, alertVisible, page, delBean, detailModalVisible, delModalVisible, selectedRows } = this.state;
 
@@ -486,19 +486,19 @@ class Device extends Component {
                   <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
                     <FormattedMessage id="oal.settings.totalAuthorizationPoints" /> :
                 </span>
-                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal || '0'}</span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal || 0}</span>
                 </span>
                 <span>
                   <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
                     <FormattedMessage id="oal.settings.available" /> :
                  </span>
-                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal - authorizedPoints.terminalAssigned || '0'}</span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalTotal - authorizedPoints.terminalAssigned || 0}</span>
                 </span>
                 <span>
                   <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
-                    <FormattedMessage id="oal.settings.assigned" /> :
+                    <FormattedMessage id="oal.common.used" /> :
                 </span>
-                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalAssigned || '0'}</span>
+                  <span style={{ margin: '0 50px 0 10px' }}>{authorizedPoints.terminalAssigned || 0}</span>
                 </span>
               </div>
             </div>

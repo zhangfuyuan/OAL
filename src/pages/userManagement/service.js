@@ -43,7 +43,7 @@ export async function ajaxSetState(data) {
  * （账号）分配授权点
  */
 export async function ajaxAssign(data) {
-  return post(`/guard-web/a/sys/user/**`, data);
+  return post(`/guard-web/a/authorize/assignCreditsByUser`, data);
 }
 
 /**
