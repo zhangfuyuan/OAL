@@ -598,7 +598,9 @@ export default {
   'oal.ajax.6011': `El número de puntos de autorización no cambia`,
   'oal.common.used': `Utilizado`,
   'oal.org.orgTotalPoints': `Puntos de organización`,
-  'oal.user-manage.agentTotalPoints': `Puntos del agente`,
-  'oal.org.totalNotLessAssign': `No puede ser menor que los puntos usados`,
-  'oal.user-manage.totalNotLessAssign': `No puede ser menor que los puntos asignados`,
+  'oal.user-manage.agentTotalPoints': `Puntos de agente`,
+  'oal.org.totalNotLessAssign': `No pueden ser menos que los puntos usados`,
+  'oal.user-manage.totalNotLessAssign': `No puede ser inferior a los puntos asignados`,
+  'oal.user-manage.terminalAssigned/terminalTotal': `Puntos asignados / totales`,
+  'oal.log-query.removeConfirm': `¿Quieres eliminar el registro seleccionado?`,
 };

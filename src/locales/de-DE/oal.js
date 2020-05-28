@@ -599,6 +599,8 @@ export default {
   'oal.common.used': `gebraucht`,
   'oal.org.orgTotalPoints': `Organisationspunkte`,
   'oal.user-manage.agentTotalPoints': `Agentenpunkte`,
-  'oal.org.totalNotLessAssign': `Kann nicht kleiner sein als verwendete Punkte`,
-  'oal.user-manage.totalNotLessAssign': `Kann nicht kleiner sein als die zugewiesenen Punkte`,
+  'oal.org.totalNotLessAssign': `Kann nicht kleiner als die verwendeten Punkte sein`,
+  'oal.user-manage.totalNotLessAssign': `Kann nicht kleiner als die zugewiesenen Punkte sein`,
+  'oal.user-manage.terminalAssigned/terminalTotal': `Zugeordnete / Gesamtpunkte`,
+  'oal.log-query.removeConfirm': `Möchten Sie den ausgewählten Datensatz löschen?`,
 };

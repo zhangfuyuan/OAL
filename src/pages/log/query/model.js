@@ -1,4 +1,4 @@
-import { ajaxTest, ajaxLogQuery, ajaxDeviceList } from './service';
+import { ajaxTest, ajaxLogQuery, ajaxDeviceList, ajaxDelLogQuery } from './service';
 
 const Model = {
   namespace: 'logQuery',
@@ -36,6 +36,11 @@ const Model = {
     // 导出
     *export({ payload }, { call, put, select }) {
       const response = yield call(ajaxTest, payload);
+
+      return Promise.resolve(response);
+    },
+    *delLogQuery({ payload }, { call, put, select }) {
+      const response = yield call(ajaxDelLogQuery, payload);
 
       return Promise.resolve(response);
     },

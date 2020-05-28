@@ -601,4 +601,6 @@ export default {
   'oal.user-manage.agentTotalPoints': `Agent points`,
   'oal.org.totalNotLessAssign': `Cannot be less than used points`,
   'oal.user-manage.totalNotLessAssign': `Cannot be less than the allocated points`,
+  'oal.user-manage.terminalAssigned/terminalTotal': `Allocated / total points`,
+  'oal.log-query.removeConfirm': `Do you want to delete the selected record?`,
 };

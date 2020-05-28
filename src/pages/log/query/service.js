@@ -19,6 +19,15 @@ export async function ajaxLogQuery(data) {
 }
 
 /**
+ * （通行-记录）删除通行记录
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxDelLogQuery(data) {
+  return post('/guard-web/a/record/recordDelete', data);
+}
+
+/**
  * demo1
  * @param data
  * @returns {Promise<*>}

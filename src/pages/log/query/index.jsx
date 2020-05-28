@@ -27,6 +27,7 @@ import StandardTable from '@/components/StandardTable';
 import { SYSTEM_PATH } from '@/utils/constants';
 import styles from './style.less';
 import { temperatureC2F } from '@/utils/utils';
+import TableDelModal from './components/TableDelModal';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -53,6 +54,7 @@ const wearMaskMap = {
   deviceListLoading: loading.effects['logQuery/getDeviceList'],
   logQueryList: logQuery.logQueryList,
   logQueryListLoading: loading.effects['logQuery/fetchLogQuery'],
+  delLogQueryLoading: loading.effects['logQuery/delLogQuery'],
 }))
 class logQuery extends Component {
 
@@ -76,6 +78,7 @@ class logQuery extends Component {
     },
     tableSelectedBean: {},
     viewVisible: false,
+    tableDelVisible: false,
   };
 
   ref_download = null;
@@ -203,8 +206,58 @@ class logQuery extends Component {
         width: 170,
         render: (text, record) => <span>{record.time && moment(record.time).format('YYYY-MM-DD HH:mm:ss') || '-'}</span>,
       },
+      {
+        title: formatMessage({ id: 'oal.common.handle' }),
+        key: 'handle',
+        render: (text, record) => (
+          <Fragment>
+            <a key="delete" onClick={() => this.table_showTableDelModal(record)}><FormattedMessage id="oal.common.delete" /></a>
+          </Fragment>
+        ),
+      },
     ];
     return cl;
+  };
+
+  // 移除记录
+  table_showTableDelModal = bean => {
+    this.setState({
+      tableDelVisible: true,
+      tableSelectedBean: bean,
+    });
+  };
+
+  table_closeTableDelModal = () => {
+    this.setState({
+      tableDelVisible: false,
+      tableSelectedBean: {},
+    });
+  };
+
+  table_submitTableDelModal = (params, callback) => {
+    const { dispatch } = this.props;
+    const { listSelectedBean, tableSelectedBean, tableSelectedRows } = this.state;
+
+    dispatch({
+      type: 'logQuery/delLogQuery',
+      payload: {
+        recordId: tableSelectedBean && tableSelectedBean._id || tableSelectedRows.map(item => item._id).join(','),
+      },
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+        this.table_closeTableDelModal();
+        this.table_loadData();
+        this.setState({
+          tableSelectedRows: [],
+        });
+        callback && callback();
+      } else {
+        console.log(res);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
   };
 
   table_handleChange = (pagination, filters, sorter) => {
@@ -396,6 +449,7 @@ class logQuery extends Component {
       deviceListLoading,
       logQueryList,
       logQueryListLoading,
+      delLogQueryLoading,
     } = this.props;
     const {
       tableSelectedRows,
@@ -403,6 +457,7 @@ class logQuery extends Component {
       tableSelectedBean,
       viewVisible,
       formValues,
+      tableDelVisible,
     } = this.state;
     const { peopleType, name, date } = formValues;
     const language = getLocale();
@@ -449,11 +504,20 @@ class logQuery extends Component {
                   <FormattedMessage id="oal.common.export" />
                 </Button>
                 <a ref={el => { this.ref_download = el }} href={`/guard-web/a/record/export?deviceId=${listSelectedBean && listSelectedBean._id || ''}&startDate=${date && date[0] || ''}&endDate=${date && date[1] || ''}&peopleType=${peopleType || ''}&faceName=${name || ''}&language=${language}`} />
+
+                <Button
+                  type="danger"
+                  style={{ marginLeft: '8px', }}
+                  disabled={!tableSelectedRows || tableSelectedRows.length === 0}
+                  onClick={this.table_showTableDelModal}
+                >
+                  <FormattedMessage id="oal.common.delete" />
+                </Button>
               </div>
               <StandardTable
                 // eslint-disable-next-line no-underscore-dangle
                 rowKey={record => record._id}
-                needRowSelection={false}
+                needRowSelection
                 selectedRows={tableSelectedRows}
                 loading={logQueryListLoading || deviceListLoading}
                 data={logQueryList}
@@ -473,6 +537,13 @@ class logQuery extends Component {
         >
           <img src={`${tableSelectedBean.imgPath}?t=${Date.now()}`} alt="" style={{ width: '100%', height: '100%' }} />
         </Modal>
+        <TableDelModal
+          visible={tableDelVisible}
+          confirmLoading={delLogQueryLoading}
+          bean={tableSelectedBean && tableSelectedBean._id ? [tableSelectedBean] : tableSelectedRows}
+          handleCancel={this.table_closeTableDelModal}
+          handleSubmit={this.table_submitTableDelModal}
+        />
       </PageHeaderWrapper>
     );
   }

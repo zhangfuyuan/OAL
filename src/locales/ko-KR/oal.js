@@ -598,7 +598,9 @@ export default {
   'oal.ajax.6011': `인증 포인트 수는 변경되지 않습니다.`,
   'oal.common.used': `사용`,
   'oal.org.orgTotalPoints': `조직 포인트`,
-  'oal.user-manage.agentTotalPoints': `에이전트 포인트`,
-  'oal.org.totalNotLessAssign': `사용 된 포인트보다 적을 수 없습니다.`,
-  'oal.user-manage.totalNotLessAssign': `할당된 포인트보다 적을 수 없습니다.`,
+  'oal.user-manage.agentTotalPoints': `요원 포인트`,
+  'oal.org.totalNotLessAssign': `사용한 포인트보다 작을 수 없습니다`,
+  'oal.user-manage.totalNotLessAssign': `할당 된 포인트보다 작을 수 없습니다`,
+  'oal.user-manage.terminalAssigned/terminalTotal': `할당 / 총점`,
+  'oal.log-query.removeConfirm': `선택한 레코드를 삭제 하시겠습니까?`,
 };

@@ -83,7 +83,7 @@ class UserManagement extends Component {
       key: 'authorizedPoints',
       dataIndex: 'authorizedPoints',
       render: (text, record) => (
-        <Tooltip title={formatMessage({ id: 'oal.common.terminalAssigned/terminalTotal' })}>
+        <Tooltip title={formatMessage({ id: 'oal.user-manage.terminalAssigned/terminalTotal' })}>
           <span>
             {record.authorizedPoints && record.authorizedPoints.terminalAssigned || 0}/{record.authorizedPoints && record.authorizedPoints.terminalTotal || 0}
           </span>

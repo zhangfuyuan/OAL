@@ -597,8 +597,10 @@ export default {
   'oal.ajax.6010': `Points d’autorisation insuffisants`,
   'oal.ajax.6011': `Le nombre de points d’autorisation ne change pas`,
   'oal.common.used': `Utilisé`,
-  'oal.org.orgTotalPoints': `Points d’organisation`,
-  'oal.user-manage.agentTotalPoints': `Points d’agent`,
+  'oal.org.orgTotalPoints': `Points d'organisation`,
+  'oal.user-manage.agentTotalPoints': `Points d'agent`,
   'oal.org.totalNotLessAssign': `Ne peut pas être inférieur aux points utilisés`,
-  'oal.user-manage.totalNotLessAssign': `Ne peut pas être inférieur aux points alloués`,
+  'oal.user-manage.totalNotLessAssign': `Ne peut pas être inférieur aux points attribués`,
+  'oal.user-manage.terminalAssigned/terminalTotal': `Points alloués / totaux`,
+  'oal.log-query.removeConfirm': `Voulez-vous supprimer l'enregistrement sélectionné?`,
 };
