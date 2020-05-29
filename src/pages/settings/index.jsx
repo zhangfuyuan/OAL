@@ -143,8 +143,10 @@ class Settings extends Component {
     return Object.keys(menuMap).map(item => {
       // admin 账号且 admin 组织才显示 "授权点数" 栏
       if ((!isAdmin || !isAdminOrg) && item === 'authorized') return null;
-      // 非 admin 账号不显示 "系统信息" 和 "告警设置" 栏
-      if (!isAdmin && (item === 'system' || item === 'alarm')) return null;
+      // 非 admin 账号不显示 "系统信息" 栏
+      if (!isAdmin && item === 'system') return null;
+      // admin 账号且非 admin 组织才显示 "告警设置" 栏
+      if ((!isAdmin || isAdminOrg) && item === 'alarm') return null;
       return <Item key={item}>{menuMap[item] && formatMessage({ id: menuMap[item] }) || '-'}</Item>
     });
   };

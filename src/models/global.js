@@ -99,12 +99,12 @@ const GlobalModel = {
             },
           });
 
-          try {
-            const { origin: curOrigin, href: curHref } = new URL(window.location.href);
-            if (!~curHref.indexOf(ip)) window.location.href = curHref.replace(curOrigin, /\/\/./.test(ip) ? ip : `//${ip}`);
-          } catch (err) {
-            console.log(err);
-          }
+          // try {
+          //   const { origin: curOrigin, href: curHref } = new URL(window.location.href);
+          //   if (!~curHref.indexOf(ip)) window.location.href = curHref.replace(curOrigin, /\/\/./.test(ip) ? ip : `//${ip}`);
+          // } catch (err) {
+          //   console.log(err);
+          // }
         } else {
           yield put(routerRedux.replace('/user/initOrigin'));
         }
