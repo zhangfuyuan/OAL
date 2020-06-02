@@ -195,11 +195,11 @@ class Device extends Component {
           },
         });
       } else {
-        message.success(formatMessage({ id: 'oal.ajax.5004' }));
+        message.error(formatMessage({ id: 'oal.ajax.5004' }));
       }
     }).catch(err => {
       console.log(err);
-      message.success(formatMessage({ id: 'oal.ajax.5004' }));
+      message.error(formatMessage({ id: 'oal.ajax.5004' }));
     });
   };
 

@@ -603,4 +603,5 @@ export default {
   'oal.user-manage.totalNotLessAssign': `不能少于已分配点数`,
   'oal.user-manage.terminalAssigned/terminalTotal': `已分配/总点数`,
   'oal.log-query.removeConfirm': `是否删除已选择的记录？`,
+  'oal.log-query.temperatureDetectionMode': `测温模式`,
 };

@@ -603,4 +603,5 @@ export default {
   'oal.user-manage.totalNotLessAssign': `Не может быть меньше выделенных очков`,
   'oal.user-manage.terminalAssigned/terminalTotal': `Выделено / всего очков`,
   'oal.log-query.removeConfirm': `Вы хотите удалить выбранную запись?`,
+  'oal.log-query.temperatureDetectionMode': `режим определения температуры`,
 };

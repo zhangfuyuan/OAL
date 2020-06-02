@@ -158,7 +158,7 @@ const AddOrUpdateOrg = props => {
             </span>
           }
           className="oal-form-item"
-          extra={`${formatMessage({ id: 'oal.org.accessPath' })} : ${window.location.origin}${publicPath}user/${form.getFieldValue('path') || '*'}/login`}
+          extra={`${formatMessage({ id: 'oal.org.accessPath' })} : ${window.location.origin}${publicPath}user/${isEdit && orgBean && orgBean.path || form.getFieldValue('path') || '*'}/login`}
         >
           {getFieldDecorator('path', {
             rules: [

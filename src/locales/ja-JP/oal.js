@@ -603,4 +603,5 @@ export default {
   'oal.user-manage.totalNotLessAssign': `割り当てられたポイントより小さくすることはできません`,
   'oal.user-manage.terminalAssigned/terminalTotal': `割り当て済み/合計ポイント`,
   'oal.log-query.removeConfirm': `選択したレコードを削除しますか？`,
+  'oal.log-query.temperatureDetectionMode': `温度検出モード`,
 };

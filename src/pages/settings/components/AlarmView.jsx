@@ -31,7 +31,10 @@ class AlarmView extends Component {
     if (isModifyAlarmContent) {
       form.validateFields((err, fieldsValue) => {
         if (err) return;
-        const params = fieldsValue;
+        const params = {
+          ...fieldsValue,
+          mailContent: fieldsValue.mailContent.replace(/\n/g, '<br>'),
+        };
         if (currentUser && currentUser.org) params.orgId = currentUser.org._id;
         params.mailLanguage = getLocale();
         updateAlarmContent(params, () => {
@@ -180,7 +183,7 @@ class AlarmView extends Component {
                             message: formatMessage({ id: 'oal.common.maxLength' }, { num: '500' }),
                           },
                         ],
-                        initialValue: currentUser && currentUser.alarmSet && currentUser.alarmSet.mailContent || formatMessage({ id: 'oal.settings.mailContentTemplate' }),
+                        initialValue: currentUser && currentUser.alarmSet && currentUser.alarmSet.mailContent && currentUser.alarmSet.mailContent.replace(/<br>/g, '\n') || formatMessage({ id: 'oal.settings.mailContentTemplate' }),
                       })(<TextArea
                         placeholder={formatMessage({ id: 'oal.settings.mailContent' })}
                         autoSize={{ minRows: 5 }}
@@ -255,7 +258,7 @@ class AlarmView extends Component {
                           onClick={() => this.clickCopyEventVariable('alarmEvents')}>
                           <FormattedMessage id="oal.settings.alarmEvents" />
 
-                          <textarea cols="40" rows="5" id="copyArea_alarmEvents" defaultValue="" style={{ position: 'absolute', top: '-999px', left: '-999px' }} />
+                          <textarea cols="40" rows="5" id="copyArea_alarmEvents" defaultValue="${alarmEvents}" style={{ position: 'absolute', top: '-999px', left: '-999px' }} />
                         </a>
                       </Tooltip>
                     </p>

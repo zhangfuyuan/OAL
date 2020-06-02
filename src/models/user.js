@@ -118,11 +118,13 @@ const UserModel = {
   },
   reducers: {
     saveCurrentUser(state, action) {
+      const { currentUser } = state;
       const _currentUser = action.payload.data.user || action.payload.data;
       const _path = _currentUser && _currentUser.org && _currentUser.org.path || '';
       const _saasIconsUrl = _currentUser && _currentUser.org && _currentUser.org.saasIconsUrl || '';
 
       if (_saasIconsUrl) _currentUser.org.saasIconsUrl = `${_saasIconsUrl}?t=${Date.now()}`;
+      if (currentUser && currentUser.alarmSet && currentUser.org && currentUser.org.path === _path) _currentUser.alarmSet = currentUser.alarmSet;
 
       return {
         ...state,

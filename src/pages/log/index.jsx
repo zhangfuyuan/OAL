@@ -41,6 +41,9 @@ const peopleTypeMap = {
   '2': 'oal.common.blacklist',
   '3': 'oal.common.visitor',
   '4': 'oal.device.maskMode',
+  '5': 'oal.log-query.temperatureDetectionMode',
+  '6': 'oal.log-query.temperatureDetectionMode',
+  '5,6': 'oal.log-query.temperatureDetectionMode',
   '99': 'oal.common.unregistered',
 }
 

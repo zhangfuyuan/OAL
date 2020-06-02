@@ -41,6 +41,9 @@ const peopleTypeMap = {
   '2': 'oal.common.blacklist',
   '3': 'oal.common.visitor',
   '4': 'oal.device.maskMode',
+  '5': 'oal.log-query.temperatureDetectionMode',
+  '6': 'oal.log-query.temperatureDetectionMode',
+  '5,6': 'oal.log-query.temperatureDetectionMode',
   '99': 'oal.common.unregistered',
 };
 const wearMaskMap = {
@@ -163,7 +166,7 @@ class logQuery extends Component {
         dataIndex: 'name',
         // sorter: (a, b) => a.name - b.name,
         // sortOrder: this.state.sortedInfo.columnKey === 'name' && this.state.sortedInfo.order,
-        render: (text, record) => <span>{(record.peopleType === '4' && wearMaskMap[record.wearMask] && formatMessage({ id: wearMaskMap[record.wearMask] })) || (record.peopleType === '99' && peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] })) || record.name || '-'}</span>,
+        render: (text, record) => <span>{(record.peopleType === '4' && wearMaskMap[record.wearMask] && formatMessage({ id: wearMaskMap[record.wearMask] })) || ((record.peopleType === '5' || record.peopleType === '6' || record.peopleType === '99') && peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap['99'] })) || record.name || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.face.staffid' }),
@@ -175,7 +178,7 @@ class logQuery extends Component {
         title: formatMessage({ id: 'oal.log-query.group' }),
         key: 'group',
         dataIndex: 'group',
-        render: (text, record) => <span>{((record.peopleType === '4' || record.peopleType === '99') && '-') || (record.peopleType === '0' && record.group && record.group.length > 0 && record.group[0].name) || (peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] })) || '-'}</span>,
+        render: (text, record) => <span>{((record.peopleType === '5' || record.peopleType === '6' || record.peopleType === '4' || record.peopleType === '99') && '-') || (record.peopleType === '0' && record.group && record.group.length > 0 && record.group[0].name) || (peopleTypeMap[record.peopleType] && formatMessage({ id: peopleTypeMap[record.peopleType] })) || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.common.type' }),
@@ -338,6 +341,7 @@ class logQuery extends Component {
                   <Option value="3"><FormattedMessage id={peopleTypeMap['3']} /></Option>
                   <Option value="99"><FormattedMessage id={peopleTypeMap['99']} /></Option>
                   <Option value="4"><FormattedMessage id={peopleTypeMap['4']} /></Option>
+                  <Option value="5,6"><FormattedMessage id={peopleTypeMap['5,6']} /></Option>
                 </Select>,
               )}
             </FormItem>
@@ -530,7 +534,7 @@ class logQuery extends Component {
         </Card>
 
         <Modal
-          title={(tableSelectedBean.peopleType === '4' && wearMaskMap[tableSelectedBean.wearMask] && formatMessage({ id: wearMaskMap[tableSelectedBean.wearMask] })) || (tableSelectedBean.peopleType === '99' && peopleTypeMap[tableSelectedBean.peopleType] && formatMessage({ id: peopleTypeMap[tableSelectedBean.peopleType] })) || tableSelectedBean.name || '-'}
+          title={(tableSelectedBean.peopleType === '4' && wearMaskMap[tableSelectedBean.wearMask] && formatMessage({ id: wearMaskMap[tableSelectedBean.wearMask] })) || ((tableSelectedBean.peopleType === '5' || tableSelectedBean.peopleType === '6' || tableSelectedBean.peopleType === '99') && peopleTypeMap[tableSelectedBean.peopleType] && formatMessage({ id: peopleTypeMap['99'] })) || tableSelectedBean.name || '-'}
           visible={viewVisible}
           footer={null}
           onCancel={this.table_closeViewModal}

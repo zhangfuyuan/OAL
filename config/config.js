@@ -143,15 +143,13 @@ export default {
       changeOrigin: true,
     },
     '/guard-web/': {
-      // target: 'http://192.168.14.74/',
+      target: 'http://192.168.14.74/',
       // target: 'http://guard.lango-tech.com/',
-      target: 'http://192.168.14.205/',
       changeOrigin: true,
     },
     '/guardFile/': {
-      // target: 'http://192.168.14.74/',
+      target: 'http://192.168.14.74/',
       // target: 'http://guard.lango-tech.com/',
-      target: 'http://192.168.14.205/',
       changeOrigin: true,
     },
   },

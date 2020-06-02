@@ -603,4 +603,5 @@ export default {
   'oal.user-manage.totalNotLessAssign': `No puede ser inferior a los puntos asignados`,
   'oal.user-manage.terminalAssigned/terminalTotal': `Puntos asignados / totales`,
   'oal.log-query.removeConfirm': `¿Quieres eliminar el registro seleccionado?`,
+  'oal.log-query.temperatureDetectionMode': `modo de detección de temperatura`,
 };

@@ -603,4 +603,5 @@ export default {
   'oal.user-manage.totalNotLessAssign': `할당 된 포인트보다 작을 수 없습니다`,
   'oal.user-manage.terminalAssigned/terminalTotal': `할당 / 총점`,
   'oal.log-query.removeConfirm': `선택한 레코드를 삭제 하시겠습니까?`,
+  'oal.log-query.temperatureDetectionMode': `온도 감지 모드`,
 };
