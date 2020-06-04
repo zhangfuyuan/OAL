@@ -41,6 +41,7 @@ const errorCode = {
   6008: 'oal.face.userNumLimit',
   6010: 'oal.ajax.6010',
   6011: 'oal.ajax.6011',
+  6012: 'oal.ajax.6012',
 };
 
 const errorMsg = {
@@ -49,6 +50,7 @@ const errorMsg = {
   3007: 'oal.user-login.loginFailed',
   6007: 'oal.face.staffidRepeat',
   6008: 'oal.face.addFailed',
+  6012: 'oal.face.icCardRepeat',
 };
 
 /**

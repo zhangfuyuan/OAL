@@ -604,4 +604,8 @@ export default {
   'oal.user-manage.terminalAssigned/terminalTotal': `Выделено / всего очков`,
   'oal.log-query.removeConfirm': `Вы хотите удалить выбранную запись?`,
   'oal.log-query.temperatureDetectionMode': `режим определения температуры`,
+  'oal.device.faceAndMaskAndTemperature': ``,
+  'oal.face.icCard': ``,
+  'oal.ajax.6012': ``,
+  'oal.face.icCardRepeat': ``,
 };

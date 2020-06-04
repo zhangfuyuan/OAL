@@ -604,4 +604,8 @@ export default {
   'oal.user-manage.terminalAssigned/terminalTotal': `Puntos asignados / totales`,
   'oal.log-query.removeConfirm': `¿Quieres eliminar el registro seleccionado?`,
   'oal.log-query.temperatureDetectionMode': `modo de detección de temperatura`,
+  'oal.device.faceAndMaskAndTemperature': ``,
+  'oal.face.icCard': ``,
+  'oal.ajax.6012': ``,
+  'oal.face.icCardRepeat': ``,
 };

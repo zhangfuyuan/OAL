@@ -604,4 +604,8 @@ export default {
   'oal.user-manage.terminalAssigned/terminalTotal': `Zugeordnete / Gesamtpunkte`,
   'oal.log-query.removeConfirm': `Möchten Sie den ausgewählten Datensatz löschen?`,
   'oal.log-query.temperatureDetectionMode': `Temperaturerkennungsmodus`,
+  'oal.device.faceAndMaskAndTemperature': ``,
+  'oal.face.icCard': ``,
+  'oal.ajax.6012': ``,
+  'oal.face.icCardRepeat': ``,
 };

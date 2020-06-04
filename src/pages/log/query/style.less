@@ -38,8 +38,8 @@
   background-color: @menu-bg;
 
   .left {
-    width: 25%;
-    max-width: 350px;
+    width: 20%;
+    max-width: 300px;
     min-width: 150px;
     padding: 24px;
     border-right: @border-width-base @border-style-base @border-color-split;
@@ -130,6 +130,14 @@
     .oal-list-content.active {
       color: @primary-color;
       background-color: #E6F7FF;
+    }
+  }
+}
+
+.right {
+  :global {
+    .ant-table-row-cell-break-word {
+      word-break: normal;
     }
   }
 }

@@ -9,7 +9,8 @@ import {
   ajaxAddGroupNode,
   ajaxModifyGroupNode,
   ajaxDelGroupNode,
-  ajaxAddOrEditInfo,
+  ajaxAddInfo,
+  ajaxEditInfo,
   ajaxGetBatchAddTaskId,
   ajaxGetBatchAddTaskProgress,
   ajaxCancelBatchAddTask,
@@ -92,9 +93,15 @@ const Model = {
     //   const response = yield call(fetchGroup, payload);
     //   return Promise.resolve(response);
     // },
-    // （单个）添加/编辑人脸信息（不包括图片）
-    *addOrEditInfo({ payload }, { call, put, select }) {
-      const response = yield call(ajaxAddOrEditInfo, payload);
+    // （单个）添加人脸信息（不包括图片）
+    *addInfo({ payload }, { call, put, select }) {
+      const response = yield call(ajaxAddInfo, payload);
+
+      return Promise.resolve(response);
+    },
+    // （单个）编辑人脸信息（不包括图片）
+    *editInfo({ payload }, { call, put, select }) {
+      const response = yield call(ajaxEditInfo, payload);
 
       return Promise.resolve(response);
     },

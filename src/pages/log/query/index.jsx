@@ -206,7 +206,7 @@ class logQuery extends Component {
         dataIndex: 'time',
         sorter: (a, b) => a.time - b.time,
         sortOrder: this.state.sortedInfo.columnKey === 'time' && this.state.sortedInfo.order,
-        width: 170,
+        width: 160,
         render: (text, record) => <span>{record.time && moment(record.time).format('YYYY-MM-DD HH:mm:ss') || '-'}</span>,
       },
       {

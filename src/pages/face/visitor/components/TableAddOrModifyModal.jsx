@@ -109,7 +109,7 @@ const TableAddOrModifyModal = props => {
   const handleOk = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      const { name, mobile, validity, userPhotos } = fieldsValue;
+      const { name, mobile, validity, icCard, userPhotos } = fieldsValue;
       const _userPhotosLen = userPhotos && userPhotos.length || 0;
       const params = {
         faceId: isEdit && bean && bean._id || '',
@@ -120,19 +120,43 @@ const TableAddOrModifyModal = props => {
         endDate: validity[1].format('YYYY-MM-DD'),
         peopleType: '3',
         isUpdateImg: _userPhotosLen > 0 ? '1' : '0',
+        icCard,
       }
 
-      if (isEdit && _userPhotosLen === 0) {
-        // 编辑且不修改图片
+      if (_userPhotosLen > 0) {
+        // 有图，无论添加/修改都调WebUploader接口
+        if (window.WebUploader) {
+          const _originFileObj = userPhotos[_userPhotosLen - 1].originFileObj;
+          const { faceId, name, mobile, isEdit, startDate, endDate, icCard, peopleType, isUpdateImg } = params || {};
+
+          faceId && (_originFileObj.faceId = faceId);
+          _originFileObj.staffname = name;
+          _originFileObj.mobile = mobile;
+          _originFileObj.isEdit = isEdit;
+          _originFileObj.startDate = startDate;
+          _originFileObj.endDate = endDate;
+          _originFileObj.icCard = icCard;
+          _originFileObj.peopleType = peopleType;
+          _originFileObj.isUpdateImg = isUpdateImg;
+          setUploadLoading(true);
+          wuInit([_originFileObj]);
+        } else {
+          console.log(window.WebUploader);
+          notification.error({
+            message: formatMessage({ id: 'oal.face.failToUpload' }),
+            description: formatMessage({ id: 'oal.face.pleaseUploadFileAgain' }),
+          });
+        }
+      } else {
+        // 无图，根据 添加 or 修改 分别调不同接口
         setUploadLoading(true);
         dispatch({
-          type: 'faceVisitor/addOrEditInfo',
+          type: isEdit ? 'faceVisitor/editInfo' : 'faceVisitor/addInfo',
           payload: params,
         }).then(res => {
           if (!visible) return;
 
           if (res && res.res > 0) {
-            // 编辑，可不修改图片直接结束
             handleSubmit(isEdit);
             resetAllVar();
           } else {
@@ -151,64 +175,7 @@ const TableAddOrModifyModal = props => {
           });
           setUploadLoading(false);
         });
-      } else if (window.WebUploader && _userPhotosLen > 0) {
-        // 含图片（添加/编辑）
-        const _originFileObj = userPhotos[_userPhotosLen - 1].originFileObj;
-        const { faceId, name, mobile, isEdit, startDate, endDate, peopleType, isUpdateImg } = params || {};
-
-        faceId && (_originFileObj.faceId = faceId);
-        _originFileObj.staffname = name;
-        _originFileObj.mobile = mobile;
-        _originFileObj.isEdit = isEdit;
-        _originFileObj.startDate = startDate;
-        _originFileObj.endDate = endDate;
-        _originFileObj.peopleType = peopleType;
-        _originFileObj.isUpdateImg = isUpdateImg;
-        setUploadLoading(true);
-        wuInit([_originFileObj]);
-      } else {
-        console.log(userPhotos);
-        notification.error({
-          message: formatMessage({ id: 'oal.face.failToUpload' }),
-          description: formatMessage({ id: 'oal.face.pleaseUploadFileAgain' }),
-        });
       }
-
-      // isEdit && (params.faceId = bean._id);
-      // setUploadLoading(true);
-      // dispatch({
-      //   type: 'faceVisitor/addOrEditInfo',
-      //   payload: params,
-      // }).then(res => {
-      //   if (!visible) return;
-
-      //   if (res && res.res > 0 && res.data) {
-      //     const len = userPhotos && userPhotos.length || 0;
-
-      //     if (window.WebUploader && len > 0) {
-      //       const _originFileObj = userPhotos[len - 1].originFileObj;
-      //       const { _id, name: _name, staffid: _staffid } = res.data;
-
-      //       _originFileObj.faceId = _id;
-      //       _originFileObj._name = _name;
-      //       _originFileObj._staffid = _staffid;
-      //       wuInit([_originFileObj]);
-      //     } else if (isEdit) {
-      //       // 编辑，可不修改图片直接结束
-      //       handleSubmit(isEdit);
-      //       resetAllVar();
-      //     } else {
-      //       console.log(userPhotos);
-      //       setUploadLoading(false);
-      //     }
-      //   } else {
-      //     console.log(res);
-      //     setUploadLoading(false);
-      //   }
-      // }).catch(err => {
-      //   console.log(err);
-      //   setUploadLoading(false);
-      // });
     });
   };
 
@@ -245,7 +212,7 @@ const TableAddOrModifyModal = props => {
     newFileList.forEach((item, index) => {
       let wuFile = new window.WebUploader.Lib.File(window.WebUploader.guid('rt_'), item);
       let newfile = new window.WebUploader.File(wuFile);
-      const { faceId, staffname, mobile, isEdit, startDate, endDate, peopleType, isUpdateImg } = item || {};
+      const { faceId, staffname, mobile, isEdit, startDate, endDate, icCard, peopleType, isUpdateImg } = item || {};
 
       faceId && (newfile.faceId = faceId);
       newfile.staffname = staffname;
@@ -253,6 +220,7 @@ const TableAddOrModifyModal = props => {
       newfile.isEdit = isEdit;
       newfile.startDate = startDate;
       newfile.endDate = endDate;
+      newfile.icCard = icCard;
       newfile.peopleType = peopleType;
       newfile.isUpdateImg = isUpdateImg;
       uploader.addFiles(newfile);
@@ -271,7 +239,7 @@ const TableAddOrModifyModal = props => {
 
     uploader.on('uploadBeforeSend', (block, data) => {
       if (!visible) return;
-      const { file: { md5, faceId, staffname, mobile, isEdit, startDate, endDate, peopleType, isUpdateImg } } = block || { file: {} };
+      const { file: { md5, faceId, staffname, mobile, isEdit, startDate, endDate, icCard, peopleType, isUpdateImg } } = block || { file: {} };
 
       data.md5 = md5;
       faceId && (data.faceId = faceId);
@@ -280,6 +248,7 @@ const TableAddOrModifyModal = props => {
       data.isEdit = isEdit;
       data.startDate = startDate;
       data.endDate = endDate;
+      data.icCard = icCard;
       data.peopleType = peopleType;
       data.isUpdateImg = isUpdateImg;
     });
@@ -310,7 +279,15 @@ const TableAddOrModifyModal = props => {
         resetAllVar();
       } else if (res === 0) {
         // 分片文件上传成功时返回，啥也不做
-      } else if (!response || res < 0 || errcode === 500 || /false/i.test(msg)) {
+      } else if (res === -1 && errcode === 6012) {
+        // IC卡号重复
+        notification.error({
+          message: formatMessage({ id: 'oal.face.icCardRepeat' }),
+          description: formatMessage({ id: 'oal.ajax.6012' }),
+        });
+        setUploadLoading(false);
+        setUploadProgress(0);
+      } else {
         notification.error({
           message: formatMessage({ id: 'oal.face.failToUpload' }),
           description: formatMessage({ id: 'oal.face.pleaseUploadFileAgain' }),
@@ -350,6 +327,14 @@ const TableAddOrModifyModal = props => {
     const errReg = /[<>|*?/:\s]/;
     if (value && errReg.test(value)) {
       callback(formatMessage({ id: 'oal.common.illegalCharacterTips' }));
+    }
+    callback();
+  };
+
+  const checkStaffid = (rule, value, callback) => {
+    const reg = /^[0-9A-Za-z]+$/;
+    if (value && !reg.test(value)) {
+      callback(formatMessage({ id: 'oal.common.enterEnglishStringOrNumber' }));
     }
     callback();
   };
@@ -416,6 +401,20 @@ const TableAddOrModifyModal = props => {
             allowClear={false}
           />)}
         </Form.Item>
+        <Form.Item label={formatMessage({ id: 'oal.face.icCard' })}>
+          {getFieldDecorator('icCard', {
+            rules: [
+              {
+                max: 60,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '60' }),
+              },
+              {
+                validator: checkStaffid,
+              },
+            ],
+            initialValue: bean && bean.icCard || '',
+          })(<Input placeholder={formatMessage({ id: 'oal.face.icCard' })} />)}
+        </Form.Item>
         <div style={{ position: 'relative', width: 155, height: 155, margin: '0 0 24px 25%', }}>
           <img src={imageUrl || (isEdit ? `${bean.imgPath}?t=${Date.now()}` : imgNull)} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: 5, objectFit: 'contain', }} />
           {
@@ -428,10 +427,10 @@ const TableAddOrModifyModal = props => {
         <Form.Item label={formatMessage({ id: 'oal.face.userPhotos' })}>
           {getFieldDecorator('userPhotos', {
             rules: [
-              {
-                required: !isEdit,
-                message: formatMessage({ id: 'oal.face.enterUserPhotosTips' }),
-              },
+              // {
+              //   required: !isEdit,
+              //   message: formatMessage({ id: 'oal.face.enterUserPhotosTips' }),
+              // },
               {
                 validator: checkUserPhotos,
               },

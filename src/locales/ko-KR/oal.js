@@ -604,4 +604,8 @@ export default {
   'oal.user-manage.terminalAssigned/terminalTotal': `할당 / 총점`,
   'oal.log-query.removeConfirm': `선택한 레코드를 삭제 하시겠습니까?`,
   'oal.log-query.temperatureDetectionMode': `온도 감지 모드`,
+  'oal.device.faceAndMaskAndTemperature': ``,
+  'oal.face.icCard': ``,
+  'oal.ajax.6012': ``,
+  'oal.face.icCardRepeat': ``,
 };

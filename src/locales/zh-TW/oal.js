@@ -604,4 +604,8 @@ export default {
   'oal.user-manage.terminalAssigned/terminalTotal': `已分配/總點數`,
   'oal.log-query.removeConfirm': `是否刪除已選擇的記錄？`,
   'oal.log-query.temperatureDetectionMode': `測溫模式`,
+  'oal.device.faceAndMaskAndTemperature': ``,
+  'oal.face.icCard': ``,
+  'oal.ajax.6012': ``,
+  'oal.face.icCardRepeat': ``,
 };

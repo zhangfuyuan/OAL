@@ -604,4 +604,8 @@ export default {
   'oal.user-manage.terminalAssigned/terminalTotal': `已分配/总点数`,
   'oal.log-query.removeConfirm': `是否删除已选择的记录？`,
   'oal.log-query.temperatureDetectionMode': `测温模式`,
+  'oal.device.faceAndMaskAndTemperature': `人脸+口罩+测温`,
+  'oal.face.icCard': `IC卡号`,
+  'oal.ajax.6012': `IC卡号重复，请修改`,
+  'oal.face.icCardRepeat': `IC卡号重复`,
 };

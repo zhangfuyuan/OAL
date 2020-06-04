@@ -292,6 +292,7 @@ const RenameModal = props => {
             <Radio.Group>
               <Radio value="1"><FormattedMessage id="oal.device.faceAndTemperature" /></Radio>
               <Radio value="2"><FormattedMessage id="oal.device.maskAndTtemperature" /></Radio>
+              <Radio value="4"><FormattedMessage id="oal.device.faceAndMaskAndTemperature" /></Radio>
               <Radio value="3"><FormattedMessage id="oal.device.temperature" /></Radio>
               {/* <Radio value="2">
                 <FormattedMessage id="oal.device.maskMode" />

@@ -10,11 +10,20 @@ export async function ajaxList(data) {
 }
 
 /**
- * （人员-访客2-1）添加/修改访客非头像信息
+ * （人员-访客2-1）添加访客非头像信息
  * @param data
  * @returns {Promise<*>}
  */
-export async function ajaxAddOrEditInfo(data) {
+export async function ajaxAddInfo(data) {
+  return post('/guard-web/a/face/**', data);
+}
+
+/**
+ * （人员-访客2-1）修改访客非头像信息
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxEditInfo(data) {
   return post('/guard-web/a/face/saveFaceInfo', data);
 }
 

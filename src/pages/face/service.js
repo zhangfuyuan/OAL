@@ -63,13 +63,21 @@ export async function fetchList(data) {
 export async function ajaxSetFaceState(data) {
   return post('/guard-web/a/face/setState', data);
 }
-
 /**
- * （人员-认证-列表3-1）添加/修改人员的非头像信息
+ * （人员-认证-列表3-1）添加人员的非头像信息
  * @param data
  * @returns {Promise<*>}
  */
-export async function ajaxAddOrEditInfo(data) {
+export async function ajaxAddInfo(data) {
+  return post('/guard-web/a/face/**', data);
+}
+
+/**
+ * （人员-认证-列表3-1）修改人员的非头像信息
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxEditInfo(data) {
   return post('/guard-web/a/face/saveFaceInfo', data);
 }
 

@@ -453,7 +453,7 @@ export default {
   'oal.log.removeSuccessfully': `Remove successfully`,
   'oal.log-query.group': `Group`,
   'oal.log-query.device': `Device`,
-  'oal.log-query.animalHeat': `Animal heat`,
+  'oal.log-query.animalHeat': `Body heat`,
   'oal.log-query.stranger': `Stranger`,
   'oal.log-query.selectGroup': `Select group`,
   'oal.log-query.pleaseSelectGroup': `Please select group`,
@@ -604,4 +604,8 @@ export default {
   'oal.user-manage.terminalAssigned/terminalTotal': `Allocated / total points`,
   'oal.log-query.removeConfirm': `Do you want to delete the selected record?`,
   'oal.log-query.temperatureDetectionMode': `Temperaturerkennungsmodus`,
+  'oal.device.faceAndMaskAndTemperature': ``,
+  'oal.face.icCard': ``,
+  'oal.ajax.6012': ``,
+  'oal.face.icCardRepeat': ``,
 };

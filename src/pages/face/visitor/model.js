@@ -1,4 +1,4 @@
-import { ajaxList, ajaxTest, getDeviceList, ajaxAddOrEditInfo, ajaxDeleteFace } from './service';
+import { ajaxList, ajaxTest, getDeviceList, ajaxAddInfo, ajaxEditInfo, ajaxDeleteFace } from './service';
 
 const Model = {
   namespace: 'faceVisitor',
@@ -20,9 +20,15 @@ const Model = {
 
       return Promise.resolve(response);
     },
-    // （单个）添加/编辑人脸信息（不包括图片）
-    *addOrEditInfo({ payload }, { call, put, select }) {
-      const response = yield call(ajaxAddOrEditInfo, payload);
+    // （单个）添加人脸信息（不包括图片）
+    *addInfo({ payload }, { call, put, select }) {
+      const response = yield call(ajaxAddInfo, payload);
+
+      return Promise.resolve(response);
+    },
+    // （单个）编辑人脸信息（不包括图片）
+    *editInfo({ payload }, { call, put, select }) {
+      const response = yield call(ajaxEditInfo, payload);
 
       return Promise.resolve(response);
     },

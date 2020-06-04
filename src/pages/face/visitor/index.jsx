@@ -131,6 +131,12 @@ class Visitor extends Component {
         render: (text, record) => <span>{record.staffid || '-'}</span>,
       },
       {
+        title: formatMessage({ id: 'oal.face.icCard' }),
+        key: 'icCard',
+        dataIndex: 'icCard',
+        render: (text, record) => <span>{record.icCard || '-'}</span>,
+      },
+      {
         title: formatMessage({ id: 'oal.common.phoneNumber' }),
         key: 'mobile',
         dataIndex: 'mobile',

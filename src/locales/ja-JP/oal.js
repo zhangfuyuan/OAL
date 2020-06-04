@@ -604,4 +604,8 @@ export default {
   'oal.user-manage.terminalAssigned/terminalTotal': `割り当て済み/合計ポイント`,
   'oal.log-query.removeConfirm': `選択したレコードを削除しますか？`,
   'oal.log-query.temperatureDetectionMode': `温度検出モード`,
+  'oal.device.faceAndMaskAndTemperature': ``,
+  'oal.face.icCard': ``,
+  'oal.ajax.6012': ``,
+  'oal.face.icCardRepeat': ``,
 };
