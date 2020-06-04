@@ -287,7 +287,7 @@ const RenameModal = props => {
         }
         <Form.Item label={formatMessage({ id: 'oal.device.recognitionMode' })}>
           {getFieldDecorator('recognitionMode', {
-            initialValue: bean && bean.recognitionMode || '2',
+            initialValue: bean && bean.recognitionMode || '',
           })(
             <Radio.Group>
               <Radio value="1"><FormattedMessage id="oal.device.faceAndTemperature" /></Radio>

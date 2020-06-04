@@ -608,4 +608,8 @@ export default {
   'oal.face.icCard': ``,
   'oal.ajax.6012': ``,
   'oal.face.icCardRepeat': ``,
+  'oal.log-query.mode': ``,
+  'oal.log-query.result': ``,
+  'oal.common.verifySuccessfully': ``,
+  'oal.common.verifyFailed': ``,
 };

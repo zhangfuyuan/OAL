@@ -608,4 +608,8 @@ export default {
   'oal.face.icCard': `IC卡号`,
   'oal.ajax.6012': `IC卡号重复，请修改`,
   'oal.face.icCardRepeat': `IC卡号重复`,
+  'oal.log-query.mode': `模式`,
+  'oal.log-query.result': `结果`,
+  'oal.common.verifySuccessfully': `验证成功`,
+  'oal.common.verifyFailed': `验证失败`,
 };
