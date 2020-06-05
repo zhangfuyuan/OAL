@@ -373,8 +373,8 @@ const TableAddOrModifyModal = props => {
                 message: formatMessage({ id: 'oal.common.pleaseEnter' }),
               },
               {
-                max: 20,
-                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '20' }),
+                max: 60,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '60' }),
               },
             ],
             initialValue: bean && bean.name || '',
