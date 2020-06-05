@@ -7,6 +7,7 @@ const recognitionModeType = {
   '1': 'oal.device.faceAndTemperature',
   '2': 'oal.device.maskAndTtemperature',
   '3': 'oal.device.temperature',
+  '4': 'oal.device.faceAndMaskAndTemperature',
 };
 
 const infraredThermometerType = {

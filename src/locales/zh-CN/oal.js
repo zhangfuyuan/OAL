@@ -612,4 +612,6 @@ export default {
   'oal.log-query.result': `结果`,
   'oal.common.verifySuccessfully': `验证成功`,
   'oal.common.verifyFailed': `验证失败`,
+  'oal.device.lowTemperatureRetest': `低温重测`,
+  'oal.device.lowTemperatureValue': `低温阈值`,
 };

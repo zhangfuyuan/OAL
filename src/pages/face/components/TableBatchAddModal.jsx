@@ -137,7 +137,7 @@ const TableBatchAddModal = props => {
   };
 
   const handleModalOk = () => {
-    if (!xlsFile || !myImgList || myImgList.length === 0) {
+    if (!xlsFile) {
       notification.error({
         message: formatMessage({ id: 'oal.face.failToUpload' }),
         description: formatMessage({ id: 'oal.face.pleaseUploadFile' }),
@@ -169,14 +169,20 @@ const TableBatchAddModal = props => {
       payload: {
         groupId,
         peopleType: '0',
-        total: imgListLen,
+        total: 0,
       },
     }).then(res => {
       if (!visible || !myUploadLoading) return;
 
       if (res && res.res > 0 && res.data && res.data.taskId) {
         taskId = res.data.taskId;
-        submit2_batchAddFace(taskId);
+        if (myImgList && myImgList.length > 0) {
+          // 有图，先上传图再上传文档
+          submit2_batchAddFace(taskId);
+        } else {
+          // 无图，直接上传文档
+          submit3_batchAddInfo(taskId);
+        }
       } else {
         handleUploadAbort();
       }

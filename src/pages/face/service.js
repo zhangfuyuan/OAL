@@ -69,7 +69,7 @@ export async function ajaxSetFaceState(data) {
  * @returns {Promise<*>}
  */
 export async function ajaxAddInfo(data) {
-  return post('/guard-web/a/face/**', data);
+  return post('/guard-web/a/face/addFaceInfo', data);
 }
 
 /**
