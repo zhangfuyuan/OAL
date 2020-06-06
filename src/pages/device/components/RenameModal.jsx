@@ -18,8 +18,8 @@ const defaultAlarmValue = {
   '1': '100.4℉',
 };
 const defaultLowTemperatureValue = {
-  '0': '37.3℃',
-  '1': '100.4℉',
+  '0': '',
+  '1': '',
 };
 
 const RenameModal = props => {
@@ -43,15 +43,16 @@ const RenameModal = props => {
     form.validateFields((err, fieldsValue) => {
       //   console.log('---------fieldsValue----------', fieldsValue)
       if (err) return;
-      const { pwd, alarmValue, waitShutdownTime, alarm, isSaveRecord, lowTemperatureRetest } = fieldsValue;
+      const { pwd, alarmValue, waitShutdownTime, alarm, isSaveRecord, lowTemperatureRetest, lowTemperatureValue } = fieldsValue;
       const params = {
         ...fieldsValue,
         alarm: alarm ? '1' : '0',
         isSaveRecord: isSaveRecord ? '1' : '0',
+        lowTemperatureRetest: lowTemperatureRetest ? '1' : '0',
       };
 
       alarmValue && (params.alarmValue = alarmValue.replace(/((℃)|(℉))$/, ''));
-      lowTemperatureRetest && (params.lowTemperatureRetest = lowTemperatureRetest.replace(/((℃)|(℉))$/, ''));
+      lowTemperatureValue && (params.lowTemperatureValue = lowTemperatureValue.replace(/((℃)|(℉))$/, ''));
       waitShutdownTime && (params.waitShutdownTime = waitShutdownTime.replace(/s$/, ''));
       params.deviceId = bean._id;
       handleSubmit(params, () => {
@@ -78,7 +79,7 @@ const RenameModal = props => {
   const handleTemperatureUnitChange = e => {
     const { value } = e.target;
     const alarmValue = form.getFieldValue('alarmValue');
-    const lowTemperatureRetest = form.getFieldValue('lowTemperatureRetest');
+    const lowTemperatureValue = form.getFieldValue('lowTemperatureValue');
 
     if (value && alarmValue) {
       form.setFieldsValue({
@@ -208,28 +209,43 @@ const RenameModal = props => {
   };
 
   const checkLowTemperatureValue = (rule, value, callback) => {
-    if (value && checkLowTemperatureValueIsError(value)) {
-      callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
+    if (value) {
+      const _errorType = checkLowTemperatureValueIsError(value);
+
+      if (_errorType === 1) {
+        callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
+      } else if (_errorType === 2) {
+        callback(formatMessage({ id: 'oal.device.lowTemperatureValueTips' }));
+      }
     }
     callback();
   };
 
   const checkLowTemperatureValueIsError = value => {
-    let isError = false;
+    let errorType = 0;
 
     if (value) {
-      if (/^[\d]{2,3}(\.[\d]{1})?$/.test(value.replace(/((℃)|(℉))$/, ''))) {
+      if (/^[\d]{1,3}(\.[\d]{1})?$/.test(value.replace(/((℃)|(℉))$/, ''))) {
         let _val = parseFloat(value);
+        let alarmValue = form.getFieldValue('alarmValue');
 
-        if (_val < 34 || _val > 120) {
-          isError = true;
+        if (alarmValue) {
+          alarmValue = parseFloat(alarmValue);
+
+          if (_val >= alarmValue) {
+            errorType = 2;
+          }
+        }
+
+        if (_val < 1 || _val > 120) {
+          errorType = 1;
         }
       } else {
-        isError = true;
+        errorType = 1;
       }
     }
 
-    return isError;
+    return errorType;
   };
 
   return (
@@ -317,6 +333,33 @@ const RenameModal = props => {
               })(<Input placeholder="34.0-120.0（℃/℉）" onFocus={handleAlarmValueFocus} onBlur={handleAlarmValueBlur} />)}
             </Form.Item>) : ''
         }
+        <Form.Item label={formatMessage({ id: 'oal.device.lowTemperatureRetest' })}>
+          {getFieldDecorator('lowTemperatureRetest', {
+            valuePropName: 'checked',
+            initialValue: (bean && bean.lowTemperatureRetest === '1') || false,
+          })(<Switch onChange={checked => setShowLowTemperature(checked)} />)}
+        </Form.Item>
+        {
+          showLowTemperature ?
+            (<Form.Item label={formatMessage({ id: 'oal.device.lowTemperatureValue' })}>
+              {getFieldDecorator('lowTemperatureValue', {
+                rules: [
+                  {
+                    required: true,
+                    message: formatMessage({ id: 'oal.common.pleaseEnter' }),
+                  },
+                  {
+                    max: 6,
+                    message: formatMessage({ id: 'oal.common.maxLength' }, { num: '6' }),
+                  },
+                  {
+                    validator: checkLowTemperatureValue,
+                  },
+                ],
+                initialValue: bean && bean.lowTemperatureValue && bean.temperatureUnit === form.getFieldValue('temperatureUnit') ? (bean.lowTemperatureValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultLowTemperatureValue[form.getFieldValue('temperatureUnit') || ''],
+              })(<Input placeholder="1.0-120.0（℃/℉）" onFocus={handleLowTemperatureValueFocus} onBlur={handleLowTemperatureValueBlur} />)}
+            </Form.Item>) : ''
+        }
         <Form.Item label={formatMessage({ id: 'oal.device.relayOperationMode' })}>
           {getFieldDecorator('relayOperationMode', {
             initialValue: bean && bean.relayOperationMode || '1',
@@ -371,33 +414,6 @@ const RenameModal = props => {
             initialValue: bean && bean.isSaveRecord === '0' ? false : true,
           })(<Switch />)}
         </Form.Item>
-        <Form.Item label={formatMessage({ id: 'oal.device.lowTemperatureRetest' })}>
-          {getFieldDecorator('lowTemperatureRetest', {
-            valuePropName: 'checked',
-            initialValue: (bean && bean.lowTemperatureRetest === '1') || false,
-          })(<Switch onChange={checked => setShowLowTemperature(checked)} />)}
-        </Form.Item>
-        {
-          showLowTemperature ?
-            (<Form.Item label={formatMessage({ id: 'oal.device.lowTemperatureValue' })}>
-              {getFieldDecorator('lowTemperatureValue', {
-                rules: [
-                  {
-                    required: true,
-                    message: formatMessage({ id: 'oal.common.pleaseEnter' }),
-                  },
-                  {
-                    max: 6,
-                    message: formatMessage({ id: 'oal.common.maxLength' }, { num: '6' }),
-                  },
-                  {
-                    validator: checkLowTemperatureValue,
-                  },
-                ],
-                initialValue: bean && bean.lowTemperatureValue && bean.temperatureUnit === form.getFieldValue('temperatureUnit') ? (bean.lowTemperatureValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultLowTemperatureValue[form.getFieldValue('temperatureUnit') || ''],
-              })(<Input placeholder="34.0-120.0（℃/℉）" onFocus={handleLowTemperatureValueFocus} onBlur={handleLowTemperatureValueBlur} />)}
-            </Form.Item>) : ''
-        }
       </Form>
       {/* <p style={{ textAlign: 'center', color: '#999', }}><FormattedMessage id="oal.device.deviceSetTips" /></p> */}
     </Modal>

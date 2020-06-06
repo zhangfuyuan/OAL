@@ -612,6 +612,7 @@ export default {
   'oal.log-query.result': `結果`,
   'oal.common.verifySuccessfully': `検証成功`,
   'oal.common.verifyFailed': `確認できませんでした`,
-  'oal.device.lowTemperatureRetest': ``,
-  'oal.device.lowTemperatureValue': ``,
+  'oal.device.lowTemperatureRetest': `低温再テスト`,
+  'oal.device.lowTemperatureValue': `再テストのしきい値`,
+  'oal.device.lowTemperatureValueTips': `アラームのしきい値未満にしてください`,
 };

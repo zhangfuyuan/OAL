@@ -613,5 +613,6 @@ export default {
   'oal.common.verifySuccessfully': `验证成功`,
   'oal.common.verifyFailed': `验证失败`,
   'oal.device.lowTemperatureRetest': `低温重测`,
-  'oal.device.lowTemperatureValue': `低温阈值`,
+  'oal.device.lowTemperatureValue': `重测阈值`,
+  'oal.device.lowTemperatureValueTips': `请小于报警阈值`,
 };

@@ -612,6 +612,7 @@ export default {
   'oal.log-query.result': `Результат`,
   'oal.common.verifySuccessfully': `Успешное подтверждение`,
   'oal.common.verifyFailed': `Проверка не удалась`,
-  'oal.device.lowTemperatureRetest': ``,
-  'oal.device.lowTemperatureValue': ``,
+  'oal.device.lowTemperatureRetest': `Низкая температура повторного тестирования`,
+  'oal.device.lowTemperatureValue': `Порог повторного тестирования`,
+  'oal.device.lowTemperatureValueTips': `Пожалуйста, будьте меньше порога тревоги`,
 };

@@ -612,6 +612,7 @@ export default {
   'oal.log-query.result': `Ergebnis`,
   'oal.common.verifySuccessfully': `Verifizierungserfolg`,
   'oal.common.verifyFailed': `Verifizierung fehlgeschlagen`,
-  'oal.device.lowTemperatureRetest': ``,
-  'oal.device.lowTemperatureValue': ``,
+  'oal.device.lowTemperatureRetest': `Niedertemperatur-Wiederholungstest`,
+  'oal.device.lowTemperatureValue': `Schwellenwert erneut testen`,
+  'oal.device.lowTemperatureValueTips': `Bitte unterschreiten Sie die Alarmschwelle`,
 };

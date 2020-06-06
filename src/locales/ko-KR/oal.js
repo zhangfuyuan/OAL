@@ -612,6 +612,7 @@ export default {
   'oal.log-query.result': `결과`,
   'oal.common.verifySuccessfully': `검증 성공`,
   'oal.common.verifyFailed': `확인 실패`,
-  'oal.device.lowTemperatureRetest': ``,
-  'oal.device.lowTemperatureValue': ``,
+  'oal.device.lowTemperatureRetest': `저온 재시험`,
+  'oal.device.lowTemperatureValue': `재시험 임계 값`,
+  'oal.device.lowTemperatureValueTips': `경보 임계 값보다 작아야합니다`,
 };

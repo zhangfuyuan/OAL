@@ -612,6 +612,7 @@ export default {
   'oal.log-query.result': `Risultato`,
   'oal.common.verifySuccessfully': `Verifica riuscita`,
   'oal.common.verifyFailed': `Verifica fallita`,
-  'oal.device.lowTemperatureRetest': ``,
-  'oal.device.lowTemperatureValue': ``,
+  'oal.device.lowTemperatureRetest': `Test di bassa temperatura`,
+  'oal.device.lowTemperatureValue': `Testare nuovamente la soglia`,
+  'oal.device.lowTemperatureValueTips': `Si prega di essere inferiore alla soglia di allarme`,
 };
