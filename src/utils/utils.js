@@ -193,3 +193,70 @@ export function temperatureC2F(value) {
 
   return res.toFixed(1);
 }
+
+/**
+ * 终端识别模式转化成字符串
+ * value 识别模式的集合值
+ * return 字符串
+ */
+export function parseRecognitionModeToStr(value) {
+  if (value && value.indexOf) {
+    const inFace = value.indexOf('face') > -1;
+    const inMask = value.indexOf('mask') > -1;
+    const inTemperature = value.indexOf('temperature') > -1;
+
+    if (inFace && inMask && inTemperature) return '4';
+    if (inFace && inMask) return '7';
+    if (inFace && inTemperature) return '1';
+    if (inMask && inTemperature) return '2';
+    if (inFace) return '5';
+    if (inMask) return '6';
+    if (inTemperature) return '3';
+  }
+
+  return '';
+}
+
+/**
+ * 终端识别模式转化成数组
+ * value 识别模式的值
+ * return 数组
+ */
+export function parseRecognitionModeToArr(value) {
+  const modeMap = {
+    '0': [],
+    '1': ['face', 'temperature'],
+    '2': ['mask', 'temperature'],
+    '3': ['temperature'],
+    '4': ['face', 'mask', 'temperature'],
+    '5': ['face'],
+    '6': ['mask'],
+    '7': ['face', 'mask'],
+  };
+
+  return modeMap[value || '0'];
+}
+
+/**
+ * 终端识别模式国际化
+ * value  识别模式的值
+ * $i18n  国际化方法
+ * other  是否仅获取模式值集合
+ * return 保留小数点后一位的字符串
+ */
+export function i18nRecognitionMode(value, $i18n, other) {
+  const modeMap = {
+    '1': ['oal.common.face', 'oal.common.temperature'],
+    '2': ['oal.common.mask', 'oal.common.temperature'],
+    '3': ['oal.common.temperature'],
+    '4': ['oal.common.face', 'oal.common.mask', 'oal.common.temperature'],
+    '5': ['oal.common.face'],
+    '6': ['oal.common.mask'],
+    '7': ['oal.common.face', 'oal.common.mask'],
+  };
+
+  if (other) return ['5', '6', '3', '1', '7', '2', '4'];
+  if (!value || typeof $i18n !== 'function') return '';
+
+  return modeMap[value] && modeMap[value].map(item => item && $i18n({ id: item }) || '').join('+') || '';
+}

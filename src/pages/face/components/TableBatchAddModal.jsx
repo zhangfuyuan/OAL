@@ -7,35 +7,39 @@ const { publicPath } = defaultSettings;
 const { Dragger } = Upload;
 
 let uploader = null;
-let myImgList = [];
-let myUploadAllSuccessNum = 0;
+// let myImgList = [];
+// let myUploadAllSuccessNum = 0;
 let taskId = '';
 let myUploadLoading = false;
-let myImgTotal = 0; // 含文件格式不正确
-let myLegalImgTotalSize = 0;
+// let myImgTotal = 0; // 含文件格式不正确
+// let myLegalImgTotalSize = 0;
 
 const userImportTemplateLinkMap = {
-  'de-DE': '/guardFile/model/users-de/users.xls',
-  'en-US': '/guardFile/model/users-en/users.xls',
-  'es-ES': '/guardFile/model/users-es/users.xls',
-  'fr-FR': '/guardFile/model/users-fr/users.xls',
-  'it-IT': '/guardFile/model/users-it/users.xls',
-  'ja-JP': '/guardFile/model/users-ja/users.xls',
-  'ko-KR': '/guardFile/model/users-ko/users.xls',
-  'pt-BR': '/guardFile/model/users-pt/users.xls',
-  'ru-RU': '/guardFile/model/users-ru/users.xls',
-  'zh-CN': '/guardFile/model/users-cn-rZH/users.xls',
-  'zh-TW': '/guardFile/model/users-cn-rTW/users.xls',
+  'de-DE': '/guardFile/model/users-de.zip',
+  'en-US': '/guardFile/model/users-en.zip',
+  'es-ES': '/guardFile/model/users-es.zip',
+  'fr-FR': '/guardFile/model/users-fr.zip',
+  'it-IT': '/guardFile/model/users-it.zip',
+  'ja-JP': '/guardFile/model/users-ja.zip',
+  'ko-KR': '/guardFile/model/users-ko.zip',
+  'ms-MY': '/guardFile/model/users-ms.zip',
+  'pt-BR': '/guardFile/model/users-pt.zip',
+  'ru-RU': '/guardFile/model/users-ru.zip',
+  'th-TH': '/guardFile/model/users-th.zip',
+  'vi-VN': '/guardFile/model/users-vi.zip',
+  'zh-CN': '/guardFile/model/users-cn-rZH.zip',
+  'zh-TW': '/guardFile/model/users-cn-rTW.zip',
 };
 
 const TableBatchAddModal = props => {
   const { visible, groupId, handleSubmit, handleCancel, dispatch } = props;
   const [uploadLoading, setUploadLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [xlsFile, setXlsFile] = useState(null);
-  const [imgListLen, setImgListLen] = useState(0);
+  // const [xlsFile, setXlsFile] = useState(null);
+  // const [imgListLen, setImgListLen] = useState(0);
   const [isUnderAnalysis, setIsUnderAnalysis] = useState(false);
-  const [imgTotal, setImgTotal] = useState(0);
+  // const [imgTotal, setImgTotal] = useState(0);
+  const [zipFile, setZipFile] = useState(null);
 
   const selectedLang = getLocale();
 
@@ -52,19 +56,20 @@ const TableBatchAddModal = props => {
     // 重置 state
     setUploadLoading(false);
     setUploadProgress(0);
-    setXlsFile(null);
-    setImgListLen(0);
+    // setXlsFile(null);
+    // setImgListLen(0);
     setIsUnderAnalysis(false);
-    setImgTotal(0);
+    // setImgTotal(0);
+    setZipFile(null);
 
     // 重置 全局变量
     if (uploader) wuDestroy();
-    myImgList = [];
-    myUploadAllSuccessNum = 0;
+    // myImgList = [];
+    // myUploadAllSuccessNum = 0;
     taskId = '';
     myUploadLoading = false;
-    myImgTotal = 0;
-    myLegalImgTotalSize = 0;
+    // myImgTotal = 0;
+    // myLegalImgTotalSize = 0;
   };
 
   const handleUploadAbort = (unNotification) => {
@@ -80,78 +85,91 @@ const TableBatchAddModal = props => {
     setIsUnderAnalysis(false);
 
     if (uploader) wuDestroy();
-    myUploadAllSuccessNum = 0;
+    // myUploadAllSuccessNum = 0;
     taskId = '';
     myUploadLoading = false;
   };
 
-  const beforeUploadXls = file => {
-    if (file.size > 1024 * 1024 * 2) {
+  // const beforeUploadXls = file => {
+  //   if (file.size > 1024 * 1024 * 2) {
+  //     notification.error({
+  //       message: formatMessage({ id: 'oal.face.failToUpload' }),
+  //       description: formatMessage({ id: 'oal.face.personnelDataFileTooLarge' }),
+  //     });
+  //   } else {
+  //     setXlsFile(file);
+  //   }
+
+  //   return false;
+  // };
+
+  const beforeUploadZip = file => {
+    if (file.size > 1024 * 1024 * 200) {
       notification.error({
         message: formatMessage({ id: 'oal.face.failToUpload' }),
-        description: formatMessage({ id: 'oal.face.personnelDataFileTooLarge' }),
+        description: formatMessage({ id: 'oal.face.zipFileTooLarge' }),
       });
     } else {
-      setXlsFile(file);
+      setZipFile(file);
     }
 
     return false;
   };
 
-  const beforeUploadImg = file => {
-    const fileType = file.type;
-    const isJpgOrPng = fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/jpg';
-    const isLt240KB = file.size / 1024 < 240;
+  // const beforeUploadImg = file => {
+  //   const fileType = file.type;
+  //   const isJpgOrPng = fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/jpg';
+  //   const isLt240KB = file.size / 1024 < 240;
 
-    if (!isJpgOrPng) {
-      notification.destroy();
-      notification.error({
-        message: formatMessage({ id: 'oal.face.failToUpload' }),
-        description: formatMessage({ id: 'oal.face.IncorrectFileFormat' }),
-      });
-    } else if (!isLt240KB || myLegalImgTotalSize > 1024 * 1024 * 200) {
-      notification.destroy();
-      notification.error({
-        message: formatMessage({ id: 'oal.face.failToUpload' }),
-        description: formatMessage({ id: 'oal.face.staffPhotoFileTooLarge' }),
-      });
-    } else {
-      myImgList.push(file);
-      setImgListLen(myImgList.length);
-      myLegalImgTotalSize += file.size;
-    }
+  //   if (!isJpgOrPng) {
+  //     notification.destroy();
+  //     notification.error({
+  //       message: formatMessage({ id: 'oal.face.failToUpload' }),
+  //       description: formatMessage({ id: 'oal.face.IncorrectFileFormat' }),
+  //     });
+  //   } else if (!isLt240KB || myLegalImgTotalSize > 1024 * 1024 * 200) {
+  //     notification.destroy();
+  //     notification.error({
+  //       message: formatMessage({ id: 'oal.face.failToUpload' }),
+  //       description: formatMessage({ id: 'oal.face.staffPhotoFileTooLarge' }),
+  //     });
+  //   } else {
+  //     myImgList.push(file);
+  //     setImgListLen(myImgList.length);
+  //     myLegalImgTotalSize += file.size;
+  //   }
 
-    myImgTotal++;
-    setImgTotal(myImgTotal);
-    return false;
-  };
+  //   myImgTotal++;
+  //   setImgTotal(myImgTotal);
+  //   return false;
+  // };
 
-  const uploadSuccessCheck = () => {
-    if (myUploadAllSuccessNum >= (imgListLen + 1)) {
-      setIsUnderAnalysis(true);
-      setUploadProgress(1);
-      submit4_getBatchAddTaskProgress(taskId);
-    } else if (myUploadAllSuccessNum >= imgListLen) {
-      submit3_batchAddInfo(taskId);
-    }
-  };
+  // const uploadSuccessCheck = () => {
+  //   if (myUploadAllSuccessNum >= (imgListLen + 1)) {
+  //     setIsUnderAnalysis(true);
+  //     setUploadProgress(1);
+  //     submit4_getBatchAddTaskProgress(taskId);
+  //   } else if (myUploadAllSuccessNum >= imgListLen) {
+  //     submit3_batchAddInfo(taskId);
+  //   }
+  // };
 
   const handleModalOk = () => {
-    if (!xlsFile) {
+    if (!zipFile) {
       notification.error({
         message: formatMessage({ id: 'oal.face.failToUpload' }),
         description: formatMessage({ id: 'oal.face.pleaseUploadFile' }),
       });
-    } else if (xlsFile.size > 1024 * 1024 * 2) {
-      notification.error({
-        message: formatMessage({ id: 'oal.face.failToUpload' }),
-        description: formatMessage({ id: 'oal.face.personnelDataFileTooLarge' }),
-      });
-    } else if (myLegalImgTotalSize > 1024 * 1024 * 200) {
-      notification.error({
-        message: formatMessage({ id: 'oal.face.failToUpload' }),
-        description: formatMessage({ id: 'oal.face.staffPhotoFileTooLarge' }),
-      });
+      // } else if (xlsFile.size > 1024 * 1024 * 2) {
+      //   notification.error({
+      //     message: formatMessage({ id: 'oal.face.failToUpload' }),
+      //     description: formatMessage({ id: 'oal.face.personnelDataFileTooLarge' }),
+      //   });
+      // } else if (myLegalImgTotalSize > 1024 * 1024 * 200) {
+      //   notification.error({
+      //     message: formatMessage({ id: 'oal.face.failToUpload' }),
+      //     description: formatMessage({ id: 'oal.face.staffPhotoFileTooLarge' }),
+      //   });
     } else {
       if (window.WebUploader && dispatch) {
         setUploadLoading(true);
@@ -170,19 +188,21 @@ const TableBatchAddModal = props => {
         groupId,
         peopleType: '0',
         total: 0,
+        type: '2',
       },
     }).then(res => {
       if (!visible || !myUploadLoading) return;
 
       if (res && res.res > 0 && res.data && res.data.taskId) {
         taskId = res.data.taskId;
-        if (myImgList && myImgList.length > 0) {
-          // 有图，先上传图再上传文档
-          submit2_batchAddFace(taskId);
-        } else {
-          // 无图，直接上传文档
-          submit3_batchAddInfo(taskId);
-        }
+        submit2_3_batchAddZip(taskId);
+        // if (myImgList && myImgList.length > 0) {
+        //   // 有图，先上传图再上传文档
+        //   submit2_batchAddFace(taskId);
+        // } else {
+        //   // 无图，直接上传文档
+        //   submit3_batchAddInfo(taskId);
+        // }
       } else {
         handleUploadAbort();
       }
@@ -193,13 +213,18 @@ const TableBatchAddModal = props => {
   };
 
   // 上传第2步：（人员-认证-列表4-2）批量上传人员照片
-  const submit2_batchAddFace = taskId => {
-    wuInit(myImgList, '/guard-web/a/face/uploadFace', taskId);
-  };
+  // const submit2_batchAddFace = taskId => {
+  //   wuInit(myImgList, '/guard-web/a/face/uploadFace', taskId);
+  // };
 
   // 上传第3步：（人员-认证-列表4-3）上传人员数据xls文件
-  const submit3_batchAddInfo = taskId => {
-    wuInit([xlsFile], '/guard-web/a/face/import', taskId);
+  // const submit3_batchAddInfo = taskId => {
+  //   wuInit([xlsFile], '/guard-web/a/face/import', taskId);
+  // };
+
+  // 上传第2、3步：（人员-认证-列表4-3）上传人员数据xls文件
+  const submit2_3_batchAddZip = taskId => {
+    wuInit([zipFile], '/guard-web/a/face/uploadFaceZip', taskId);
   };
 
   // 上传第4步：轮询后台的解析数据进度
@@ -272,7 +297,7 @@ const TableBatchAddModal = props => {
       thumb: false, // 不生成缩略图
       compress: false, // 如果此选项为false, 则图片在上传前不进行压缩
       prepareNextFile: true, // 是否允许在文件传输时提前把下一个文件准备好
-      chunked: false // 分片上传
+      chunked: true // 分片上传
     });
 
     newFileList.forEach((item, index) => {
@@ -317,13 +342,14 @@ const TableBatchAddModal = props => {
       const { res, errcode, msg } = response || {};
 
       if (res > 0) {
-        myUploadAllSuccessNum++;
-        setUploadProgress(parseInt(myUploadAllSuccessNum / (imgListLen + 1) * 100));
-        uploadSuccessCheck();
+        setIsUnderAnalysis(true);
+        setUploadProgress(1);
+        submit4_getBatchAddTaskProgress(taskId);
+        // myUploadAllSuccessNum++;
+        // setUploadProgress(parseInt(myUploadAllSuccessNum / (imgListLen + 1) * 100));
+        // uploadSuccessCheck();
       } else if (res === 0) {
         // 分片文件上传成功时返回，啥也不做
-      } else if (res < 0 || errcode === 500 || /false/i.test(msg)) {
-        handleUploadAbort();
       } else {
         handleUploadAbort();
       }
@@ -351,21 +377,27 @@ const TableBatchAddModal = props => {
 
   /********************************************** WebUploader API End **********************************************/
 
-  const handleDelXlsFile = () => {
+  // const handleDelXlsFile = () => {
+  //   if (myUploadLoading) return;
+
+  //   setXlsFile(null);
+  // };
+
+  const handleDelZipFile = () => {
     if (myUploadLoading) return;
 
-    setXlsFile(null);
+    setZipFile(null);
   };
 
-  const handleDelImgList = () => {
-    if (myUploadLoading) return;
+  // const handleDelImgList = () => {
+  //   if (myUploadLoading) return;
 
-    myImgList = [];
-    setImgListLen(0);
-    myImgTotal = 0;
-    myLegalImgTotalSize = 0;
-    setImgTotal(0);
-  };
+  //   myImgList = [];
+  //   setImgListLen(0);
+  //   myImgTotal = 0;
+  //   myLegalImgTotalSize = 0;
+  //   setImgTotal(0);
+  // };
 
   return (
     <Modal
@@ -378,7 +410,88 @@ const TableBatchAddModal = props => {
       onCancel={handleCancel}
     >
       <div>
-        <Dragger
+        <div style={{ color: '#999' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', }}>
+            <FormattedMessage id="oal.face.uploadExplain" />
+          </h3>
+
+          <p>
+            <FormattedMessage id="oal.face.batchAddExplainTips1-1" />
+            &nbsp;
+            <a href={userImportTemplateLinkMap[selectedLang] || '/guardFile/model/users-en.zip'}>
+              <FormattedMessage id="oal.face.batchAddExplainTips1-2" />
+            </a>
+            &nbsp;
+            <FormattedMessage id="oal.face.batchAddExplainTips1-3" />
+          </p>
+          <p>
+            <FormattedMessage id="oal.face.batchAddExplainTips2" />
+          </p>
+          <p>
+            <FormattedMessage id="oal.face.batchAddExplainTips3(2)" />
+          </p>
+          <p>
+            <FormattedMessage id="oal.face.batchAddExplainTips4(2)" />
+          </p>
+        </div>
+
+        <div style={{ margin: '30px 0' }}>
+          <Dragger
+            accept=".zip"
+            action="/guard-web/a/face/uploadFaceZip"
+            withCredentials
+            showUploadList={false}
+            beforeUpload={beforeUploadZip}
+            disabled={uploadLoading}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', padding: '0 30px' }}>
+              <Icon type="file-zip" style={{ fontSize: '48px', }} />
+
+              <div style={{ textAlign: 'left', paddingLeft: '30px' }}>
+                <p style={{ fontSize: '24px', }}>
+                  <FormattedMessage id="oal.face.batchAddZipDragTips1" />
+                </p>
+                <p>
+                  <FormattedMessage id="oal.face.batchAddZipDragTips2" />
+                </p>
+              </div>
+            </div>
+          </Dragger>
+
+          {
+            zipFile ?
+              (<div>
+                <span>
+                  <div className="ant-upload-list-item ant-upload-list-item-undefined ant-upload-list-item-list-type-text">
+                    <div className="ant-upload-list-item-info">
+                      <span>
+                        <Icon type="paper-clip" />
+                        <span
+                          className="ant-upload-list-item-name ant-upload-list-item-name-icon-count-1"
+                          title={zipFile.name}
+                        >
+                          {zipFile.name}
+                        </span>
+                        {
+                          !uploadLoading ?
+                            (<span className="ant-upload-list-item-card-actions ">
+                              <a
+                                title={formatMessage({ id: 'oal.common.delete' })}
+                                onClick={handleDelZipFile}
+                              >
+                                <Icon type="close" />
+                              </a>
+                            </span>) : ''
+                        }
+                      </span>
+                    </div>
+                  </div>
+                </span>
+              </div>) : ''
+          }
+        </div>
+
+        {/* <Dragger
           accept=".xls, .xlsx, .csv"
           action="/guard-web/a/face/import"
           withCredentials
@@ -420,9 +533,9 @@ const TableBatchAddModal = props => {
               </p>
             </div>
           </div>
-        </Dragger>
+        </Dragger> */}
 
-        <div>
+        {/* <div>
           {
             xlsFile ?
               (<div>
@@ -485,32 +598,7 @@ const TableBatchAddModal = props => {
                 </span>
               </div>) : ''
           }
-        </div>
-
-        <div style={{ marginTop: '30px', color: '#999', }}>
-          <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', }}>
-            <FormattedMessage id="oal.face.uploadExplain" />
-          </h3>
-
-          <p>
-            <FormattedMessage id="oal.face.batchAddExplainTips1-1" />
-            &nbsp;
-            <a href={userImportTemplateLinkMap[selectedLang] || '/guardFile/model/users-en/users.xls'}>
-              <FormattedMessage id="oal.face.batchAddExplainTips1-2" />
-            </a>
-            &nbsp;
-            <FormattedMessage id="oal.face.batchAddExplainTips1-3" />
-          </p>
-          <p>
-            <FormattedMessage id="oal.face.batchAddExplainTips2" />
-          </p>
-          <p>
-            <FormattedMessage id="oal.face.batchAddExplainTips3" />
-          </p>
-          <p>
-            <FormattedMessage id="oal.face.batchAddExplainTips4" />
-          </p>
-        </div>
+        </div> */}
       </div>
 
       <Modal

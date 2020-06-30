@@ -25,8 +25,11 @@ import 'moment/locale/fr';
 import 'moment/locale/it';
 import 'moment/locale/ja';
 import 'moment/locale/ko';
+import 'moment/locale/ms-my';
 import 'moment/locale/pt-br';
 import 'moment/locale/ru';
+import 'moment/locale/th';
+import 'moment/locale/vi';
 import 'moment/locale/zh-cn';
 import 'moment/locale/zh-tw';
 
@@ -103,6 +106,15 @@ const localeInfo = {
     data: require('react-intl/locale-data/ko'),
     momentLocale: 'ko',
   },
+  'ms-MY': {
+    messages: {
+      ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/ms-MY.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/ms-MY.js')),
+    },
+    locale: 'ms-MY',
+    antd: require('antd/lib/locale-provider/ms_MY'),
+    data: require('react-intl/locale-data/ms'),
+    momentLocale: 'ms-my',
+  },
   'pt-BR': {
     messages: {
       ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/pt-BR.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/pt-BR.js')),
@@ -120,6 +132,24 @@ const localeInfo = {
     antd: require('antd/lib/locale-provider/ru_RU'),
     data: require('react-intl/locale-data/ru'),
     momentLocale: 'ru',
+  },
+  'th-TH': {
+    messages: {
+      ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/th-TH.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/th-TH.js')),
+    },
+    locale: 'th-TH',
+    antd: require('antd/lib/locale-provider/th_TH'),
+    data: require('react-intl/locale-data/th'),
+    momentLocale: 'th',
+  },
+  'vi-VN': {
+    messages: {
+      ...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/locales/vi-VN.js')),...((locale) => locale.__esModule ? locale.default : locale)(require('E:/web/guarderClient/guarderClient/src/pages/user/login/locales/vi-VN.js')),
+    },
+    locale: 'vi-VN',
+    antd: require('antd/lib/locale-provider/vi_VN'),
+    data: require('react-intl/locale-data/vi'),
+    momentLocale: 'vi',
   },
   'zh-CN': {
     messages: {

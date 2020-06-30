@@ -25,7 +25,7 @@ class AuthorizedPoints extends Component {
             <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
               <FormattedMessage id="oal.settings.available" /> :
             </span>
-            <span style={{ margin: '0 50px 0 10px' }}>{currentUser.terminalTotal - currentUser.terminalAssigned || '0'}</span>
+            <span style={{ margin: '0 50px 0 10px' }}>{currentUser.terminalTotal - (currentUser.terminalAssigned || 0) || '0'}</span>
           </span>
           <span>
             <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>

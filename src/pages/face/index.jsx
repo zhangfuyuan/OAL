@@ -234,9 +234,15 @@ class Face extends Component {
   };
 
   tree_onSelect = (selectedKeys, info) => {
+    const { tablePage } = this.state;
+
     this.setState({
       selectedKeys: [info.node.props.dataRef._id],
       tableSelectedRows: [],
+      tablePage: {
+        ...tablePage,
+        current: 1,
+      },
     }, () => {
       this.table_loadFaceList();
     });

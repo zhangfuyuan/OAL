@@ -2,13 +2,14 @@ import { Modal, Descriptions, Button } from 'antd';
 import React from 'react';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import moment from 'moment';
+import { i18nRecognitionMode } from '@/utils/utils';
 
-const recognitionModeType = {
-  '1': 'oal.device.faceAndTemperature',
-  '2': 'oal.device.maskAndTtemperature',
-  '3': 'oal.device.temperature',
-  '4': 'oal.device.faceAndMaskAndTemperature',
-};
+// const recognitionModeType = {
+//   '1': 'oal.device.faceAndTemperature',
+//   '2': 'oal.device.maskAndTtemperature',
+//   '3': 'oal.device.temperature',
+//   '4': 'oal.device.faceAndMaskAndTemperature',
+// };
 
 const infraredThermometerType = {
   '0': 'oal.device.nonsupport',
@@ -45,7 +46,7 @@ const DetailModal = props => {
           {/* <Descriptions.Item label={formatMessage({ id: 'oal.device.mac' })}>{bean.mac || '-'}</Descriptions.Item> */}
           <Descriptions.Item label={formatMessage({ id: 'oal.device.firmwareVersion' })}>{bean.firmwareVersion || '-'}</Descriptions.Item>
           <Descriptions.Item label={formatMessage({ id: 'oal.device.softwareRelease' })}>{bean.deviceVersion || '-'}</Descriptions.Item>
-          <Descriptions.Item label={formatMessage({ id: 'oal.device.recognitionMode' })}>{recognitionModeType[bean.recognitionMode] ? formatMessage({ id: recognitionModeType[bean.recognitionMode] }) : '-'}</Descriptions.Item>
+          <Descriptions.Item label={formatMessage({ id: 'oal.device.recognitionMode' })}>{i18nRecognitionMode(bean.recognitionMode, formatMessage) || '-'}</Descriptions.Item>
           <Descriptions.Item label={formatMessage({ id: 'oal.device.infraredThermometer' })}>{infraredThermometerType[bean.infraredThermometer] ? formatMessage({ id: infraredThermometerType[bean.infraredThermometer] }) : '-'}</Descriptions.Item>
         </Descriptions>
       </div>

@@ -11,7 +11,7 @@ const SelectLang = props => {
 
   const changeLang = ({ key }) => setLocale(key, false);
 
-  const locales = ['de-DE', 'en-US', 'es-ES', 'fr-FR', 'it-IT', 'ja-JP', 'ko-KR', 'pt-BR', 'ru-RU', 'zh-CN', 'zh-TW'];
+  const locales = ['de-DE', 'en-US', 'es-ES', 'fr-FR', 'it-IT', 'ja-JP', 'ko-KR', 'ms-MY', 'pt-BR', 'ru-RU', 'th-TH', 'vi-VN', 'zh-CN', 'zh-TW'];
   const languageLabels = {
     'de-DE': 'Deutsche',
     'en-US': 'English',
@@ -20,8 +20,11 @@ const SelectLang = props => {
     'it-IT': 'italiano',
     'ja-JP': '日本語',
     'ko-KR': '한국어',
+    'ms-MY': 'Melayu',
     'pt-BR': 'Português',
     'ru-RU': 'русский',
+    'th-TH': 'ไทย',
+    'vi-VN': 'Thổ nhĩ kỳ',
     'zh-CN': '简体中文',
     'zh-TW': '繁体中文',
   };

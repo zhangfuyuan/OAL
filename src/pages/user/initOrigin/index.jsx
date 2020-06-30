@@ -51,7 +51,7 @@ class InitOrigin extends Component {
   };
 
   checkOrigin = (rule, value, callback) => {
-    if (value && value.indexOf('.') < 1) {
+    if (value && (value.indexOf('.') < 1 || !/^http(s)?:\/\//.test(value))) {
       callback(formatMessage({ id: 'oal.init.enterIpErrorTips' }));
     }
     callback();

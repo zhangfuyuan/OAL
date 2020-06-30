@@ -26,7 +26,7 @@ import moment from 'moment';
 import StandardTable from '@/components/StandardTable';
 import { SYSTEM_PATH } from '@/utils/constants';
 import styles from './style.less';
-import { temperatureC2F } from '@/utils/utils';
+import { temperatureC2F, i18nRecognitionMode } from '@/utils/utils';
 import TableDelModal from './components/TableDelModal';
 
 const FormItem = Form.Item;
@@ -50,13 +50,13 @@ const wearMaskMap = {
   '0': 'oal.log.notWearMask',
   '1': 'oal.log.wearMask',
 };
-const recognitionModeMap = {
-  '': 'oal.common.all',
-  '1': 'oal.device.faceAndTemperature',
-  '2': 'oal.device.maskAndTtemperature',
-  '3': 'oal.device.temperature',
-  '4': 'oal.device.faceAndMaskAndTemperature',
-};
+// const recognitionModeMap = {
+//   '': 'oal.common.all',
+//   '1': 'oal.device.faceAndTemperature',
+//   '2': 'oal.device.maskAndTtemperature',
+//   '3': 'oal.device.temperature',
+//   '4': 'oal.device.faceAndMaskAndTemperature',
+// };
 const resultMap = {
   '': 'oal.common.all',
   '0': 'oal.common.verifyFailed',
@@ -98,6 +98,8 @@ class logQuery extends Component {
 
   ref_download = null;
 
+  recognitionModekeys = i18nRecognitionMode(null, null, true);
+
   componentDidMount() {
     this.list_loadData();
   }
@@ -126,8 +128,14 @@ class logQuery extends Component {
   };
 
   list_handleClickItem = (e, bean) => {
+    const { tablePage } = this.state;
+
     this.setState({
       listSelectedBean: bean,
+      tablePage: {
+        ...tablePage,
+        current: 1,
+      },
     }, () => {
       this.table_loadData();
     });
@@ -164,14 +172,13 @@ class logQuery extends Component {
 
   table_columns = () => {
     const { listSelectedBean } = this.state;
-    const _t = Date.now();
 
     const cl = [
       {
         title: formatMessage({ id: 'oal.common.photo' }),
         key: 'avatar',
         width: 100,
-        render: (text, record) => <Avatar src={`${record.imgPath}?t=${_t}`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
+        render: (text, record) => <Avatar src={record.imgPath} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
       },
       {
         title: formatMessage({ id: 'oal.common.fullName' }),
@@ -218,7 +225,7 @@ class logQuery extends Component {
         title: formatMessage({ id: 'oal.log-query.mode' }),
         key: 'mode',
         dataIndex: 'mode',
-        render: (text, record) => <span>{recognitionModeMap[record.recognitionMode] && formatMessage({ id: recognitionModeMap[record.recognitionMode] }) || '-'}</span>,
+        render: (text, record) => <span>{i18nRecognitionMode(record.recognitionMode, formatMessage) || '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.log-query.result' }),
@@ -367,7 +374,7 @@ class logQuery extends Component {
                   <Option value="99"><FormattedMessage id={peopleTypeMap['99']} /></Option>
                   <Option value="4"><FormattedMessage id={peopleTypeMap['4']} /></Option>
                   <Option value="5,6"><FormattedMessage id={peopleTypeMap['5,6']} /></Option>
-                </Select>,
+                </Select>
               )}
             </FormItem>
           </Col> */}
@@ -390,12 +397,11 @@ class logQuery extends Component {
                     width: '100%',
                   }}
                 >
-                  <Option value=""><FormattedMessage id={recognitionModeMap['']} /></Option>
-                  <Option value="1"><FormattedMessage id={recognitionModeMap['1']} /></Option>
-                  <Option value="2"><FormattedMessage id={recognitionModeMap['2']} /></Option>
-                  <Option value="4"><FormattedMessage id={recognitionModeMap['4']} /></Option>
-                  <Option value="3"><FormattedMessage id={recognitionModeMap['3']} /></Option>
-                </Select>,
+                  <Option value=""><FormattedMessage id="oal.common.all" /></Option>
+                  {
+                    this.recognitionModekeys.map(val => <Option key={val} value={val}>{i18nRecognitionMode(val, formatMessage) || '-'}</Option>)
+                  }
+                </Select>
               )}
             </FormItem>
           </Col>
@@ -413,7 +419,7 @@ class logQuery extends Component {
                   <Option value=""><FormattedMessage id={resultMap['']} /></Option>
                   <Option value="1"><FormattedMessage id={resultMap['1']} /></Option>
                   <Option value="0"><FormattedMessage id={resultMap['0']} /></Option>
-                </Select>,
+                </Select>
               )}
             </FormItem>
           </Col>
@@ -602,7 +608,7 @@ class logQuery extends Component {
           footer={null}
           onCancel={this.table_closeViewModal}
         >
-          <img src={`${tableSelectedBean.imgPath}?t=${Date.now()}`} alt="" style={{ width: '100%', height: '100%' }} />
+          <img src={tableSelectedBean.imgPath} alt="" style={{ width: '100%', height: '100%' }} />
         </Modal>
         <TableDelModal
           visible={tableDelVisible}

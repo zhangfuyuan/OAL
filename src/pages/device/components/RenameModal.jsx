@@ -1,7 +1,20 @@
-import { Modal, Form, Input, Radio, Button, Switch, Tooltip, Icon, } from 'antd';
+import {
+  Modal,
+  Form,
+  Input,
+  Radio,
+  Button,
+  Switch,
+  Tooltip,
+  Icon,
+  Checkbox,
+  Slider,
+  Row,
+  Col,
+} from 'antd';
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
-// import { pswBase64Thrice, pswBase64ThriceRestore } from '@/utils/utils';
+import { parseRecognitionModeToStr, parseRecognitionModeToArr } from '@/utils/utils';
 
 const formItemLayout = {
   labelCol: {
@@ -21,6 +34,7 @@ const defaultLowTemperatureValue = {
   '0': '',
   '1': '',
 };
+const faceInRecognitionMode = ['4', '7', '1', '5'];
 
 const RenameModal = props => {
   const { form, bean, visible, handleSubmit, confirmLoading, handleCancel } = props;
@@ -28,6 +42,9 @@ const RenameModal = props => {
   const [showAlarm, setShowAlarm] = useState(false);
   const [showWaitShutdownTime, setShowWaitShutdownTime] = useState(false);
   const [showLowTemperature, setShowLowTemperature] = useState(false);
+  const [showFaceMode, setShowFaceMode] = useState(false);
+  const [recognitionRateSlider, setRecognitionRateSlider] = useState(90.0);
+  const [recognitionRateInput, setRecognitionRateInput] = useState('90.0%');
 
   let title = formatMessage({ id: 'oal.common.set' });
 
@@ -36,6 +53,9 @@ const RenameModal = props => {
       setShowAlarm((bean && bean.alarm === '1') || false);
       setShowWaitShutdownTime((bean && (bean.relayOperationMode === '1' || bean.relayOperationMode === '4')) || false);
       setShowLowTemperature((bean && bean.lowTemperatureRetest === '1') || false);
+      setShowFaceMode((bean && faceInRecognitionMode.indexOf(bean.recognitionMode) > -1) || false);
+      setRecognitionRateSlider((bean && parseFloat(bean.recognitionRate)) || 90.0);
+      setRecognitionRateInput(`${(bean && bean.recognitionRate) || '90.0'}%`);
     }
   }, [visible]);
 
@@ -43,12 +63,25 @@ const RenameModal = props => {
     form.validateFields((err, fieldsValue) => {
       //   console.log('---------fieldsValue----------', fieldsValue)
       if (err) return;
-      const { pwd, alarmValue, waitShutdownTime, alarm, isSaveRecord, lowTemperatureRetest, lowTemperatureValue } = fieldsValue;
+      const {
+        pwd,
+        alarmValue,
+        waitShutdownTime,
+        alarm,
+        isSaveRecord,
+        lowTemperatureRetest,
+        lowTemperatureValue,
+        recognitionMode,
+        fastMovingDetection,
+      } = fieldsValue;
       const params = {
         ...fieldsValue,
         alarm: alarm ? '1' : '0',
         isSaveRecord: isSaveRecord ? '1' : '0',
         lowTemperatureRetest: lowTemperatureRetest ? '1' : '0',
+        recognitionMode: recognitionMode ? parseRecognitionModeToStr(recognitionMode) : '',
+        recognitionRate: recognitionRateSlider.toFixed(1) || '90.0',
+        fastMovingDetection: fastMovingDetection ? '1' : '0',
       };
 
       alarmValue && (params.alarmValue = alarmValue.replace(/((℃)|(℉))$/, ''));
@@ -248,6 +281,49 @@ const RenameModal = props => {
     return errorType;
   };
 
+  const handleRecognitionRateSliderChange = value => {
+    setRecognitionRateSlider(value);
+    setRecognitionRateInput(`${value.toFixed(1)}%`);
+  };
+
+  const handleRecognitionRateFocus = e => {
+    const { value } = e.target;
+
+    if (value && /%$/.test(value)) {
+      setRecognitionRateInput(value.replace(/%$/, ''));
+    }
+  };
+
+  const handleRecognitionRateBlur = e => {
+    const { value } = e.target;
+
+    if (value && !checkRecognitionRateInputIsError(value)) {
+      setRecognitionRateSlider(parseFloat(value));
+      setRecognitionRateInput(`${parseFloat(value).toFixed(1)}%`);
+    } else {
+      setRecognitionRateSlider(bean && parseFloat(bean.recognitionRate) || 90.0);
+      setRecognitionRateInput(`${bean && bean.recognitionRate || '90.0'}%`);
+    }
+  };
+
+  const checkRecognitionRateInputIsError = value => {
+    let isError = false;
+
+    if (value) {
+      if (/^[\d]{2}(\.[\d]{1})?$/.test(value.replace(/%$/, ''))) {
+        let _val = parseFloat(value);
+
+        if (_val < 85.0 || _val > 99.9) {
+          isError = true;
+        }
+      } else {
+        isError = true;
+      }
+    }
+
+    return isError;
+  };
+
   return (
     <Modal
       destroyOnClose
@@ -259,7 +335,7 @@ const RenameModal = props => {
       confirmLoading={confirmLoading}
       maskClosable={false}
     >
-      <Form {...formItemLayout}>
+      <Form {...formItemLayout} style={{ maxHeight: '60vh', overflow: 'auto' }}>
         <Form.Item label={formatMessage({ id: 'oal.device.deviceName' })}>
           {getFieldDecorator('name', {
             rules: [
@@ -389,24 +465,72 @@ const RenameModal = props => {
               })(<Input placeholder="1-120（s）" onFocus={handleWaitShutdownTimeFocus} onBlur={handleWaitShutdownTimeBlur} />)}
             </Form.Item>) : ''
         }
-        <Form.Item label={formatMessage({ id: 'oal.device.recognitionMode' })}>
+        <Form.Item label={formatMessage({ id: 'oal.device.recognitionMode' })} style={showFaceMode ? { marginBottom: 0 } : {}}>
           {getFieldDecorator('recognitionMode', {
-            initialValue: bean && bean.recognitionMode || '',
+            rules: [
+              {
+                required: true,
+                message: formatMessage({ id: 'oal.common.pleaseSelect' }),
+              },
+            ],
+            initialValue: bean && bean.recognitionMode && parseRecognitionModeToArr(bean.recognitionMode) || [],
           })(
-            <Radio.Group>
-              <Radio value="1"><FormattedMessage id="oal.device.faceAndTemperature" /></Radio>
-              <Radio value="2"><FormattedMessage id="oal.device.maskAndTtemperature" /></Radio>
-              <Radio value="4"><FormattedMessage id="oal.device.faceAndMaskAndTemperature" /></Radio>
-              <Radio value="3"><FormattedMessage id="oal.device.temperature" /></Radio>
-              {/* <Radio value="2">
-                <FormattedMessage id="oal.device.maskMode" />
-                &nbsp;&nbsp;
-                <Tooltip title={formatMessage({ id: 'oal.device.maskModeTips' })}>
-                  <Icon type="info-circle" theme="twoTone" style={{ fontSize: '18px' }} />
-                </Tooltip>
-              </Radio> */}
-            </Radio.Group>
+            <Checkbox.Group onChange={checkedValue => setShowFaceMode(checkedValue.indexOf('face') > -1)} style={{ width: '100%' }}>
+              <Checkbox value="face"><FormattedMessage id="oal.common.face" /></Checkbox>
+              <Checkbox value="mask"><FormattedMessage id="oal.common.mask" /></Checkbox>
+              <Checkbox value="temperature"><FormattedMessage id="oal.common.temperature" /></Checkbox>
+            </Checkbox.Group>
           )}
+        </Form.Item>
+        {
+          showFaceMode ?
+            (<Form.Item label="" style={{ paddingLeft: '25%' }}>
+              {getFieldDecorator('faceMode', {
+                rules: [
+                  {
+                    required: true,
+                    message: formatMessage({ id: 'oal.common.pleaseSelect' }),
+                  },
+                ],
+                initialValue: bean && bean.faceMode || '0',
+              })(
+                <Radio.Group>
+                  <Radio value="0"><FormattedMessage id="oal.device.precise" /></Radio>
+                  <Radio value="1"><FormattedMessage id="oal.device.fast" /></Radio>
+                </Radio.Group>
+              )}
+            </Form.Item>) : ''
+        }
+        <Form.Item label={formatMessage({ id: 'oal.device.recognitionRate' })}>
+          {getFieldDecorator('recognitionRate')(
+            <Row>
+              <Col span={18}>
+                <Slider
+                  min={85.0}
+                  max={99.9}
+                  step={0.1}
+                  onChange={handleRecognitionRateSliderChange}
+                  value={recognitionRateSlider}
+                  tipFormatter={null}
+                  style={{ marginRight: 16 }}
+                />
+              </Col>
+              <Col span={6}>
+                <Input
+                  value={recognitionRateInput}
+                  onChange={e => setRecognitionRateInput(e.target.value)}
+                  onFocus={handleRecognitionRateFocus}
+                  onBlur={handleRecognitionRateBlur}
+                />
+              </Col>
+            </Row>
+          )}
+        </Form.Item>
+        <Form.Item label={formatMessage({ id: 'oal.device.fastMovingDetection' })}>
+          {getFieldDecorator('fastMovingDetection', {
+            valuePropName: 'checked',
+            initialValue: bean && bean.fastMovingDetection === '1' ? true : false,
+          })(<Switch />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.device.identifyRecord' })}>
           {getFieldDecorator('isSaveRecord', {

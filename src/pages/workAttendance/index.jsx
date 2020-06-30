@@ -18,7 +18,7 @@ import moment from 'moment';
 import StandardTable from '../../components/StandardTable';
 // import DetailDrawer from './components/DetailDrawer';
 import styles from './style.less';
-import { exportCSV } from '@/utils/utils';
+// import { exportCSV } from '@/utils/utils';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import defaultSettings from '../../../config/defaultSettings';
 import router from 'umi/router';
