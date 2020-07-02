@@ -627,4 +627,5 @@ export default {
   'oal.face.batchAddZipDragTips1': `Tệp nhân sự (.zip)`,
   'oal.face.batchAddZipDragTips2': `Nhấp hoặc kéo tập tin để tải lên ở đây`,
   'oal.face.zipFileTooLarge': `Dữ liệu nhân sự / tập tin ảnh người quá lớn`,
+  'oal.common.exportAll': `Xuất khẩu tất cả`,
 };

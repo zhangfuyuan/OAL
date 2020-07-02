@@ -627,4 +627,5 @@ export default {
   'oal.face.batchAddZipDragTips1': `Fail kakitangan (.zip)`,
   'oal.face.batchAddZipDragTips2': `Klik atau seret fail untuk dimuat naik di sini`,
   'oal.face.zipFileTooLarge': `Fail data personel / foto terlalu besar`,
+  'oal.common.exportAll': `Eksport semua`,
 };

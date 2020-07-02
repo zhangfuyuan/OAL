@@ -627,4 +627,5 @@ export default {
   'oal.face.batchAddZipDragTips1': `Arquivos de pessoal (.zip)`,
   'oal.face.batchAddZipDragTips2': `Clique ou arraste os arquivos para fazer o upload aqui`,
   'oal.face.zipFileTooLarge': `O arquivo de dados pessoais / foto pessoal é muito grande`,
+  'oal.common.exportAll': `Exportar tudo`,
 };

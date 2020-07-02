@@ -627,4 +627,5 @@ export default {
   'oal.face.batchAddZipDragTips1': `Кадровые файлы (.zip)`,
   'oal.face.batchAddZipDragTips2': `Нажмите или перетащите файлы, чтобы загрузить сюда`,
   'oal.face.zipFileTooLarge': `Данные персонала / фотография человека слишком велики`,
+  'oal.common.exportAll': `Экспортировать все`,
 };

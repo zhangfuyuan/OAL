@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
-import { parseRecognitionModeToStr, parseRecognitionModeToArr } from '@/utils/utils';
+import { parseRecognitionModeToStr, parseRecognitionModeToArr, temperatureC2F, temperatureF2C } from '@/utils/utils';
 
 const formItemLayout = {
   labelCol: {
@@ -54,8 +54,10 @@ const RenameModal = props => {
       setShowWaitShutdownTime((bean && (bean.relayOperationMode === '1' || bean.relayOperationMode === '4')) || false);
       setShowLowTemperature((bean && bean.lowTemperatureRetest === '1') || false);
       setShowFaceMode((bean && faceInRecognitionMode.indexOf(bean.recognitionMode) > -1) || false);
-      setRecognitionRateSlider((bean && parseFloat(bean.recognitionRate)) || 90.0);
-      setRecognitionRateInput(`${(bean && bean.recognitionRate) || '90.0'}%`);
+      let _recognitionRate = (bean && parseFloat(bean.recognitionRate)) || 90.0;
+      _recognitionRate = _recognitionRate > 1 ? _recognitionRate : _recognitionRate * 100;
+      setRecognitionRateSlider(_recognitionRate);
+      setRecognitionRateInput(`${_recognitionRate.toFixed(1)}%`);
     }
   }, [visible]);
 
@@ -80,7 +82,7 @@ const RenameModal = props => {
         isSaveRecord: isSaveRecord ? '1' : '0',
         lowTemperatureRetest: lowTemperatureRetest ? '1' : '0',
         recognitionMode: recognitionMode ? parseRecognitionModeToStr(recognitionMode) : '',
-        recognitionRate: recognitionRateSlider.toFixed(1) || '90.0',
+        recognitionRate: recognitionRateSlider && (recognitionRateSlider / 100).toFixed(3) || '0.900',
         fastMovingDetection: fastMovingDetection ? '1' : '0',
       };
 
@@ -113,16 +115,19 @@ const RenameModal = props => {
     const { value } = e.target;
     const alarmValue = form.getFieldValue('alarmValue');
     const lowTemperatureValue = form.getFieldValue('lowTemperatureValue');
+    const _unit = value === '1' ? '℉' : '℃';
 
     if (value && alarmValue) {
       form.setFieldsValue({
-        alarmValue: bean && bean.alarmValue && bean.temperatureUnit === value ? (bean.alarmValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultAlarmValue[value || '0'],
+        alarmValue: (value === '1' ? temperatureC2F(alarmValue) : temperatureF2C(alarmValue)) + _unit,
+        // alarmValue: bean && bean.alarmValue && bean.temperatureUnit === value ? (bean.alarmValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultAlarmValue[value || '0'],
       });
     }
 
     if (value && lowTemperatureValue) {
       form.setFieldsValue({
-        lowTemperatureValue: bean && bean.lowTemperatureValue && bean.temperatureUnit === value ? (bean.lowTemperatureValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultLowTemperatureValue[value || '0'],
+        lowTemperatureValue: (value === '1' ? temperatureC2F(lowTemperatureValue) : temperatureF2C(lowTemperatureValue)) + _unit,
+        // lowTemperatureValue: bean && bean.lowTemperatureValue && bean.temperatureUnit === value ? (bean.lowTemperatureValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultLowTemperatureValue[value || '0'],
       });
     }
   };

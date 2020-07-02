@@ -195,6 +195,23 @@ export function temperatureC2F(value) {
 }
 
 /**
+ * 温度单位，华氏度转成摄氏度
+ * 
+ * return 保留小数点后一位的字符串
+ */
+export function temperatureF2C(value) {
+  let res = parseFloat(value) || 0;
+
+  try {
+    res = (res - 32) * 5 / 9;
+  } catch (err) {
+    console.log(err);
+  }
+
+  return res.toFixed(1);
+}
+
+/**
  * 终端识别模式转化成字符串
  * value 识别模式的集合值
  * return 字符串

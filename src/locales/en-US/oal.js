@@ -627,4 +627,5 @@ export default {
   'oal.face.batchAddZipDragTips1': `Personnel files (.zip)`,
   'oal.face.batchAddZipDragTips2': `Click or drag files to upload here`,
   'oal.face.zipFileTooLarge': `The personnel data/person photo file is too large`,
+  'oal.common.exportAll': `Export all`,
 };

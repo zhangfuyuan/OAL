@@ -627,4 +627,5 @@ export default {
   'oal.face.batchAddZipDragTips1': `Personalakten (.zip)`,
   'oal.face.batchAddZipDragTips2': `Klicken oder ziehen Sie Dateien, um sie hier hochzuladen`,
   'oal.face.zipFileTooLarge': `Die Personaldaten / Personenfotodatei ist zu groß`,
+  'oal.common.exportAll': `Alle exportieren`,
 };

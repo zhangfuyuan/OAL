@@ -627,4 +627,5 @@ export default {
   'oal.face.batchAddZipDragTips1': `인사 파일 (.zip)`,
   'oal.face.batchAddZipDragTips2': `파일을 클릭하거나 드래그하여 여기에 업로드`,
   'oal.face.zipFileTooLarge': `개인 데이터 / 개인 사진 파일이 너무 큽니다`,
+  'oal.common.exportAll': `모두 내보내기`,
 };

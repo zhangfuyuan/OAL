@@ -574,7 +574,7 @@ class logQuery extends Component {
                   loading={logQueryListLoading || deviceListLoading}
                   onClick={this.handleExport}
                 >
-                  <FormattedMessage id="oal.common.export" />
+                  <FormattedMessage id="oal.common.exportAll" />
                 </Button>
                 <a ref={el => { this.ref_download = el }} href={`/guard-web/a/record/export?deviceId=${listSelectedBean && listSelectedBean._id || ''}&startDate=${date && date[0] || ''}&endDate=${date && date[1] || ''}&recognitionMode=${recognitionMode || ''}&result=${result || ''}&faceName=${name || ''}&language=${language}`} />
 

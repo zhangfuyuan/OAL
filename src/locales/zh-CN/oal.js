@@ -627,4 +627,5 @@ export default {
   'oal.face.batchAddZipDragTips1': `人员文件(.zip)`,
   'oal.face.batchAddZipDragTips2': `点击或拖拽文件到这里上传`,
   'oal.face.zipFileTooLarge': `人员数据/人员照片文件过大`,
+  'oal.common.exportAll': `全部导出`,
 };

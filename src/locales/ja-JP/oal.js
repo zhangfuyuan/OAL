@@ -627,4 +627,5 @@ export default {
   'oal.face.batchAddZipDragTips1': `人事ファイル（.zip）`,
   'oal.face.batchAddZipDragTips2': `ここをクリックしてアップロードするファイルをクリックまたはドラッグします`,
   'oal.face.zipFileTooLarge': `人事データ/人物写真ファイルが大きすぎます`,
+  'oal.common.exportAll': `すべてエクスポート`,
 };
