@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `。システム名`,
   'oal.user-manage.currentToTotal': `、合計{total}エージェント`,
   'oal.device.currentToTotal': `、合計{total}デバイス`,
-  'oal.device.mac': `有線Mac`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `設定`,
   'oal.device.deviceInfo': `デバイス情報`,
   'oal.device.deviceId': `デバイスID`,
@@ -615,4 +615,7 @@ export default {
   'oal.device.lowTemperatureRetest': `低温再テスト`,
   'oal.device.lowTemperatureValue': `再テストのしきい値`,
   'oal.device.lowTemperatureValueTips': `アラームのしきい値未満にしてください`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

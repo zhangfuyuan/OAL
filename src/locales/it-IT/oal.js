@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `, inserire il nome del sistema`,
   'oal.user-manage.currentToTotal': `un totale di {total} agenti`,
   'oal.device.currentToTotal': `un totale di {total} dispositivi`,
-  'oal.device.mac': `maccablate`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `impostazioni`,
   'oal.device.deviceInfo': `informazioni`,
   'oal.device.deviceId': `dispositivo ID dispositivoID dispositivo`,
@@ -615,4 +615,7 @@ export default {
   'oal.device.lowTemperatureRetest': `Test di bassa temperatura`,
   'oal.device.lowTemperatureValue': `Testare nuovamente la soglia`,
   'oal.device.lowTemperatureValueTips': `Si prega di essere inferiore alla soglia di allarme`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

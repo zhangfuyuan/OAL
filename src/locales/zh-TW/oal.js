@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `請輸入系統名稱`,
   'oal.user-manage.currentToTotal': `總共 {total} 個代理`,
   'oal.device.currentToTotal': `總共 {total} 臺設備`,
-  'oal.device.mac': `有線mac`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `設置`,
   'oal.device.deviceInfo': `設備信息`,
   'oal.device.deviceId': `設備ID`,
@@ -615,4 +615,7 @@ export default {
   'oal.device.lowTemperatureRetest': `低溫重測`,
   'oal.device.lowTemperatureValue': `重測閾值`,
   'oal.device.lowTemperatureValueTips': `請小於報警閾值`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `geben Sie bitte die Systemnamen`,
   'oal.user-manage.currentToTotal': `insgesamt {total} Agenten`,
   'oal.device.currentToTotal': `insgesamt {total} Geräte`,
-  'oal.device.mac': `verdrahtet mac`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `Einstellungen`,
   'oal.device.deviceInfo': `Geräteinformationen`,
   'oal.device.deviceId': `GeräteID`,
@@ -615,4 +615,7 @@ export default {
   'oal.device.lowTemperatureRetest': `Niedertemperatur-Wiederholungstest`,
   'oal.device.lowTemperatureValue': `Schwellenwert erneut testen`,
   'oal.device.lowTemperatureValueTips': `Bitte unterschreiten Sie die Alarmschwelle`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

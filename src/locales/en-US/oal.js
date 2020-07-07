@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `Please enter the system name`,
   'oal.user-manage.currentToTotal': `{total} agents in total`,
   'oal.device.currentToTotal': `{total} devices in total`,
-  'oal.device.mac': `Wired mac `,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `settings`,
   'oal.device.deviceInfo': `Device info`,
   'oal.device.deviceId': `Device ID`,
@@ -615,4 +615,7 @@ export default {
   'oal.device.lowTemperatureRetest': `Low temperature retest`,
   'oal.device.lowTemperatureValue': `Retest threshold`,
   'oal.device.lowTemperatureValueTips': `Please be less than the alarm threshold`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

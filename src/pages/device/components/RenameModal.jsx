@@ -43,7 +43,7 @@ const RenameModal = props => {
     form.validateFields((err, fieldsValue) => {
       //   console.log('---------fieldsValue----------', fieldsValue)
       if (err) return;
-      const { pwd, alarmValue, waitShutdownTime, alarm, isSaveRecord, lowTemperatureRetest, lowTemperatureValue } = fieldsValue;
+      const { pwd, alarmValue, waitShutdownTime, alarm, isSaveRecord, lowTemperatureRetest, lowTemperatureValue, detectionTemperatureTime } = fieldsValue;
       const params = {
         ...fieldsValue,
         alarm: alarm ? '1' : '0',
@@ -54,6 +54,7 @@ const RenameModal = props => {
       alarmValue && (params.alarmValue = alarmValue.replace(/((℃)|(℉))$/, ''));
       lowTemperatureValue && (params.lowTemperatureValue = lowTemperatureValue.replace(/((℃)|(℉))$/, ''));
       waitShutdownTime && (params.waitShutdownTime = waitShutdownTime.replace(/s$/, ''));
+      detectionTemperatureTime && (params.detectionTemperatureTime = detectionTemperatureTime.replace(/s$/, ''));
       params.deviceId = bean._id;
       handleSubmit(params, () => {
         form.resetFields();
@@ -248,6 +249,51 @@ const RenameModal = props => {
     return errorType;
   };
 
+  const checkDetectionTemperatureTimeIsError = value => {
+    let isError = false;
+
+    if (value) {
+      if (/^[\d]{1,2}$/.test(value.replace(/s$/, ''))) {
+        let _val = parseFloat(value);
+
+        if (_val < 1 || _val > 99) {
+          isError = true;
+        }
+      } else {
+        isError = true;
+      }
+    }
+
+    return isError;
+  };
+
+  const checkDetectionTemperatureTime = (rule, value, callback) => {
+    if (value && checkDetectionTemperatureTimeIsError(value)) {
+      callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
+    }
+    callback();
+  };
+
+  const handleDetectionTemperatureTimeBlur = e => {
+    const { value } = e.target;
+
+    if (value && !checkDetectionTemperatureTimeIsError(value)) {
+      form.setFieldsValue({
+        detectionTemperatureTime: `${value.replace(/s$/, '')}s`,
+      });
+    }
+  };
+
+  const handleDetectionTemperatureTimeFocus = e => {
+    const { value } = e.target;
+
+    if (value && /s$/.test(value)) {
+      form.setFieldsValue({
+        detectionTemperatureTime: value.replace(/s$/, ''),
+      });
+    }
+  };
+
   return (
     <Modal
       destroyOnClose
@@ -407,6 +453,24 @@ const RenameModal = props => {
               </Radio> */}
             </Radio.Group>
           )}
+        </Form.Item>
+        <Form.Item label={formatMessage({ id: 'oal.device.detectionTemperatureTime' })}>
+          {getFieldDecorator('detectionTemperatureTime', {
+            rules: [
+              {
+                required: true,
+                message: formatMessage({ id: 'oal.common.pleaseEnter' }),
+              },
+              {
+                max: 6,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '6' }),
+              },
+              // {
+              //   validator: checkDetectionTemperatureTime,
+              // },
+            ],
+            initialValue: bean && bean.detectionTemperatureTime ? `${bean.detectionTemperatureTime}s` : '',
+          })(<Input placeholder="1-99（s）" onFocus={handleDetectionTemperatureTimeFocus} onBlur={handleDetectionTemperatureTimeBlur} />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.device.identifyRecord' })}>
           {getFieldDecorator('isSaveRecord', {

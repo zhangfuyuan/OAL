@@ -52,6 +52,7 @@ const status = ['oal.device.offline', 'oal.device.online'];
   deviceListLoading: loading.effects['device/fetch'],
   renameLoading: loading.effects['device/rename'],
   deleteLoading: loading.effects['device/delete'],
+  updateLoading: loading.effects['device/update'],
 }))
 class Device extends Component {
   state = {
@@ -224,6 +225,25 @@ class Device extends Component {
     this.openDelModal(this.state.selectedRows);
   };
 
+  handleBatchUpdate = () => {
+    const { dispatch } = this.props;
+    const { selectedRows } = this.state;
+
+    dispatch({
+      type: 'device/update',
+      payload: {
+        deviceId: selectedRows && selectedRows.map(item => item._id).join(',') || '',
+      },
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.device.softwareUpdateTips' }));
+        this.setState({
+          selectedRows: [],
+        });
+      }
+    })
+  };
+
   table_columns = () => {
     // const MoreBtn = ({ item }) => (
     //   <Dropdown
@@ -258,12 +278,12 @@ class Device extends Component {
         // sorter: (a, b) => a.networkState - b.networkState,
         // sortOrder: this.state.sortedInfo.columnKey === 'networkState' && this.state.sortedInfo.order,
       },
-      // {
-      //   title: formatMessage({ id: 'oal.device.mac' }),
-      //   key: 'mac',
-      //   dataIndex: 'mac',
-      //   render: text => text || '-',
-      // },
+      {
+        title: formatMessage({ id: 'oal.device.mac' }),
+        key: 'mac',
+        dataIndex: 'mac',
+        render: text => text || '-',
+      },
       {
         title: 'IP',
         key: 'ip',
@@ -444,6 +464,7 @@ class Device extends Component {
       loginUser,
       renameLoading,
       deleteLoading,
+      updateLoading,
       currentUser,
     } = this.props;
     const authorizedPoints = currentUser && currentUser.org && currentUser.org.authorizedPoints || {};
@@ -477,9 +498,14 @@ class Device extends Component {
               className={styles.tableListOperator}
               style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
-              <Button type="danger" onClick={this.handleBatchDelete} disabled={!selectedRows || selectedRows.length === 0}>
-                <FormattedMessage id="oal.common.delete" />
-              </Button>
+              <div>
+                <Button type="danger" onClick={this.handleBatchDelete} disabled={!selectedRows || selectedRows.length === 0} style={{ marginRight: 16 }}>
+                  <FormattedMessage id="oal.common.delete" />
+                </Button>
+                <Button loading={updateLoading} onClick={this.handleBatchUpdate} disabled={!selectedRows || selectedRows.length === 0}>
+                  <FormattedMessage id="oal.device.softwareUpdate" />
+                </Button>
+              </div>
 
               <div>
                 <span>

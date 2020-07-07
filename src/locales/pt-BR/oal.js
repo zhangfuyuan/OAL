@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `. Digite o nome do sistema no`,
   'oal.user-manage.currentToTotal': `total de {total} agentes no`,
   'oal.device.currentToTotal': `total de {total} dispositivos`,
-  'oal.device.mac': `mac com fio`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `configurações do`,
   'oal.device.deviceInfo': `informações doinformações do`,
   'oal.device.deviceId': `dispositivodispositivoID do dispositivo`,
@@ -615,4 +615,7 @@ export default {
   'oal.device.lowTemperatureRetest': `Teste de baixa temperatura`,
   'oal.device.lowTemperatureValue': `Limite de novo teste`,
   'oal.device.lowTemperatureValueTips': `Por favor, seja menor que o limite do alarme`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

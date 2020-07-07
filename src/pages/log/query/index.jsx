@@ -126,8 +126,14 @@ class logQuery extends Component {
   };
 
   list_handleClickItem = (e, bean) => {
+    const { tablePage } = this.state;
+
     this.setState({
       listSelectedBean: bean,
+      tablePage: {
+        ...tablePage,
+        current: 1,
+      },
     }, () => {
       this.table_loadData();
     });
@@ -164,14 +170,13 @@ class logQuery extends Component {
 
   table_columns = () => {
     const { listSelectedBean } = this.state;
-    const _t = Date.now();
 
     const cl = [
       {
         title: formatMessage({ id: 'oal.common.photo' }),
         key: 'avatar',
         width: 100,
-        render: (text, record) => <Avatar src={`${record.imgPath}?t=${_t}`} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
+        render: (text, record) => <Avatar src={record.imgPath} shape="square" size="large" onClick={() => this.table_openViewModal(record)} style={{ cursor: 'pointer' }} />,
       },
       {
         title: formatMessage({ id: 'oal.common.fullName' }),
@@ -602,7 +607,7 @@ class logQuery extends Component {
           footer={null}
           onCancel={this.table_closeViewModal}
         >
-          <img src={`${tableSelectedBean.imgPath}?t=${Date.now()}`} alt="" style={{ width: '100%', height: '100%' }} />
+          <img src={tableSelectedBean.imgPath} alt="" style={{ width: '100%', height: '100%' }} />
         </Modal>
         <TableDelModal
           visible={tableDelVisible}

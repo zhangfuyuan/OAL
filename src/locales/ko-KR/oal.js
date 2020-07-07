@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `. 시스템 이름를 입력하십시오`,
   'oal.user-manage.currentToTotal': `을 총 {total} 에이전트`,
   'oal.device.currentToTotal': `. 총 {total} 장치`,
-  'oal.device.mac': `유선 Mac`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `설정`,
   'oal.device.deviceInfo': `장치 정보`,
   'oal.device.deviceId': `장치 ID`,
@@ -615,4 +615,7 @@ export default {
   'oal.device.lowTemperatureRetest': `저온 재시험`,
   'oal.device.lowTemperatureValue': `재시험 임계 값`,
   'oal.device.lowTemperatureValueTips': `경보 임계 값보다 작아야합니다`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

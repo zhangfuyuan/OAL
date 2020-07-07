@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `Пожалуйставведите имя системы`,
   'oal.user-manage.currentToTotal': `Есть {total} агент`,
   'oal.device.currentToTotal': `Есть {total} устройства`,
-  'oal.device.mac': `Проводные макинтош`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `набор`,
   'oal.device.deviceInfo': `устройств info`,
   'oal.device.deviceId': `Идентификатор устройства`,
@@ -615,4 +615,7 @@ export default {
   'oal.device.lowTemperatureRetest': `Низкая температура повторного тестирования`,
   'oal.device.lowTemperatureValue': `Порог повторного тестирования`,
   'oal.device.lowTemperatureValueTips': `Пожалуйста, будьте меньше порога тревоги`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

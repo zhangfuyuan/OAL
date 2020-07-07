@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `请输入系统名称`,
   'oal.user-manage.currentToTotal': `总共 {total} 个代理`,
   'oal.device.currentToTotal': `总共 {total} 台设备`,
-  'oal.device.mac': `有线mac`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `设置`,
   'oal.device.deviceInfo': `设备信息`,
   'oal.device.deviceId': `设备ID`,
@@ -615,4 +615,7 @@ export default {
   'oal.device.lowTemperatureRetest': `低温重测`,
   'oal.device.lowTemperatureValue': `重测阈值`,
   'oal.device.lowTemperatureValueTips': `请小于报警阈值`,
+  'oal.device.detectionTemperatureTime': `检测温度时间`,
+  'oal.device.softwareUpdate': `软件更新`,
+  'oal.device.softwareUpdateTips': `开始检测并更新`,
 };

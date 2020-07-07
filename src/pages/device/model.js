@@ -1,4 +1,4 @@
-import { getDeviceList, verifyDevice, removeDevice, renameDevice, ajaxSetDeviceInfo, ajaxDeviceDelete } from './service';
+import { getDeviceList, verifyDevice, removeDevice, renameDevice, ajaxSetDeviceInfo, ajaxDeviceDelete, ajaxDeviceUpdate } from './service';
 import { findIndex } from 'lodash'
 
 const Model = {
@@ -27,6 +27,11 @@ const Model = {
     },
     *delete({ payload }, { call, put }) {
       const response = yield call(ajaxDeviceDelete, payload);
+
+      return Promise.resolve(response);
+    },
+    *update({ payload }, { call, put }) {
+      const response = yield call(ajaxDeviceUpdate, payload);
 
       return Promise.resolve(response);
     },
