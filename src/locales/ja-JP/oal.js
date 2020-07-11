@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `。システム名`,
   'oal.user-manage.currentToTotal': `、合計{total}エージェント`,
   'oal.device.currentToTotal': `、合計{total}デバイス`,
-  'oal.device.mac': `有線Mac`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `設定`,
   'oal.device.deviceInfo': `デバイス情報`,
   'oal.device.deviceId': `デバイスID`,
@@ -628,4 +628,6 @@ export default {
   'oal.face.batchAddZipDragTips2': `ここをクリックしてアップロードするファイルをクリックまたはドラッグします`,
   'oal.face.zipFileTooLarge': `人事データ/人物写真ファイルが大きすぎます`,
   'oal.common.exportAll': `すべてエクスポート`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

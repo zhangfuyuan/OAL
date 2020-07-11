@@ -28,6 +28,15 @@ export async function ajaxDeviceDelete(data) {
 }
 
 /**
+ * （设备4）软件升级
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxDeviceUpdate(data) {
+  return post(`/guard-web/a/device/deviceUpdate`, data);
+}
+
+/**
  * 设备审核
  *
  */

@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `geben Sie bitte die Systemnamen`,
   'oal.user-manage.currentToTotal': `insgesamt {total} Agenten`,
   'oal.device.currentToTotal': `insgesamt {total} Geräte`,
-  'oal.device.mac': `verdrahtet mac`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `Einstellungen`,
   'oal.device.deviceInfo': `Geräteinformationen`,
   'oal.device.deviceId': `GeräteID`,
@@ -628,4 +628,6 @@ export default {
   'oal.face.batchAddZipDragTips2': `Klicken oder ziehen Sie Dateien, um sie hier hochzuladen`,
   'oal.face.zipFileTooLarge': `Die Personaldaten / Personenfotodatei ist zu groß`,
   'oal.common.exportAll': `Alle exportieren`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `請輸入系統名稱`,
   'oal.user-manage.currentToTotal': `總共 {total} 個代理`,
   'oal.device.currentToTotal': `總共 {total} 臺設備`,
-  'oal.device.mac': `有線mac`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `設置`,
   'oal.device.deviceInfo': `設備信息`,
   'oal.device.deviceId': `設備ID`,
@@ -628,4 +628,6 @@ export default {
   'oal.face.batchAddZipDragTips2': `點擊或拖拽文件到這裡上傳`,
   'oal.face.zipFileTooLarge': `人員數據/人員照片文件過大`,
   'oal.common.exportAll': `全部導出`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

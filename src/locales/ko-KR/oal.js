@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `. 시스템 이름를 입력하십시오`,
   'oal.user-manage.currentToTotal': `을 총 {total} 에이전트`,
   'oal.device.currentToTotal': `. 총 {total} 장치`,
-  'oal.device.mac': `유선 Mac`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `설정`,
   'oal.device.deviceInfo': `장치 정보`,
   'oal.device.deviceId': `장치 ID`,
@@ -628,4 +628,6 @@ export default {
   'oal.face.batchAddZipDragTips2': `파일을 클릭하거나 드래그하여 여기에 업로드`,
   'oal.face.zipFileTooLarge': `개인 데이터 / 개인 사진 파일이 너무 큽니다`,
   'oal.common.exportAll': `모두 내보내기`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

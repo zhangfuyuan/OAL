@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `Please enter the system name`,
   'oal.user-manage.currentToTotal': `{total} agents in total`,
   'oal.device.currentToTotal': `{total} devices in total`,
-  'oal.device.mac': `Wired mac `,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `settings`,
   'oal.device.deviceInfo': `Device info`,
   'oal.device.deviceId': `Device ID`,
@@ -628,4 +628,6 @@ export default {
   'oal.face.batchAddZipDragTips2': `Click or drag files to upload here`,
   'oal.face.zipFileTooLarge': `The personnel data/person photo file is too large`,
   'oal.common.exportAll': `Export all`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

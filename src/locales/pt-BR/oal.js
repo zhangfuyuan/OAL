@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `. Digite o nome do sistema no`,
   'oal.user-manage.currentToTotal': `total de {total} agentes no`,
   'oal.device.currentToTotal': `total de {total} dispositivos`,
-  'oal.device.mac': `mac com fio`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `configurações do`,
   'oal.device.deviceInfo': `informações doinformações do`,
   'oal.device.deviceId': `dispositivodispositivoID do dispositivo`,
@@ -628,4 +628,6 @@ export default {
   'oal.face.batchAddZipDragTips2': `Clique ou arraste os arquivos para fazer o upload aqui`,
   'oal.face.zipFileTooLarge': `O arquivo de dados pessoais / foto pessoal é muito grande`,
   'oal.common.exportAll': `Exportar tudo`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `กรุณาใส่ชื่อระบบ`,
   'oal.user-manage.currentToTotal': `ตัวแทนทั้งหมด {total}`,
   'oal.device.currentToTotal': `อุปกรณ์ทั้งหมด {total} รายการ`,
-  'oal.device.mac': `สาย mac`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `การตั้งค่า`,
   'oal.device.deviceInfo': `ข้อมูลอุปกรณ์`,
   'oal.device.deviceId': `ID อุปกรณ์`,
@@ -628,4 +628,6 @@ export default {
   'oal.face.batchAddZipDragTips2': `คลิกหรือลากไฟล์เพื่ออัพโหลดที่นี่`,
   'oal.face.zipFileTooLarge': `ไฟล์ข้อมูลบุคลากร / บุคคลภาพใหญ่เกินไป`,
   'oal.common.exportAll': `ส่งออกทั้งหมด`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

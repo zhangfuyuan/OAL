@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `Sila masukkan nama sistem`,
   'oal.user-manage.currentToTotal': `{total} ejen secara keseluruhan`,
   'oal.device.currentToTotal': `{total} peranti secara keseluruhan`,
-  'oal.device.mac': `Mac berwayar`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `tetapan`,
   'oal.device.deviceInfo': `Maklumat peranti`,
   'oal.device.deviceId': `ID Peranti`,
@@ -628,4 +628,6 @@ export default {
   'oal.face.batchAddZipDragTips2': `Klik atau seret fail untuk dimuat naik di sini`,
   'oal.face.zipFileTooLarge': `Fail data personel / foto terlalu besar`,
   'oal.common.exportAll': `Eksport semua`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

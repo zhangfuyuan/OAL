@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `Пожалуйставведите имя системы`,
   'oal.user-manage.currentToTotal': `Есть {total} агент`,
   'oal.device.currentToTotal': `Есть {total} устройства`,
-  'oal.device.mac': `Проводные макинтош`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `набор`,
   'oal.device.deviceInfo': `устройств info`,
   'oal.device.deviceId': `Идентификатор устройства`,
@@ -628,4 +628,6 @@ export default {
   'oal.face.batchAddZipDragTips2': `Нажмите или перетащите файлы, чтобы загрузить сюда`,
   'oal.face.zipFileTooLarge': `Данные персонала / фотография человека слишком велики`,
   'oal.common.exportAll': `Экспортировать все`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

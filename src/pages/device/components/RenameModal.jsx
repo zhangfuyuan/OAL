@@ -39,7 +39,6 @@ const faceInRecognitionMode = ['4', '7', '1', '5'];
 const RenameModal = props => {
   const { form, bean, visible, handleSubmit, confirmLoading, handleCancel } = props;
   const { getFieldDecorator, getFieldError } = form;
-  const [showAlarm, setShowAlarm] = useState(false);
   const [showWaitShutdownTime, setShowWaitShutdownTime] = useState(false);
   const [showLowTemperature, setShowLowTemperature] = useState(false);
   const [showFaceMode, setShowFaceMode] = useState(false);
@@ -50,7 +49,6 @@ const RenameModal = props => {
 
   useEffect(() => {
     if (visible === true) {
-      setShowAlarm((bean && bean.alarm === '1') || false);
       setShowWaitShutdownTime((bean && (bean.relayOperationMode === '1' || bean.relayOperationMode === '4')) || false);
       setShowLowTemperature((bean && bean.lowTemperatureRetest === '1') || false);
       setShowFaceMode((bean && faceInRecognitionMode.indexOf(bean.recognitionMode) > -1) || false);
@@ -393,29 +391,26 @@ const RenameModal = props => {
           {getFieldDecorator('alarm', {
             valuePropName: 'checked',
             initialValue: (bean && bean.alarm === '1') || false,
-          })(<Switch onChange={checked => setShowAlarm(checked)} />)}
+          })(<Switch />)}
         </Form.Item>
-        {
-          showAlarm ?
-            (<Form.Item label={formatMessage({ id: 'oal.device.alarmThresholdValue' })}>
-              {getFieldDecorator('alarmValue', {
-                rules: [
-                  {
-                    required: true,
-                    message: formatMessage({ id: 'oal.common.pleaseEnter' }),
-                  },
-                  {
-                    max: 6,
-                    message: formatMessage({ id: 'oal.common.maxLength' }, { num: '6' }),
-                  },
-                  {
-                    validator: checkAlarmValue,
-                  },
-                ],
-                initialValue: bean && bean.alarmValue && bean.temperatureUnit === form.getFieldValue('temperatureUnit') ? (bean.alarmValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultAlarmValue[form.getFieldValue('temperatureUnit') || ''],
-              })(<Input placeholder="34.0-120.0（℃/℉）" onFocus={handleAlarmValueFocus} onBlur={handleAlarmValueBlur} />)}
-            </Form.Item>) : ''
-        }
+        <Form.Item label={formatMessage({ id: 'oal.device.alarmThresholdValue' })}>
+          {getFieldDecorator('alarmValue', {
+            rules: [
+              {
+                required: true,
+                message: formatMessage({ id: 'oal.common.pleaseEnter' }),
+              },
+              {
+                max: 6,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '6' }),
+              },
+              {
+                validator: checkAlarmValue,
+              },
+            ],
+            initialValue: bean && bean.alarmValue && bean.temperatureUnit === form.getFieldValue('temperatureUnit') ? (bean.alarmValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultAlarmValue[form.getFieldValue('temperatureUnit') || ''],
+          })(<Input placeholder="34.0-120.0（℃/℉）" onFocus={handleAlarmValueFocus} onBlur={handleAlarmValueBlur} />)}
+        </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.device.lowTemperatureRetest' })}>
           {getFieldDecorator('lowTemperatureRetest', {
             valuePropName: 'checked',

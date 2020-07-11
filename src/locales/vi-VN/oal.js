@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `Vui lòng nhập tên hệ thống`,
   'oal.user-manage.currentToTotal': `Tổng cộng {total} số đại lý`,
   'oal.device.currentToTotal': `{total} thiết bị trong tổng số`,
-  'oal.device.mac': `Mac có dây`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `cài đặt`,
   'oal.device.deviceInfo': `Thông tin thiết bị`,
   'oal.device.deviceId': `ID thiết bị`,
@@ -628,4 +628,6 @@ export default {
   'oal.face.batchAddZipDragTips2': `Nhấp hoặc kéo tập tin để tải lên ở đây`,
   'oal.face.zipFileTooLarge': `Dữ liệu nhân sự / tập tin ảnh người quá lớn`,
   'oal.common.exportAll': `Xuất khẩu tất cả`,
+  'oal.device.softwareUpdate': ``,
+  'oal.device.softwareUpdateTips': ``,
 };

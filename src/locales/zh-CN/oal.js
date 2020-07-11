@@ -341,7 +341,7 @@ export default {
   'oal.settings.enterSysnameTips': `请输入系统名称`,
   'oal.user-manage.currentToTotal': `总共 {total} 个代理`,
   'oal.device.currentToTotal': `总共 {total} 台设备`,
-  'oal.device.mac': `有线mac`,
+  'oal.device.mac': `Mac`,
   'oal.common.set': `设置`,
   'oal.device.deviceInfo': `设备信息`,
   'oal.device.deviceId': `设备ID`,
@@ -628,4 +628,6 @@ export default {
   'oal.face.batchAddZipDragTips2': `点击或拖拽文件到这里上传`,
   'oal.face.zipFileTooLarge': `人员数据/人员照片文件过大`,
   'oal.common.exportAll': `全部导出`,
+  'oal.device.softwareUpdate': `软件更新`,
+  'oal.device.softwareUpdateTips': `开始检测并更新`,
 };
