@@ -615,4 +615,5 @@ export default {
   'oal.device.lowTemperatureRetest': `Niedertemperatur-Wiederholungstest`,
   'oal.device.lowTemperatureValue': `Schwellenwert erneut testen`,
   'oal.device.lowTemperatureValueTips': `Bitte unterschreiten Sie die Alarmschwelle`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
 };

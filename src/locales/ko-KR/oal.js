@@ -615,4 +615,5 @@ export default {
   'oal.device.lowTemperatureRetest': `저온 재시험`,
   'oal.device.lowTemperatureValue': `재시험 임계 값`,
   'oal.device.lowTemperatureValueTips': `경보 임계 값보다 작아야합니다`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
 };

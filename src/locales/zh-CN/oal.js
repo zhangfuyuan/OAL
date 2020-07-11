@@ -615,4 +615,5 @@ export default {
   'oal.device.lowTemperatureRetest': `低温重测`,
   'oal.device.lowTemperatureValue': `重测阈值`,
   'oal.device.lowTemperatureValueTips': `请小于报警阈值`,
+  'oal.device.detectionTemperatureTime': `检测温度时间`,
 };

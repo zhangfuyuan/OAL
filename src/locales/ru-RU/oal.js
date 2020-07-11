@@ -615,4 +615,5 @@ export default {
   'oal.device.lowTemperatureRetest': `Низкая температура повторного тестирования`,
   'oal.device.lowTemperatureValue': `Порог повторного тестирования`,
   'oal.device.lowTemperatureValueTips': `Пожалуйста, будьте меньше порога тревоги`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
 };

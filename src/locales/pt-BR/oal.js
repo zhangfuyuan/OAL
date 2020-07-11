@@ -615,4 +615,5 @@ export default {
   'oal.device.lowTemperatureRetest': `Teste de baixa temperatura`,
   'oal.device.lowTemperatureValue': `Limite de novo teste`,
   'oal.device.lowTemperatureValueTips': `Por favor, seja menor que o limite do alarme`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
 };

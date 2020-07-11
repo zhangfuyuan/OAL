@@ -615,4 +615,5 @@ export default {
   'oal.device.lowTemperatureRetest': `低温再テスト`,
   'oal.device.lowTemperatureValue': `再テストのしきい値`,
   'oal.device.lowTemperatureValueTips': `アラームのしきい値未満にしてください`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
 };

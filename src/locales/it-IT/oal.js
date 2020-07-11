@@ -615,4 +615,5 @@ export default {
   'oal.device.lowTemperatureRetest': `Test di bassa temperatura`,
   'oal.device.lowTemperatureValue': `Testare nuovamente la soglia`,
   'oal.device.lowTemperatureValueTips': `Si prega di essere inferiore alla soglia di allarme`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
 };

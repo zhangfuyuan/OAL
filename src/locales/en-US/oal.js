@@ -615,4 +615,5 @@ export default {
   'oal.device.lowTemperatureRetest': `Low temperature retest`,
   'oal.device.lowTemperatureValue': `Retest threshold`,
   'oal.device.lowTemperatureValueTips': `Please be less than the alarm threshold`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
 };

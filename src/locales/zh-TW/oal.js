@@ -615,4 +615,5 @@ export default {
   'oal.device.lowTemperatureRetest': `低溫重測`,
   'oal.device.lowTemperatureValue': `重測閾值`,
   'oal.device.lowTemperatureValueTips': `請小於報警閾值`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
 };

@@ -615,4 +615,5 @@ export default {
   'oal.device.lowTemperatureRetest': `Prueba de baja temperatura`,
   'oal.device.lowTemperatureValue': `Retest umbral`,
   'oal.device.lowTemperatureValueTips': `Por favor sea menor que el umbral de alarma`,
+  'oal.device.detectionTemperatureTime': `Detection temperature time`,
 };

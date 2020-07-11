@@ -183,8 +183,14 @@ class Log extends Component {
   };
 
   list_handleClickItem = (e, bean) => {
+    const { tablePage } = this.state;
+
     this.setState({
       listSelectedBean: bean,
+      tablePage: {
+        ...tablePage,
+        current: 1,
+      },
     }, () => {
       this.table_loadData();
     });
