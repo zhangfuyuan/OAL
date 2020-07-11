@@ -306,8 +306,10 @@ const RenameModal = props => {
       setRecognitionRateSlider(parseFloat(value));
       setRecognitionRateInput(`${parseFloat(value).toFixed(1)}%`);
     } else {
-      setRecognitionRateSlider(bean && parseFloat(bean.recognitionRate) || 90.0);
-      setRecognitionRateInput(`${bean && bean.recognitionRate || '90.0'}%`);
+      let _recognitionRate = (bean && parseFloat(bean.recognitionRate)) || 90.0;
+      _recognitionRate = _recognitionRate > 1 ? _recognitionRate : _recognitionRate * 100;
+      setRecognitionRateSlider(_recognitionRate);
+      setRecognitionRateInput(`${_recognitionRate.toFixed(1)}%`);
     }
   };
 
