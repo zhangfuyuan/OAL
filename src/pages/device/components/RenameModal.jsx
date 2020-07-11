@@ -21,11 +21,18 @@ const defaultLowTemperatureValue = {
   '0': '',
   '1': '',
 };
+const defaultLowerTemperatureBound = {
+  '0': '',
+  '1': '',
+};
+const defaultUpperTemperatureBound = {
+  '0': '',
+  '1': '',
+};
 
 const RenameModal = props => {
   const { form, bean, visible, handleSubmit, confirmLoading, handleCancel } = props;
   const { getFieldDecorator, getFieldError } = form;
-  const [showAlarm, setShowAlarm] = useState(false);
   const [showWaitShutdownTime, setShowWaitShutdownTime] = useState(false);
   const [showLowTemperature, setShowLowTemperature] = useState(false);
 
@@ -33,7 +40,6 @@ const RenameModal = props => {
 
   useEffect(() => {
     if (visible === true) {
-      setShowAlarm((bean && bean.alarm === '1') || false);
       setShowWaitShutdownTime((bean && (bean.relayOperationMode === '1' || bean.relayOperationMode === '4')) || false);
       setShowLowTemperature((bean && bean.lowTemperatureRetest === '1') || false);
     }
@@ -43,7 +49,18 @@ const RenameModal = props => {
     form.validateFields((err, fieldsValue) => {
       //   console.log('---------fieldsValue----------', fieldsValue)
       if (err) return;
-      const { pwd, alarmValue, waitShutdownTime, alarm, isSaveRecord, lowTemperatureRetest, lowTemperatureValue, detectionTemperatureTime } = fieldsValue;
+      const {
+        pwd,
+        alarmValue,
+        waitShutdownTime,
+        alarm,
+        isSaveRecord,
+        lowTemperatureRetest,
+        lowTemperatureValue,
+        detectionTemperatureTime,
+        lowerTemperatureBound,
+        upperTemperatureBound,
+      } = fieldsValue;
       const params = {
         ...fieldsValue,
         alarm: alarm ? '1' : '0',
@@ -53,6 +70,8 @@ const RenameModal = props => {
 
       alarmValue && (params.alarmValue = alarmValue.replace(/((℃)|(℉))$/, ''));
       lowTemperatureValue && (params.lowTemperatureValue = lowTemperatureValue.replace(/((℃)|(℉))$/, ''));
+      lowerTemperatureBound && (params.lowerTemperatureBound = lowerTemperatureBound.replace(/((℃)|(℉))$/, ''));
+      upperTemperatureBound && (params.upperTemperatureBound = upperTemperatureBound.replace(/((℃)|(℉))$/, ''));
       waitShutdownTime && (params.waitShutdownTime = waitShutdownTime.replace(/s$/, ''));
       detectionTemperatureTime && (params.detectionTemperatureTime = detectionTemperatureTime.replace(/s$/, ''));
       params.deviceId = bean._id;
@@ -81,6 +100,8 @@ const RenameModal = props => {
     const { value } = e.target;
     const alarmValue = form.getFieldValue('alarmValue');
     const lowTemperatureValue = form.getFieldValue('lowTemperatureValue');
+    const lowerTemperatureBound = form.getFieldValue('lowerTemperatureBound');
+    const upperTemperatureBound = form.getFieldValue('upperTemperatureBound');
 
     if (value && alarmValue) {
       form.setFieldsValue({
@@ -91,6 +112,18 @@ const RenameModal = props => {
     if (value && lowTemperatureValue) {
       form.setFieldsValue({
         lowTemperatureValue: bean && bean.lowTemperatureValue && bean.temperatureUnit === value ? (bean.lowTemperatureValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultLowTemperatureValue[value || '0'],
+      });
+    }
+
+    if (value && lowerTemperatureBound) {
+      form.setFieldsValue({
+        lowerTemperatureBound: bean && bean.lowerTemperatureBound && bean.temperatureUnit === value ? (bean.lowerTemperatureBound + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultLowerTemperatureBound[value || '0'],
+      });
+    }
+
+    if (value && upperTemperatureBound) {
+      form.setFieldsValue({
+        upperTemperatureBound: bean && bean.upperTemperatureBound && bean.temperatureUnit === value ? (bean.upperTemperatureBound + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultUpperTemperatureBound[value || '0'],
       });
     }
   };
@@ -158,8 +191,17 @@ const RenameModal = props => {
   };
 
   const checkAlarmValue = (rule, value, callback) => {
-    if (value && checkAlarmValueIsError(value)) {
-      callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
+    if (value) {
+      if (checkAlarmValueIsError(value)) {
+        callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
+      } else {
+        const upperTemperatureBound = form.getFieldValue('upperTemperatureBound');
+        const _val = parseFloat(value);
+
+        if (upperTemperatureBound && _val >= parseFloat(upperTemperatureBound)) {
+          callback(formatMessage({ id: 'oal.device.pleaseBelowUpperTemperatureBound' }));
+        }
+      }
     }
     callback();
   };
@@ -217,6 +259,16 @@ const RenameModal = props => {
         callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
       } else if (_errorType === 2) {
         callback(formatMessage({ id: 'oal.device.lowTemperatureValueTips' }));
+      } else {
+        const alarmValue = form.getFieldValue('alarmValue');
+        const upperTemperatureBound = form.getFieldValue('upperTemperatureBound');
+        const _val = parseFloat(value);
+
+        if (alarmValue && _val >= parseFloat(alarmValue)) {
+          callback(formatMessage({ id: 'oal.device.pleaseBelowAlarmValue' }));
+        } else if (upperTemperatureBound && _val >= parseFloat(upperTemperatureBound)) {
+          callback(formatMessage({ id: 'oal.device.pleaseBelowUpperTemperatureBound' }));
+        }
       }
     }
     callback();
@@ -294,6 +346,115 @@ const RenameModal = props => {
     }
   };
 
+  const checkLowerTemperatureBound = (rule, value, callback) => {
+    if (value) {
+      if (checkLowerTemperatureBoundIsError(value)) {
+        callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
+      } else {
+        const lowTemperatureValue = form.getFieldValue('lowTemperatureValue');
+        const alarmValue = form.getFieldValue('alarmValue');
+        const upperTemperatureBound = form.getFieldValue('upperTemperatureBound');
+        const _val = parseFloat(value);
+
+        if (lowTemperatureValue && _val >= parseFloat(lowTemperatureValue)) {
+          callback(formatMessage({ id: 'oal.device.pleaseBelowLowTemperatureValue' }));
+        } else if (alarmValue && _val >= parseFloat(alarmValue)) {
+          callback(formatMessage({ id: 'oal.device.pleaseBelowAlarmValue' }));
+        } else if (upperTemperatureBound && _val >= parseFloat(upperTemperatureBound)) {
+          callback(formatMessage({ id: 'oal.device.pleaseBelowUpperTemperatureBound' }));
+        }
+      }
+    }
+    callback();
+  };
+
+  const checkLowerTemperatureBoundIsError = value => {
+    let isError = false;
+
+    if (value) {
+      if (/^[\d]{1,3}(\.[\d]{1})?$/.test(value.replace(/((℃)|(℉))$/, ''))) {
+        let _val = parseFloat(value);
+
+        if (_val < 0 || _val > 120) {
+          isError = true;
+        }
+      } else {
+        isError = true;
+      }
+    }
+
+    return isError;
+  };
+
+  const handleLowerTemperatureBoundFocus = e => {
+    const { value } = e.target;
+
+    if (value && /((℃)|(℉))$/.test(value)) {
+      form.setFieldsValue({
+        lowerTemperatureBound: value.replace(/((℃)|(℉))$/, ''),
+      });
+    }
+  };
+
+  const handleLowerTemperatureBoundBlur = e => {
+    const { value } = e.target;
+
+    if (value && !checkLowerTemperatureBoundIsError(value)) {
+      let _val = parseFloat(value).toFixed(1);
+
+      form.setFieldsValue({
+        lowerTemperatureBound: `${_val}${form.getFieldValue('temperatureUnit') === '1' ? '℉' : '℃'}`,
+      });
+    }
+  };
+
+  const checkUpperTemperatureBound = (rule, value, callback) => {
+    if (value && checkUpperTemperatureBoundIsError(value)) {
+      callback(formatMessage({ id: 'oal.device.incorrectFormat' }));
+    }
+    callback();
+  };
+
+  const checkUpperTemperatureBoundIsError = value => {
+    let isError = false;
+
+    if (value) {
+      if (/^[\d]{2,3}(\.[\d]{1})?$/.test(value.replace(/((℃)|(℉))$/, ''))) {
+        let _val = parseFloat(value);
+
+        if (_val < 34 || _val > 120) {
+          isError = true;
+        }
+      } else {
+        isError = true;
+      }
+    }
+
+    return isError;
+  };
+
+  const handleUpperTemperatureBoundFocus = e => {
+    const { value } = e.target;
+
+    if (value && /((℃)|(℉))$/.test(value)) {
+      form.setFieldsValue({
+        upperTemperatureBound: value.replace(/((℃)|(℉))$/, ''),
+      });
+    }
+  };
+
+  const handleUpperTemperatureBoundBlur = e => {
+    const { value } = e.target;
+
+    if (value && !checkUpperTemperatureBoundIsError(value)) {
+      let _val = parseFloat(value).toFixed(1);
+
+      form.setFieldsValue({
+        upperTemperatureBound: `${_val}${form.getFieldValue('temperatureUnit') === '1' ? '℉' : '℃'}`,
+      });
+    }
+  };
+
   return (
     <Modal
       destroyOnClose
@@ -305,7 +466,7 @@ const RenameModal = props => {
       confirmLoading={confirmLoading}
       maskClosable={false}
     >
-      <Form {...formItemLayout}>
+      <Form {...formItemLayout} style={{ height: '60vh', overflow: 'auto' }}>
         <Form.Item label={formatMessage({ id: 'oal.device.deviceName' })}>
           {getFieldDecorator('name', {
             rules: [
@@ -352,33 +513,66 @@ const RenameModal = props => {
             </Radio.Group>
           )}
         </Form.Item>
+        <Form.Item label={formatMessage({ id: 'oal.device.detectionThreshold' })}>
+          {getFieldDecorator('lowerTemperatureBound', {
+            rules: [
+              {
+                required: true,
+                message: formatMessage({ id: 'oal.common.pleaseEnter' }),
+              },
+              {
+                max: 6,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '6' }),
+              },
+              {
+                validator: checkLowerTemperatureBound,
+              },
+            ],
+            initialValue: bean && bean.lowerTemperatureBound && bean.temperatureUnit === form.getFieldValue('temperatureUnit') ? (bean.lowerTemperatureBound + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultLowerTemperatureBound[form.getFieldValue('temperatureUnit') || ''],
+          })(<Input placeholder="0.0-120.0（℃/℉）" onFocus={handleLowerTemperatureBoundFocus} onBlur={handleLowerTemperatureBoundBlur} />)}
+        </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.device.highTemperatureAlarm' })}>
           {getFieldDecorator('alarm', {
             valuePropName: 'checked',
             initialValue: (bean && bean.alarm === '1') || false,
-          })(<Switch onChange={checked => setShowAlarm(checked)} />)}
+          })(<Switch />)}
         </Form.Item>
-        {
-          showAlarm ?
-            (<Form.Item label={formatMessage({ id: 'oal.device.alarmThresholdValue' })}>
-              {getFieldDecorator('alarmValue', {
-                rules: [
-                  {
-                    required: true,
-                    message: formatMessage({ id: 'oal.common.pleaseEnter' }),
-                  },
-                  {
-                    max: 6,
-                    message: formatMessage({ id: 'oal.common.maxLength' }, { num: '6' }),
-                  },
-                  {
-                    validator: checkAlarmValue,
-                  },
-                ],
-                initialValue: bean && bean.alarmValue && bean.temperatureUnit === form.getFieldValue('temperatureUnit') ? (bean.alarmValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultAlarmValue[form.getFieldValue('temperatureUnit') || ''],
-              })(<Input placeholder="34.0-120.0（℃/℉）" onFocus={handleAlarmValueFocus} onBlur={handleAlarmValueBlur} />)}
-            </Form.Item>) : ''
-        }
+        <Form.Item label={formatMessage({ id: 'oal.device.alarmThresholdValue' })}>
+          {getFieldDecorator('alarmValue', {
+            rules: [
+              {
+                required: true,
+                message: formatMessage({ id: 'oal.common.pleaseEnter' }),
+              },
+              {
+                max: 6,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '6' }),
+              },
+              {
+                validator: checkAlarmValue,
+              },
+            ],
+            initialValue: bean && bean.alarmValue && bean.temperatureUnit === form.getFieldValue('temperatureUnit') ? (bean.alarmValue + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultAlarmValue[form.getFieldValue('temperatureUnit') || ''],
+          })(<Input placeholder="34.0-120.0（℃/℉）" onFocus={handleAlarmValueFocus} onBlur={handleAlarmValueBlur} />)}
+        </Form.Item>
+        <Form.Item label={formatMessage({ id: 'oal.device.abnormalAlarm' })}>
+          {getFieldDecorator('upperTemperatureBound', {
+            rules: [
+              {
+                required: true,
+                message: formatMessage({ id: 'oal.common.pleaseEnter' }),
+              },
+              {
+                max: 6,
+                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '6' }),
+              },
+              {
+                validator: checkUpperTemperatureBound,
+              },
+            ],
+            initialValue: bean && bean.upperTemperatureBound && bean.temperatureUnit === form.getFieldValue('temperatureUnit') ? (bean.upperTemperatureBound + (bean.temperatureUnit === '1' ? '℉' : '℃')) : defaultUpperTemperatureBound[form.getFieldValue('temperatureUnit') || ''],
+          })(<Input placeholder="34.0-120.0（℃/℉）" onFocus={handleUpperTemperatureBoundFocus} onBlur={handleUpperTemperatureBoundBlur} />)}
+        </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.device.lowTemperatureRetest' })}>
           {getFieldDecorator('lowTemperatureRetest', {
             valuePropName: 'checked',

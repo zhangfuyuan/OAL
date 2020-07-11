@@ -616,6 +616,11 @@ export default {
   'oal.device.lowTemperatureValue': `重测阈值`,
   'oal.device.lowTemperatureValueTips': `请小于报警阈值`,
   'oal.device.detectionTemperatureTime': `检测温度时间`,
-  'oal.device.softwareUpdate': `软件更新`,
-  'oal.device.softwareUpdateTips': `开始检测并更新`,
+  'oal.device.softwareUpdate': `批量升级`,
+  'oal.device.softwareUpdateTips': `设备开始升级`,
+  'oal.device.detectionThreshold': `检测阈值`,
+  'oal.device.abnormalAlarm': `异常报警`,
+  'oal.device.pleaseBelowLowTemperatureValue': `请小于重测阈值`,
+  'oal.device.pleaseBelowAlarmValue': `请小于报警阈值`,
+  'oal.device.pleaseBelowUpperTemperatureBound': `请小于异常报警`,
 };

@@ -616,6 +616,11 @@ export default {
   'oal.device.lowTemperatureValue': `재시험 임계 값`,
   'oal.device.lowTemperatureValueTips': `경보 임계 값보다 작아야합니다`,
   'oal.device.detectionTemperatureTime': `Detection temperature time`,
-  'oal.device.softwareUpdate': ``,
-  'oal.device.softwareUpdateTips': ``,
+  'oal.device.softwareUpdate': `Batch upgrading`,
+  'oal.device.softwareUpdateTips': `Equipment upgrade started`,
+  'oal.device.detectionThreshold': `Detection threshold`,
+  'oal.device.abnormalAlarm': `Abnormal alarm`,
+  'oal.device.pleaseBelowLowTemperatureValue': `Please be below the retest threshold`,
+  'oal.device.pleaseBelowAlarmValue': `Please be below the alarm threshold`,
+  'oal.device.pleaseBelowUpperTemperatureBound': `Please be below the abnormal alarm`,
 };
