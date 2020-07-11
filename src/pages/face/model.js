@@ -16,6 +16,7 @@ import {
   ajaxCancelBatchAddTask,
   ajaxMoveFace,
   ajaxRefreshGroupNum,
+  ajaxRemoveFace,
 } from './service';
 import { getSysConfig } from '@/services/sys';
 
@@ -114,6 +115,12 @@ const Model = {
     // 禁/启用认证人员
     *setFaceState({ payload }, { call, put, select }) {
       const response = yield call(ajaxSetFaceState, payload);
+
+      return Promise.resolve(response);
+    },
+    // 删除认证人员
+    *removeFace({ payload }, { call, put, select }) {
+      const response = yield call(ajaxRemoveFace, payload);
 
       return Promise.resolve(response);
     },

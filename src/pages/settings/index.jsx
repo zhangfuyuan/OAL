@@ -18,9 +18,9 @@ import ModifyAlarmEvents from './components/ModifyAlarmEvents';
 import AuthorizedPointsLoading from './components/AuthorizedPointsLoading';
 import AuthorizedPointsUpload from './components/AuthorizedPointsUpload';
 // import ModifySysIcons from './components/ModifySysIcons';
-import FaceKey from './components/FaceKey';
-import FaceKeyModal from './components/FaceKeyModal';
-import FaceLibrary from './components/FaceLibrary';
+// import FaceKey from './components/FaceKey';
+// import FaceKeyModal from './components/FaceKeyModal';
+// import FaceLibrary from './components/FaceLibrary';
 import styles from './style.less';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import { pswBase64Thrice } from '@/utils/utils';
@@ -31,7 +31,7 @@ const { Item } = Menu;
   currentUser: user.currentUser,
   settingInfo,
   systemVersion,
-  devInfo: settingInfo.devInfo,
+  // devInfo: settingInfo.devInfo,
   devInfoLoading: loading.effects['settingInfo/getDevInfo'],
   settings,
   faceKeyList: faceKey.faceKeyList,
@@ -55,7 +55,7 @@ class Settings extends Component {
       system: 'oal.settings.menu-system',
       alarm: 'oal.settings.menu-alarm',
       authorized: 'oal.settings.menu-authorized',
-      // developer: 'oal.settings.menu-developer',
+      developer: 'oal.settings.menu-developer',
       // faceKey: 'oal.settings.menu-faceKey',
       // faceLibrary: 'oal.settings.menu-faceLibrary',
     };
@@ -117,12 +117,12 @@ class Settings extends Component {
     }
   }
 
-  loadDevInfo = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'settingInfo/getDevInfo',
-    });
-  };
+  // loadDevInfo = () => {
+  //   const { dispatch } = this.props;
+  //   dispatch({
+  //     type: 'settingInfo/getDevInfo',
+  //   });
+  // };
 
   // loadFaceKeyList = () => {
   //   const { dispatch } = this.props;
@@ -144,7 +144,7 @@ class Settings extends Component {
       // admin 账号且 admin 组织才显示 "授权点数" 栏
       if ((!isAdmin || !isAdminOrg) && item === 'authorized') return null;
       // 非 admin 账号不显示 "系统信息" 栏
-      if (!isAdmin && item === 'system') return null;
+      if (!isAdmin && (item === 'system' || item === 'developer')) return null;
       // admin 账号且非 admin 组织才显示 "告警设置" 栏
       if ((!isAdmin || isAdminOrg) && item === 'alarm') return null;
       return <Item key={item}>{menuMap[item] && formatMessage({ id: menuMap[item] }) || '-'}</Item>
@@ -160,11 +160,11 @@ class Settings extends Component {
     this.setState({
       selectKey: key,
     });
-    if (key === 'developer') {
-      this.loadDevInfo();
-    } else if (key === 'faceKey') {
-      this.loadFaceKeyList();
-    }
+    // if (key === 'developer') {
+    //   this.loadDevInfo();
+    // } else if (key === 'faceKey') {
+    //   this.loadFaceKeyList();
+    // }
   };
 
   submitBaseInfo = values => {
@@ -182,27 +182,27 @@ class Settings extends Component {
     });
   };
 
-  applyDevAccount = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'settingInfo/applyDevAccount',
-    }).then(res => {
-      if (res && res.res > 0) {
-        message.success(formatMessage({ id: 'oal.settings.applicationApproved' }));
-      }
-    });
-  };
+  // applyDevAccount = () => {
+  //   const { dispatch } = this.props;
+  //   dispatch({
+  //     type: 'settingInfo/applyDevAccount',
+  //   }).then(res => {
+  //     if (res && res.res > 0) {
+  //       message.success(formatMessage({ id: 'oal.settings.applicationApproved' }));
+  //     }
+  //   });
+  // };
 
-  resetSecret = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'settingInfo/resetSecret',
-    }).then(res => {
-      if (res && res.res > 0) {
-        message.success(formatMessage({ id: 'oal.settings.resetSuccessfully' }));
-      }
-    });
-  };
+  // resetSecret = () => {
+  //   const { dispatch } = this.props;
+  //   dispatch({
+  //     type: 'settingInfo/resetSecret',
+  //   }).then(res => {
+  //     if (res && res.res > 0) {
+  //       message.success(formatMessage({ id: 'oal.settings.resetSuccessfully' }));
+  //     }
+  //   });
+  // };
 
   openModifyPswModal = () => {
     this.setState({ modifyPswVisible: true });
@@ -606,7 +606,7 @@ class Settings extends Component {
   renderChildren = () => {
     const {
       currentUser,
-      devInfo,
+      // devInfo,
       devInfoLoading,
       faceKeyList,
       faceKeyListLoading,
@@ -636,13 +636,14 @@ class Settings extends Component {
           updateSysIcons={this.submitSysIcons}
         // openUploadModal={this.openModifySysIcons}
         />;
-      // case 'developer':
-      //   return <DeveloperView
-      //     devInfo={devInfo}
-      //     loading={devInfoLoading}
-      //     toApply={this.applyDevAccount}
-      //     toReset={this.resetSecret}
-      //   />;
+      case 'developer':
+        return <DeveloperView
+          // devInfo={devInfo}
+          loading={devInfoLoading}
+          dispatch={dispatch}
+        // toApply={this.applyDevAccount}
+        // toReset={this.resetSecret}
+        />;
       // case 'faceKey':
       //   return <FaceKey
       //     data={faceKeyList}

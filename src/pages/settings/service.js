@@ -65,10 +65,24 @@ export async function ajaxDeviceCode(data) {
 
 
 /**
- * 获取自己的开发者账号
+ * 获取apikey列表
  */
-export async function getDevInfo() {
-  return get('/api/developer/get');
+export async function ajaxGetDevInfo() {
+  return get('/guard-web/a/apiKey/fetchAll');
+}
+
+/**
+ * 保存apiKey
+ */
+export async function ajaxSetDevInfo(data) {
+  return post('/guard-web/a/apiKey/save', data);
+}
+
+/**
+ * 删除apikey
+ */
+export async function ajaxDelDevInfo(data) {
+  return post('/guard-web/a/apiKey/delete', data);
 }
 
 /**

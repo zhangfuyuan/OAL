@@ -1,7 +1,9 @@
 import {
-  getDevInfo,
-  applyDevAccount,
-  resetSecret,
+  ajaxGetDevInfo,
+  ajaxSetDevInfo,
+  ajaxDelDevInfo,
+  // applyDevAccount,
+  // resetSecret,
   ajaxAlarmSendSettings,
   ajaxAlarmReceiveSettings,
   ajaxAlarmEvents,
@@ -15,46 +17,47 @@ import { getSysConfig, setSysConfig } from '@/services/sys';
 const Model = {
   namespace: 'settingInfo',
   state: {
-    devInfo: {}, // 开发者信息
+    // devInfo: {}, // 开发者信息
     sysConfigs: [], // 系统设置
   },
   effects: {
     *getDevInfo(_, { call, put }) {
-      const response = yield call(getDevInfo);
-      // console.log('getDevInfo response-->', response);
-      const { res, data } = response;
-      if (res > 0) {
-        yield put({
-          type: 'saveDevInfo',
-          payload: data,
-        });
-      }
+      const response = yield call(ajaxGetDevInfo);
+
       return Promise.resolve(response);
     },
-    *applyDevAccount(_, { call, put }) {
-      const response = yield call(applyDevAccount);
-      // console.log('applyDevAccount response-->', response);
-      const { res, data } = response;
-      if (res > 0) {
-        yield put({
-          type: 'saveDevInfo',
-          payload: data,
-        });
-      }
+    *setDevInfo({ payload }, { call, put }) {
+      const response = yield call(ajaxSetDevInfo, payload);
+
       return Promise.resolve(response);
     },
-    *resetSecret(_, { call, put }) {
-      const response = yield call(resetSecret);
-      // console.log('resetSecret response-->', response);
-      const { res, data } = response;
-      if (res > 0) {
-        yield put({
-          type: 'saveDevInfo',
-          payload: data,
-        });
-      }
+    *deltDevInfo({ payload }, { call, put }) {
+      const response = yield call(ajaxDelDevInfo, payload);
+
       return Promise.resolve(response);
     },
+    // *applyDevAccount(_, { call, put }) {
+    //   const response = yield call(applyDevAccount);
+    //   const { res, data } = response;
+    //   if (res > 0) {
+    //     yield put({
+    //       type: 'saveDevInfo',
+    //       payload: data,
+    //     });
+    //   }
+    //   return Promise.resolve(response);
+    // },
+    // *resetSecret(_, { call, put }) {
+    //   const response = yield call(resetSecret);
+    //   const { res, data } = response;
+    //   if (res > 0) {
+    //     yield put({
+    //       type: 'saveDevInfo',
+    //       payload: data,
+    //     });
+    //   }
+    //   return Promise.resolve(response);
+    // },
     *toGetSysConfigs(_, { call, put }) {
       const response = yield call(getSysConfig);
       // console.log('toGetSysConfigs response-->', response);
@@ -122,13 +125,6 @@ const Model = {
     },
   },
   reducers: {
-    saveDevInfo(state, action) {
-      // console.log('save org-:', action.payload);
-      return {
-        ...state,
-        devInfo: action.payload,
-      };
-    },
     saveSysConfig(state, action) {
       return {
         ...state,

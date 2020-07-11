@@ -69,6 +69,11 @@ const UserLayout = props => {
             <div className={styles.desc}>{systemVersion}</div>
           </div>
           {children}
+          <div style={systemVersion && systemVersion.indexOf('polysense') > -1 ? { position: 'absolute', bottom: '24px', textAlign: 'center', width: '100%' } : { display: 'none' }}>
+            <div>Polysense Technologies Inc.</div>
+            <div>3000 Scott Blvd, Santa Clara, CA 95054</div>
+            <div>Need help?  Please send email to :  Services@polysense.net</div>
+          </div>
         </div>
       </div>
     </DocumentTitle>

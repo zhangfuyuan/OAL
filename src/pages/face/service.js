@@ -118,6 +118,15 @@ export async function ajaxMoveFace(data) {
 }
 
 /**
+ * （人员-访客3）删除人员
+ * @param data
+ * @returns {Promise<*>}
+ */
+export async function ajaxRemoveFace(data) {
+  return post('/guard-web/a/face/deleteFace', data);
+}
+
+/**
  * 删除人脸
  * @param data
  */

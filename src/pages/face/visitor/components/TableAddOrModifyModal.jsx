@@ -116,8 +116,8 @@ const TableAddOrModifyModal = props => {
         name,
         mobile,
         isEdit,
-        startDate: validity[0].format('YYYY-MM-DD'),
-        endDate: validity[1].format('YYYY-MM-DD'),
+        startDate: validity[0].format('YYYY-MM-DD HH:mm:ss'),
+        endDate: validity[1].format('YYYY-MM-DD HH:mm:ss'),
         peopleType: '3',
         isUpdateImg: _userPhotosLen > 0 ? '1' : '0',
         icCard,
@@ -382,21 +382,23 @@ const TableAddOrModifyModal = props => {
               },
             ],
             initialValue: ((startDate, endDate) => {
-              let res = [moment(moment(), 'YYYY-MM-DD'), moment(moment(), 'YYYY-MM-DD')];
+              let res = [moment(moment().startOf('day'), 'YYYY-MM-DD HH:mm:ss'), moment(moment().endOf('day'), 'YYYY-MM-DD HH:mm:ss')];
 
               if (startDate && endDate) {
-                res = [moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')];
+                res = [moment(startDate, 'YYYY-MM-DD HH:mm:ss'), moment(endDate, 'YYYY-MM-DD HH:mm:ss')];
               }
 
               return res;
             })(bean && bean.startDate || '', bean && bean.endDate || ''),
           })(<RangePicker
             ranges={{
-              [formatMessage({ id: 'oal.face-visitor.today' })]: [moment(), moment()],
+              [formatMessage({ id: 'oal.face-visitor.today' })]: [moment().startOf('day'), moment().endOf('day')],
               [formatMessage({ id: 'oal.face-visitor.thisWeek' })]: [moment().week(moment().week()).startOf('week'), moment().week(moment().week()).endOf('week')],
               [formatMessage({ id: 'oal.face-visitor.thisMonth' })]: [moment().week(moment().week()).startOf('month'), moment().week(moment().week()).endOf('month')],
             }}
             allowClear={false}
+            showTime
+            format="YYYY-MM-DD HH:mm:ss"
           />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'oal.face.icCard' })}>

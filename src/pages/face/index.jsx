@@ -474,10 +474,39 @@ class Face extends Component {
                 <a key="disable" onClick={(e) => this.table_showTableDelModal(e, record)}><FormattedMessage id="oal.common.disable" /></a> :
                 <a key="enable" onClick={() => this.table_submitTableDelModal(1, record)}><FormattedMessage id="oal.common.enable" /></a>
             }
+            <Divider type="vertical" />
+            <a key="remove" onClick={() => this.table_submitTableRemove(record, true)}><FormattedMessage id="oal.common.delete" /></a>
           </Fragment>
         ),
       });
     return cl;
+  };
+
+  // 单个删除（人脸信息）
+  table_submitTableRemove = (bean, isOne) => {
+    const { dispatch } = this.props;
+    const { tableSelectedRows } = this.state;
+    const _isOne = isOne;
+
+    dispatch({
+      type: 'face/removeFace',
+      payload: {
+        faceId: _isOne ? (bean && bean._id || '') : (tableSelectedRows && tableSelectedRows.map(item => item._id).join(',') || ''),
+        peopleType: '0',
+      },
+    }).then(res => {
+      if (res && res.res > 0) {
+        message.success(formatMessage({ id: 'oal.common.deletedSuccessfully' }));
+        this.table_loadFaceList();
+        this.tree_refreshGroupNum(this.state.selectedKeys[0] || '');
+
+        if (!_isOne) {
+          this.setState({
+            tableSelectedRows: [],
+          });
+        }
+      }
+    })
   };
 
   table_onPageChange = (page, pageSize) => {
@@ -619,7 +648,7 @@ class Face extends Component {
     });
   };
 
-  // 单个/批量删除（人脸信息）
+  // 单个禁/启用（人脸信息）
   table_showTableDelModal = (e, bean) => {
     this.setState({
       tableDelVisible: true,
@@ -802,8 +831,16 @@ class Face extends Component {
                     type="primary"
                     disabled={!tableSelectedRows || tableSelectedRows.length === 0}
                     onClick={this.table_showTableMoveModal}
+                    style={{ marginRight: 16 }}
                   >
                     <FormattedMessage id="oal.common.move" />
+                  </Button>
+                  <Button
+                    type="danger"
+                    disabled={!tableSelectedRows || tableSelectedRows.length === 0}
+                    onClick={this.table_submitTableRemove}
+                  >
+                    <FormattedMessage id="oal.common.delete" />
                   </Button>
                 </div>
 
