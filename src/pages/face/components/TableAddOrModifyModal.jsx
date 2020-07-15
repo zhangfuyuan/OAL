@@ -42,7 +42,7 @@ const formItemLayout = {
 };
 
 const TableAddOrModifyModal = props => {
-  const { form, bean, visible, handleSubmit, handleCancel, dispatch, groupId } = props;
+  const { form, bean, visible, handleSubmit, handleCancel, dispatch, groupId, supportIcCard } = props;
   const { getFieldDecorator, setFieldsValue, resetFields } = form;
   const [imageUrl, setImageUrl] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -129,8 +129,9 @@ const TableAddOrModifyModal = props => {
         isEdit,
         peopleType: '0',
         isUpdateImg: _userPhotosLen > 0 ? '1' : '0',
-        icCard,
       }
+
+      icCard && (params.icCard = icCard);
 
       if (_userPhotosLen > 0) {
         // 有图，无论添加/修改都调WebUploader接口
@@ -141,7 +142,7 @@ const TableAddOrModifyModal = props => {
           faceId && (_originFileObj.faceId = faceId);
           _originFileObj.staffname = name;
           _originFileObj.staffid = staffid;
-          _originFileObj.icCard = icCard;
+          icCard && (_originFileObj.icCard = icCard);
           _originFileObj.groupId = groupId;
           _originFileObj.isEdit = isEdit;
           _originFileObj.peopleType = peopleType;
@@ -208,7 +209,7 @@ const TableAddOrModifyModal = props => {
       faceId && (newfile.faceId = faceId);
       newfile.staffname = staffname;
       newfile.staffid = staffid;
-      newfile.icCard = icCard;
+      icCard && (newfile.icCard = icCard);
       newfile.groupId = groupId;
       newfile.isEdit = isEdit;
       newfile.peopleType = peopleType;
@@ -235,7 +236,7 @@ const TableAddOrModifyModal = props => {
       faceId && (data.faceId = faceId);
       data.staffname = staffname;
       data.staffid = staffid;
-      data.icCard = icCard;
+      icCard && (data.icCard = icCard);
       data.groupId = groupId;
       data.isEdit = isEdit;
       data.peopleType = peopleType;
@@ -373,20 +374,25 @@ const TableAddOrModifyModal = props => {
             initialValue: bean && bean.staffid || '',
           })(<Input placeholder={formatMessage({ id: 'oal.face.enterStaffid' })} disabled={!!bean && !!bean.staffid} />)}
         </Form.Item>
-        <Form.Item label={formatMessage({ id: 'oal.face.icCard' })}>
-          {getFieldDecorator('icCard', {
-            rules: [
-              {
-                max: 60,
-                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '60' }),
-              },
-              {
-                validator: checkStaffid,
-              },
-            ],
-            initialValue: bean && bean.icCard || '',
-          })(<Input placeholder={formatMessage({ id: 'oal.face.icCard' })} />)}
-        </Form.Item>
+        {
+          supportIcCard ?
+            (
+              <Form.Item label={formatMessage({ id: 'oal.face.icCard' })}>
+                {getFieldDecorator('icCard', {
+                  rules: [
+                    {
+                      max: 60,
+                      message: formatMessage({ id: 'oal.common.maxLength' }, { num: '60' }),
+                    },
+                    {
+                      validator: checkStaffid,
+                    },
+                  ],
+                  initialValue: bean && bean.icCard || '',
+                })(<Input placeholder={formatMessage({ id: 'oal.face.icCard' })} />)}
+              </Form.Item>
+            ) : ''
+        }
         <div style={{ position: 'relative', width: 155, height: 155, margin: '0 0 24px 25%', }}>
           <img src={imageUrl || (isEdit && bean.imgPath ? `${bean.imgPath}?t=${Date.now()}` : imgNull)} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: 5, objectFit: 'contain', }} />
           {

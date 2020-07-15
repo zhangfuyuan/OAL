@@ -9,6 +9,7 @@ const GlobalModel = {
     notices: [],
     systemVersion: '',
     systemOrigin: '',
+    systemSet: {},
   },
   effects: {
     *fetchNotices(_, { call, put, select }) {
@@ -88,6 +89,21 @@ const GlobalModel = {
         },
       });
 
+      if (res && data) {
+        const { emailSupportTemperature, emailSupportPhotos, supportIcCard } = data;
+
+        yield put({
+          type: 'saveSysSet',
+          payload: {
+            sysSet: {
+              emailSupportTemperature,
+              emailSupportPhotos,
+              supportIcCard,
+            },
+          },
+        });
+      }
+
       if (process.env.NODE_ENV === 'production' && res && data) {
         const { ip } = data || {};
 
@@ -152,6 +168,9 @@ const GlobalModel = {
 
     saveVersion(state, { payload: { version } }) {
       return { ...state, systemVersion: version };
+    },
+    saveSysSet(state, { payload: { sysSet } }) {
+      return { ...state, systemSet: sysSet };
     },
     saveOrigin(state, { payload: { origin } }) {
       return { ...state, systemOrigin: origin };

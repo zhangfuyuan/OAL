@@ -27,7 +27,7 @@ import { pswBase64Thrice } from '@/utils/utils';
 
 const { Item } = Menu;
 
-@connect(({ user, settingInfo, settings, faceKey, global: { systemVersion }, loading }) => ({
+@connect(({ user, settingInfo, settings, faceKey, global: { systemVersion, systemSet }, loading }) => ({
   currentUser: user.currentUser,
   settingInfo,
   systemVersion,
@@ -45,6 +45,7 @@ const { Item } = Menu;
   alarmReceiveSettingsLoading: loading.effects['settingInfo/alarmReceiveSettings'],
   alarmEventsLoading: loading.effects['settingInfo/alarmEvents'],
   // alarmContentLoading: loading.effects['settingInfo/alarmContent'],
+  systemSet,
 }))
 class Settings extends Component {
   constructor(props) {
@@ -614,6 +615,7 @@ class Settings extends Component {
       systemVersion,
       baseViewLoading,
       dispatch,
+      systemSet,
     } = this.props;
     const { selectKey } = this.state;
     switch (selectKey) {
@@ -660,6 +662,7 @@ class Settings extends Component {
         return <AlarmView
           currentUser={currentUser}
           orgId={currentUser && currentUser.org && currentUser.org._id || ''}
+          systemSet={systemSet}
           openSendSettingsModal={this.openModifyAlarmSendSettings}
           deleteAlarmSendSettings={this.deleteAlarmSendSettings}
           openReceiveSettingsModal={this.openModifyAlarmReceiveSettings}

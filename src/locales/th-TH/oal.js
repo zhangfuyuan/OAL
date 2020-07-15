@@ -628,6 +628,9 @@ export default {
   'oal.face.batchAddZipDragTips2': `คลิกหรือลากไฟล์เพื่ออัพโหลดที่นี่`,
   'oal.face.zipFileTooLarge': `ไฟล์ข้อมูลบุคลากร / บุคคลภาพใหญ่เกินไป`,
   'oal.common.exportAll': `ส่งออกทั้งหมด`,
-  'oal.device.softwareUpdate': ``,
-  'oal.device.softwareUpdateTips': ``,
+  'oal.device.softwareUpdate': `การอัพเดตซอฟต์แวร์`,
+  'oal.device.softwareUpdateTips': `เริ่มการตรวจสอบและอัปเดต`,
+  'oal.settings.mailContentTemplate2': `\${name} hello \n อุปกรณ์ของคุณ \${devicename} ตรวจพบบุคคล \${personName} （หมายเลขงาน \${jobNumber}） \${alarmEvents} ที่ \${time}, \${temperature} \n นี่คืออีเมลของระบบโปรด อย่าตอบกลับ`,
+  'oal.settings.temperature': `อุณหภูมิ`,
+  'oal.settings.personnelPhoto': `ภาพถ่ายบุคคล`,
 };

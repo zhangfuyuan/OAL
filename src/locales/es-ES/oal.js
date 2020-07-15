@@ -628,6 +628,9 @@ export default {
   'oal.face.batchAddZipDragTips2': `Haga clic o arrastre los archivos para cargarlos aquí.`,
   'oal.face.zipFileTooLarge': `El archivo de datos de personal / foto de persona es demasiado grande`,
   'oal.common.exportAll': `Exportar todo`,
-  'oal.device.softwareUpdate': ``,
-  'oal.device.softwareUpdateTips': ``,
+  'oal.device.softwareUpdate': `Actualización de software`,
+  'oal.device.softwareUpdateTips': `Comienza a detectar y actualizar`,
+  'oal.settings.mailContentTemplate2': `\${name} Hola \nSu dispositivo \${devicename} detectó una persona en \${time} \${personName} (número de trabajo \${jobNumber}) \${alarmEvents}, \${temperature} \nEste correo electrónico es un correo electrónico del sistema, no responda a la`,
+  'oal.settings.temperature': `Temperatura`,
+  'oal.settings.personnelPhoto': `Fotos del personal`,
 };

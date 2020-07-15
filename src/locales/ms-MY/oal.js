@@ -628,6 +628,9 @@ export default {
   'oal.face.batchAddZipDragTips2': `Klik atau seret fail untuk dimuat naik di sini`,
   'oal.face.zipFileTooLarge': `Fail data personel / foto terlalu besar`,
   'oal.common.exportAll': `Eksport semua`,
-  'oal.device.softwareUpdate': ``,
-  'oal.device.softwareUpdateTips': ``,
+  'oal.device.softwareUpdate': `Kemas kini perisian`,
+  'oal.device.softwareUpdateTips': `Mula menyemak dan mengemas kini`,
+  'oal.settings.mailContentTemplate2': `\${name} hello \nPerangkat anda \${devicename} mengesan seseorang \${personName} number nombor pekerjaan \${jobNumber}） \${alarmEvents} pada \${time}, \${temperature} \nIni adalah e-mel sistem, sila jangan balas`,
+  'oal.settings.temperature': `Suhu`,
+  'oal.settings.personnelPhoto': `Gambar orang`,
 };

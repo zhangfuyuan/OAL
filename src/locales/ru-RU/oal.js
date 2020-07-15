@@ -628,6 +628,9 @@ export default {
   'oal.face.batchAddZipDragTips2': `Нажмите или перетащите файлы, чтобы загрузить сюда`,
   'oal.face.zipFileTooLarge': `Данные персонала / фотография человека слишком велики`,
   'oal.common.exportAll': `Экспортировать все`,
-  'oal.device.softwareUpdate': ``,
-  'oal.device.softwareUpdateTips': ``,
+  'oal.device.softwareUpdate': `Обновление программного обеспечения`,
+  'oal.device.softwareUpdateTips': `Начать проверку и обновление`,
+  'oal.settings.mailContentTemplate2': `\${name} привет \nВаше устройство \${devicename} обнаружило человека \${personName} （ номер задания \${jobNumber}） \${alarmEvents} в \${time}, \${temperature} \nЭто системный адрес электронной почты, пожалуйста, не отвечайте`,
+  'oal.settings.temperature': `Температура`,
+  'oal.settings.personnelPhoto': `Фото персонала.`,
 };

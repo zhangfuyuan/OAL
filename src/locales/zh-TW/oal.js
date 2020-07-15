@@ -628,6 +628,9 @@ export default {
   'oal.face.batchAddZipDragTips2': `點擊或拖拽文件到這裡上傳`,
   'oal.face.zipFileTooLarge': `人員數據/人員照片文件過大`,
   'oal.common.exportAll': `全部導出`,
-  'oal.device.softwareUpdate': ``,
-  'oal.device.softwareUpdateTips': ``,
+  'oal.device.softwareUpdate': `軟件更新`,
+  'oal.device.softwareUpdateTips': `開始檢測並更新`,
+  'oal.settings.mailContentTemplate2': `\${name} 您好\n您的設備 \${devicename} 在 \${time} 檢測到人員 \${personName}（工號 \${jobNumber} ）\${alarmEvents}, \${temperature} \n此郵件爲系統郵件，請勿回覆`,
+  'oal.settings.temperature': `體溫值`,
+  'oal.settings.personnelPhoto': `人員照片`,
 };

@@ -46,7 +46,7 @@ const formItemLayout = {
 };
 
 const TableAddOrModifyModal = props => {
-  const { form, bean, visible, handleSubmit, handleCancel, dispatch } = props;
+  const { form, bean, visible, handleSubmit, handleCancel, dispatch, supportIcCard } = props;
   const { getFieldDecorator, setFieldsValue, resetFields } = form;
   const [imageUrl, setImageUrl] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -120,8 +120,9 @@ const TableAddOrModifyModal = props => {
         endDate: validity[1].format('YYYY-MM-DD'),
         peopleType: '3',
         isUpdateImg: _userPhotosLen > 0 ? '1' : '0',
-        icCard,
       }
+
+      icCard && (params.icCard = icCard);
 
       if (_userPhotosLen > 0) {
         // 有图，无论添加/修改都调WebUploader接口
@@ -135,7 +136,7 @@ const TableAddOrModifyModal = props => {
           _originFileObj.isEdit = isEdit;
           _originFileObj.startDate = startDate;
           _originFileObj.endDate = endDate;
-          _originFileObj.icCard = icCard;
+          icCard && (_originFileObj.icCard = icCard);
           _originFileObj.peopleType = peopleType;
           _originFileObj.isUpdateImg = isUpdateImg;
           setUploadLoading(true);
@@ -218,7 +219,7 @@ const TableAddOrModifyModal = props => {
       newfile.isEdit = isEdit;
       newfile.startDate = startDate;
       newfile.endDate = endDate;
-      newfile.icCard = icCard;
+      icCard && (newfile.icCard = icCard);
       newfile.peopleType = peopleType;
       newfile.isUpdateImg = isUpdateImg;
       uploader.addFiles(newfile);
@@ -246,7 +247,7 @@ const TableAddOrModifyModal = props => {
       data.isEdit = isEdit;
       data.startDate = startDate;
       data.endDate = endDate;
-      data.icCard = icCard;
+      icCard && (data.icCard = icCard);
       data.peopleType = peopleType;
       data.isUpdateImg = isUpdateImg;
     });
@@ -399,20 +400,25 @@ const TableAddOrModifyModal = props => {
             allowClear={false}
           />)}
         </Form.Item>
-        <Form.Item label={formatMessage({ id: 'oal.face.icCard' })}>
-          {getFieldDecorator('icCard', {
-            rules: [
-              {
-                max: 60,
-                message: formatMessage({ id: 'oal.common.maxLength' }, { num: '60' }),
-              },
-              {
-                validator: checkStaffid,
-              },
-            ],
-            initialValue: bean && bean.icCard || '',
-          })(<Input placeholder={formatMessage({ id: 'oal.face.icCard' })} />)}
-        </Form.Item>
+        {
+          supportIcCard ?
+            (
+              <Form.Item label={formatMessage({ id: 'oal.face.icCard' })}>
+                {getFieldDecorator('icCard', {
+                  rules: [
+                    {
+                      max: 60,
+                      message: formatMessage({ id: 'oal.common.maxLength' }, { num: '60' }),
+                    },
+                    {
+                      validator: checkStaffid,
+                    },
+                  ],
+                  initialValue: bean && bean.icCard || '',
+                })(<Input placeholder={formatMessage({ id: 'oal.face.icCard' })} />)}
+              </Form.Item>
+            ) : ''
+        }
         <div style={{ position: 'relative', width: 155, height: 155, margin: '0 0 24px 25%', }}>
           <img src={imageUrl || (isEdit && bean.imgPath ? `${bean.imgPath}?t=${Date.now()}` : imgNull)} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: 5, objectFit: 'contain', }} />
           {

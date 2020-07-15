@@ -35,12 +35,13 @@ import TableDelModal from './components/TableDelModal';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@connect(({ setting, faceVisitor, loading }) => ({
+@connect(({ setting, faceVisitor, loading, global: { systemSet } }) => ({
   setting,
   faceVisitor,
   listLoading: loading.effects['faceVisitor/fetchList'],
   deviceList: faceVisitor.deviceList,
   delVisitorLoading: loading.effects['faceVisitor/delVisitor'],
+  systemSet,
 }))
 class Visitor extends Component {
 
@@ -108,6 +109,7 @@ class Visitor extends Component {
   };
 
   table_columns = () => {
+    const { systemSet } = this.props;
     const _t = Date.now();
 
     const cl = [
@@ -130,12 +132,20 @@ class Visitor extends Component {
         dataIndex: 'staffid',
         render: (text, record) => <span>{record.staffid || '-'}</span>,
       },
-      {
-        title: formatMessage({ id: 'oal.face.icCard' }),
-        key: 'icCard',
-        dataIndex: 'icCard',
-        render: (text, record) => <span>{record.icCard || '-'}</span>,
-      },
+    ];
+
+    if (systemSet && systemSet.supportIcCard === '1') {
+      cl.push(
+        {
+          title: formatMessage({ id: 'oal.face.icCard' }),
+          key: 'icCard',
+          dataIndex: 'icCard',
+          render: (text, record) => <span>{record.icCard || '-'}</span>,
+        },
+      );
+    }
+
+    cl.push(
       {
         title: formatMessage({ id: 'oal.common.phoneNumber' }),
         key: 'mobile',
@@ -164,7 +174,8 @@ class Visitor extends Component {
           </Fragment>
         ),
       },
-    ];
+    );
+
     return cl;
   };
 
@@ -369,6 +380,7 @@ class Visitor extends Component {
       dispatch,
       deviceList,
       delVisitorLoading,
+      systemSet,
     } = this.props;
     const {
       tableSelectedRows,
@@ -435,6 +447,7 @@ class Visitor extends Component {
           visible={tableAddOrModifyVisible}
           bean={tableSelectedBean}
           dispatch={dispatch}
+          supportIcCard={systemSet && systemSet.supportIcCard === '1'}
           handleCancel={this.table_closeTableAddOrModifyModal}
           handleSubmit={this.table_submitTableAddOrModifyModal}
         />

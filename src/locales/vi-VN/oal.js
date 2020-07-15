@@ -628,6 +628,9 @@ export default {
   'oal.face.batchAddZipDragTips2': `Nhấp hoặc kéo tập tin để tải lên ở đây`,
   'oal.face.zipFileTooLarge': `Dữ liệu nhân sự / tập tin ảnh người quá lớn`,
   'oal.common.exportAll': `Xuất khẩu tất cả`,
-  'oal.device.softwareUpdate': ``,
-  'oal.device.softwareUpdateTips': ``,
+  'oal.device.softwareUpdate': `Cập nhật phần mềm`,
+  'oal.device.softwareUpdateTips': `Bắt đầu kiểm tra và cập nhật`,
+  'oal.settings.mailContentTemplate2': `\${name} hello \n Thiết bị của bạn \${devicename} đã phát hiện ra một người \${personName} number số công việc \${jobNumber} \${alarmEvents} tại \${time}, \${temperature} \n Đây là email hệ thống, vui lòng không trả lời`,
+  'oal.settings.temperature': `Nhiệt độ cơ thể`,
+  'oal.settings.personnelPhoto': `Hình ảnh nhân viên`,
 };

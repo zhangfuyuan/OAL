@@ -630,4 +630,7 @@ export default {
   'oal.common.exportAll': `全部导出`,
   'oal.device.softwareUpdate': `软件更新`,
   'oal.device.softwareUpdateTips': `开始检测并更新`,
+  'oal.settings.mailContentTemplate2': `\${name} 您好\n您的设备 \${devicename} 在 \${time} 检测到人员 \${personName}（工号 \${jobNumber} ）\${alarmEvents}, \${temperature} \n此邮件为系统邮件，请勿回复`,
+  'oal.settings.temperature': `体温值`,
+  'oal.settings.personnelPhoto': `人员照片`,
 };

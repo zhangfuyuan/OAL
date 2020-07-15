@@ -628,6 +628,9 @@ export default {
   'oal.face.batchAddZipDragTips2': `Cliquez ou faites glisser les fichiers pour les télécharger ici`,
   'oal.face.zipFileTooLarge': `Le fichier photo personnel / personne est trop volumineux`,
   'oal.common.exportAll': `Tout exporter`,
-  'oal.device.softwareUpdate': ``,
-  'oal.device.softwareUpdateTips': ``,
+  'oal.device.softwareUpdate': `Mise à jour logicielle`,
+  'oal.device.softwareUpdateTips': `Commencer la vérification et la mise à jour`,
+  'oal.settings.mailContentTemplate2': `\${name} bonjour \nVotre appareil \${devicename} a détecté une personne \${personName} （ numéro de travail \${jobNumber}） \${alarmEvents} à \${time}, \${temperature} \nCeci est un e-mail système, veuillez ne pas répondre`,
+  'oal.settings.temperature': `température`,
+  'oal.settings.personnelPhoto': `Photographies du personnel`,
 };

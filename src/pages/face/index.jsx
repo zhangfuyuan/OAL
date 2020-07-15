@@ -27,7 +27,7 @@ const { Search } = Input;
 const { confirm } = Modal;
 const { TreeNode } = Tree;
 
-@connect(({ user, face, faceKey, loading }) => ({
+@connect(({ user, face, global: { systemSet }, loading }) => ({
   face,
   user: user.currentUser,
   tableLoading: loading.effects['face/fetch'],
@@ -39,6 +39,7 @@ const { TreeNode } = Tree;
   delGroupNodeLoading: loading.effects['face/delGroupNode'],
   moveFaceLoading: loading.effects['face/moveFace'],
   setFaceStateLoading: loading.effects['face/setFaceState'],
+  systemSet,
 }))
 class Face extends Component {
   state = {
@@ -426,7 +427,7 @@ class Face extends Component {
   };
 
   table_columns = () => {
-    const { user } = this.props;
+    const { user, systemSet } = this.props;
     const _t = Date.now();
 
     const cl = [
@@ -450,13 +451,18 @@ class Face extends Component {
         dataIndex: 'staffid',
         render: (text, record) => <span>{record.staffid || '-'}</span>,
       },
-      {
-        title: formatMessage({ id: 'oal.face.icCard' }),
-        key: 'icCard',
-        dataIndex: 'icCard',
-        render: (text, record) => <span>{record.icCard || '-'}</span>,
-      },
     ];
+
+    if (systemSet && systemSet.supportIcCard === '1') {
+      cl.push(
+        {
+          title: formatMessage({ id: 'oal.face.icCard' }),
+          key: 'icCard',
+          dataIndex: 'icCard',
+          render: (text, record) => <span>{record.icCard || '-'}</span>,
+        },
+      );
+    }
 
     cl.push(
       {
@@ -476,7 +482,8 @@ class Face extends Component {
             }
           </Fragment>
         ),
-      });
+      }
+    );
     return cl;
   };
 
@@ -685,6 +692,7 @@ class Face extends Component {
       delGroupNodeLoading,
       moveFaceLoading,
       setFaceStateLoading,
+      systemSet,
     } = this.props;
     const {
       treeData,
@@ -850,6 +858,7 @@ class Face extends Component {
             bean={tableSelectedBean}
             dispatch={dispatch}
             groupId={selectedKeys[0]}
+            supportIcCard={systemSet && systemSet.supportIcCard === '1'}
             handleCancel={this.table_closeTableAddOrModifyModal}
             handleSubmit={this.table_submitTableAddOrModifyModal}
           />

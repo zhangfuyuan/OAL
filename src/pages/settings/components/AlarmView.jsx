@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { List, Button, Result, message, Popconfirm, Avatar, Upload, notification, Spin, Form, Input, Tooltip } from 'antd';
+import { List, Button, Result, message, Popconfirm, Avatar, Upload, notification, Spin, Form, Input, Tooltip, Checkbox } from 'antd';
 import logo from '@/assets/logo.png';
 import { FormattedMessage, formatMessage, getLocale } from 'umi-plugin-react/locale';
 
@@ -22,11 +22,22 @@ const formItemLayout = {
 class AlarmView extends Component {
   state = {
     isModifyAlarmContent: false,
+    isAddPhoto: false,
   };
 
+  componentDidMount() {
+    const { currentUser } = this.props;
+    const alarmInfo = (currentUser && currentUser.alarmSet) || {};
+
+    this.setState({
+      isAddPhoto: alarmInfo.sendPhoto === '1',
+    });
+  }
+
   handleModifyAlarmContent = () => {
-    const { updateAlarmContent, form, currentUser } = this.props;
-    const { isModifyAlarmContent } = this.state;
+    const { updateAlarmContent, form, currentUser, systemSet } = this.props;
+    const supportPhotos = systemSet && systemSet.emailSupportPhotos === '1';
+    const { isModifyAlarmContent, isAddPhoto } = this.state;
 
     if (isModifyAlarmContent) {
       form.validateFields((err, fieldsValue) => {
@@ -37,6 +48,7 @@ class AlarmView extends Component {
         };
         if (currentUser && currentUser.org) params.orgId = currentUser.org._id;
         params.mailLanguage = getLocale();
+        supportPhotos && (params.sendPhoto = isAddPhoto ? '1' : '0');
         updateAlarmContent(params, () => {
           this.setState({
             isModifyAlarmContent: false,
@@ -51,7 +63,10 @@ class AlarmView extends Component {
   };
 
   useDefaultTemplate = () => {
-    this.props.form.setFieldsValue({ mailContent: formatMessage({ id: 'oal.settings.mailContentTemplate' }) });
+    const { form, systemSet } = this.props;
+    const supportTemperature = systemSet && systemSet.emailSupportTemperature === '1';
+
+    form.setFieldsValue({ mailContent: formatMessage({ id: (supportTemperature ? 'oal.settings.mailContentTemplate2' : 'oal.settings.mailContentTemplate') }) });
   };
 
   clickCopyEventVariable = variable => {
@@ -71,6 +86,12 @@ class AlarmView extends Component {
     }
   };
 
+  handlePhotoChange = (e) => {
+    this.setState({
+      isAddPhoto: e.target.checked,
+    });
+  };
+
   getData = () => {
     const {
       form,
@@ -82,10 +103,13 @@ class AlarmView extends Component {
       deleteAlarmReceiveSettings,
       openEventsModal,
       updateAlarmContent,
+      systemSet,
     } = this.props;
     const { getFieldDecorator, getFieldValue, setFieldsValue } = form;
-    const { isModifyAlarmContent } = this.state;
+    const { isModifyAlarmContent, isAddPhoto } = this.state;
     const alarmInfo = (currentUser && currentUser.alarmSet) || {};
+    const supportTemperature = systemSet && systemSet.emailSupportTemperature === '1';
+    const supportPhotos = systemSet && systemSet.emailSupportPhotos === '1';
 
     const items = [
       {
@@ -183,7 +207,7 @@ class AlarmView extends Component {
                             message: formatMessage({ id: 'oal.common.maxLength' }, { num: '500' }),
                           },
                         ],
-                        initialValue: currentUser && currentUser.alarmSet && currentUser.alarmSet.mailContent && currentUser.alarmSet.mailContent.replace(/<br>/g, '\n') || formatMessage({ id: 'oal.settings.mailContentTemplate' }),
+                        initialValue: currentUser && currentUser.alarmSet && currentUser.alarmSet.mailContent && currentUser.alarmSet.mailContent.replace(/<br>/g, '\n') || formatMessage({ id: (supportTemperature ? 'oal.settings.mailContentTemplate2' : 'oal.settings.mailContentTemplate') }),
                       })(<TextArea
                         placeholder={formatMessage({ id: 'oal.settings.mailContent' })}
                         autoSize={{ minRows: 5 }}
@@ -193,7 +217,7 @@ class AlarmView extends Component {
                   </Form>
 
                   <a
-                    style={{ position: 'absolute', bottom: '82px', right: '22%' }}
+                    style={{ position: 'absolute', bottom: (supportPhotos ? '118px' : '82px'), right: '22%' }}
                     onClick={this.useDefaultTemplate}>
                     <FormattedMessage id="oal.settings.defaultTemplate" />
                   </a>
@@ -261,7 +285,33 @@ class AlarmView extends Component {
                           <textarea cols="40" rows="5" id="copyArea_alarmEvents" defaultValue="${alarmEvents}" style={{ position: 'absolute', top: '-999px', left: '-999px' }} />
                         </a>
                       </Tooltip>
+
+                      {
+                        supportTemperature ?
+                          (
+                            <Tooltip title="${temperature}">
+                              <a
+                                style={{ marginRight: '20px' }}
+                                onClick={() => this.clickCopyEventVariable('temperature')}>
+                                <FormattedMessage id="oal.settings.temperature" />
+
+                                <textarea cols="40" rows="5" id="copyArea_temperature" defaultValue="${temperature}" style={{ position: 'absolute', top: '-999px', left: '-999px' }} />
+                              </a>
+                            </Tooltip>
+                          ) : ''
+                      }
                     </p>
+
+                    {
+                      supportPhotos ?
+                        (
+                          <p>
+                            <Checkbox checked={isAddPhoto} onChange={this.handlePhotoChange}>
+                              <FormattedMessage id="oal.settings.personnelPhoto" />
+                            </Checkbox>
+                          </p>
+                        ) : ''
+                    }
                   </div>
                 </div>) : ''
             }

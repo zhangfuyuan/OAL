@@ -628,6 +628,9 @@ export default {
   'oal.face.batchAddZipDragTips2': `파일을 클릭하거나 드래그하여 여기에 업로드`,
   'oal.face.zipFileTooLarge': `개인 데이터 / 개인 사진 파일이 너무 큽니다`,
   'oal.common.exportAll': `모두 내보내기`,
-  'oal.device.softwareUpdate': ``,
-  'oal.device.softwareUpdateTips': ``,
+  'oal.device.softwareUpdate': `소프트웨어 업데이트`,
+  'oal.device.softwareUpdateTips': `확인 및 업데이트 시작`,
+  'oal.settings.mailContentTemplate2': `\${name} Hello \n장치 \${devicename}이 (가) \${time} \${personName} (작업 번호 \${jobNumber}) \${alarmEvents}에서 사용자를 감지했습니다, \${temperature}. \n이 이메일은 시스템 이메일이므로회신하지 마십시오.`,
+  'oal.settings.temperature': `체온치`,
+  'oal.settings.personnelPhoto': `인사 사진`,
 };
