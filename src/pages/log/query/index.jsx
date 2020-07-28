@@ -219,7 +219,7 @@ class logQuery extends Component {
         dataIndex: 'temperature',
         sorter: (a, b) => a.temperature - b.temperature,
         sortOrder: this.state.sortedInfo.columnKey === 'temperature' && this.state.sortedInfo.order,
-        render: (text, record) => <span>{record.temperature ? (listSelectedBean && listSelectedBean.temperatureUnit === '1' ? temperatureC2F(record.temperature) + '℉' : record.temperature + '℃') : '-'}</span>,
+        render: (text, record) => <span>{record.temperature && record.temperature !== '-' ? (listSelectedBean && listSelectedBean.temperatureUnit === '1' ? temperatureC2F(record.temperature) + '℉' : record.temperature + '℃') : '-'}</span>,
       },
       {
         title: formatMessage({ id: 'oal.log-query.mode' }),

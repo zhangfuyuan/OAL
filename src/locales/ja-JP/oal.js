@@ -631,6 +631,6 @@ export default {
   'oal.device.softwareUpdate': `ソフトウェアの更新`,
   'oal.device.softwareUpdateTips': `チェックと更新を開始`,
   'oal.settings.mailContentTemplate2': `こんにちは\${name}様　\nデバイス\${devicename}が\${time} \${personName}（スタッフID\${jobNumber}）で人物を検出しました\${alarmEvents}, \${temperature} \nこのメールは送信専用のため、返信しないでください`,
-  'oal.settings.temperature': `体温値`,
+  'oal.settings.temperature': `体温`,
   'oal.settings.personnelPhoto': `人の写真`,
 };
